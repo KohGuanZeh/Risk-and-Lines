@@ -4,15 +4,6 @@ using UnityEngine;
 
 public class TravelDot : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+	[Header("Travel Dot Properties")]
+	public bool locked; //Check if Dot is already being locked by a Player
 }
