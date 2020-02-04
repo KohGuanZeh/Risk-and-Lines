@@ -348,10 +348,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gm: {fileID: 0}
   linePreset: {fileID: 0}
-  travelSpeed: 0
+  travelSpeed: 5
   targetDot: {fileID: 0}
   storedDot: {fileID: 0}
-  doubleTapThreshold: 0
+  doubleTapThreshold: 0.15
   distanceToStop: 0
 --- !u!1001 &1118631849
 PrefabInstance:
@@ -577,7 +577,7 @@ Camera:
   far clip plane: 1000
   field of view: 100
   orthographic: 1
-  orthographic size: 12
+  orthographic size: 10
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2

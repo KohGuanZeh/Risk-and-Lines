@@ -33,7 +33,7 @@ public class Player : MonoBehaviour
 		Touch touch = Input.GetTouch(0); // this is for the first finger that entered the screen
 
 		// Sets the dot to move towards
-		if (touch.phase == TouchPhase.Ended)
+		if (touch.phase == TouchPhase.Began)
 		{
 			RaycastHit2D rayHit = Physics2D.GetRayIntersection(gm.cam.ScreenPointToRay(touch.position)); // this to get the direciton of the raycast
 
@@ -47,19 +47,26 @@ public class Player : MonoBehaviour
 
 					if (targetDot == null && !travelDot.locked)
 					{
+						print("Detected Touch");
 						travelDot.locked = true;
 						targetDot = travelDot;
-						doubleTapThreshold = 0.15f;
 					} 
 					else if (travelDot == storedDot && doubleTapThreshold > 0) //If there is already a Stored Dot, This is Considered a Double Tap
 					{
 						blinked = true;
-						storedDot = null;
-						doubleTapThreshold = 0;
+						if (travelDot.locked && targetDot != travelDot)
+						{
+							storedDot = null;
+							return;
+						}
 						BlinkControl();
 					}
 
-					if (!blinked && !travelDot.locked) storedDot = travelDot;
+					if (!blinked)
+					{
+						storedDot = travelDot;
+						doubleTapThreshold = 0.5f;
+					}
 				}
 			}
 		}
