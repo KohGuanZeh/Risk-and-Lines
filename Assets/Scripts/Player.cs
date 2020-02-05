@@ -9,9 +9,9 @@ public class Player : MonoBehaviour
     [SerializeField] LineRenderer linePreset; //Stores the Line Prefab that it will Instantiate each time Player travels
 
     [Header("Player Movement Properties")]
-    [SerializeField] float travelSpeed; //Speed at which the Player Dot travels
+    [SerializeField] float travelSpeed = 5; //Speed at which the Player Dot travels
+	[SerializeField] LineRenderer currentTravelLine; //The Line 
 	[SerializeField] TravelDot targetDot, storedDot; //Target Dot is which Dot Player will travel to. Stored Dot is The Dot that is currently tapped
-
 	[SerializeField] float doubleTapThreshold; //this is the time before travel and also the time to register a double tap
 	[SerializeField] float distanceToStop;
 
@@ -50,6 +50,18 @@ public class Player : MonoBehaviour
 						print("Detected Touch");
 						travelDot.locked = true;
 						targetDot = travelDot;
+
+						if (currentTravelLine)
+						{
+							currentTravelLine.positionCount++;
+							currentTravelLine.SetPosition(currentTravelLine.positionCount - 1, transform.position);
+						}
+						else
+						{
+							currentTravelLine = Instantiate(linePreset, transform); //Will be changed to Object Pooling
+							currentTravelLine.positionCount = 2;
+							for (int i = 0; i < currentTravelLine.positionCount; i++) currentTravelLine.SetPosition(i, transform.position);
+						}
 					} 
 					else if (travelDot == storedDot && doubleTapThreshold > 0) //If there is already a Stored Dot, This is Considered a Double Tap
 					{
@@ -75,13 +87,17 @@ public class Player : MonoBehaviour
 	// for normal travel
 	void TravelControl()
 	{
-		if (targetDot != null)
-		{
-			transform.position = Vector2.MoveTowards(transform.position, targetDot.transform.position, travelSpeed * Time.deltaTime);
+		if (targetDot == null) return;
 
-			//To remove the targetDot
-			float distanceToDot = Vector2.Distance(transform.position, targetDot.transform.position);
-			if (distanceToDot <= distanceToStop) targetDot = null;
+		transform.position = Vector2.MoveTowards(transform.position, targetDot.transform.position, travelSpeed * Time.deltaTime);
+		currentTravelLine.SetPosition(currentTravelLine.positionCount - 1, transform.position);
+
+		//To remove the targetDot
+		float distanceToDot = Vector2.Distance(transform.position, targetDot.transform.position);
+		if (distanceToDot <= distanceToStop)
+		{
+			targetDot = null;
+			distanceToStop = 0f;
 		}
 	}
 
@@ -93,6 +109,15 @@ public class Player : MonoBehaviour
 		transform.position = storedDot.transform.position;
 		targetDot = null;
 		storedDot = null;
+		CutLine();
 		doubleTapThreshold = 0;
+	}
+
+	//Delete the last position and cut out the Travel Line
+	void CutLine()
+	{
+		if (distanceToStop <= 0) currentTravelLine.positionCount--;
+		if (currentTravelLine.positionCount == 1) Destroy(currentTravelLine);
+		currentTravelLine = null;
 	}
 }

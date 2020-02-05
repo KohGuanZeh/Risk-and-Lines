@@ -42,6 +42,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Line
+    uniqueID: 4259867473
+    locked: 0
   - name: Travel Dot
     uniqueID: 506138591
     locked: 0

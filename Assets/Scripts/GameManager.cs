@@ -13,6 +13,9 @@ public class GameManager : MonoBehaviour
     public float camSpeed = 3.0f;
     public bool moveCam; //If true, Cam will move. Else Cam will stop moving
 
+    [Header("For Spawning Dots")]
+    public int dotDensity;
+
     private void Awake()
     {
         inst = this;
