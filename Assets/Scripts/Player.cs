@@ -107,6 +107,7 @@ public class Player : MonoBehaviour
 		//Insert Camera Shake Effect
 
 		transform.position = storedDot.transform.position;
+		targetDot.locked = false;
 		targetDot = null;
 		storedDot = null;
 		CutLine();
