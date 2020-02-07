@@ -67,6 +67,8 @@ public class GameManager : MonoBehaviour
             lastXSpawn += xInterval;
 
             int dotsToSpawn = Random.Range(minMaxDotSpawn.x, minMaxDotSpawn.y + 1);
+            minMaxDotSpawn.x = Random.Range(0f, 100f) > 50 ? 2 : 1;
+            minMaxDotSpawn.y = Random.Range(0f, 100f) > 50 ? 5 : 2;
             Vector3[] dotPositions = new Vector3[dotsToSpawn];
             float yHeight = (cam.orthographicSize - yMargin) * 2;
             float maxY = yHeight / dotsToSpawn;
