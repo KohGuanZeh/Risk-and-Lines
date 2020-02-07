@@ -96,8 +96,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gm: {fileID: 0}
-  linePreset: {fileID: 2090796913703933400, guid: 40b964882842aff4181d5c8a16362a9d,
-    type: 3}
+  linePreset: {fileID: 0}
   travelSpeed: 5
   currentTravelLine: {fileID: 0}
   targetDot: {fileID: 0}

@@ -22,6 +22,10 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 	// for quick play
 	public GameObject quickPlay,quickPlayCancel;
 	[SerializeField] private int roomSize;
+
+	// for the waiting room 
+	public int waitSceneIndex;
+
 	private void Start()
 	{
 		//Connect to server using the PhotonServerSettings
@@ -68,5 +72,30 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 	{
 		Debug.Log("Failed to create room... trying again");
 		CreateRoom();
+	}
+
+	// to allow the server to send information to the client
+	public override void OnEnable()
+	{
+		PhotonNetwork.AddCallbackTarget(this);
+	}
+
+	public override void OnDisable()
+	{
+		PhotonNetwork.RemoveCallbackTarget(this);
+	}
+	public override void OnJoinedRoom()
+	{
+		//base.OnJoinedRoom();
+		PhotonNetwork.LoadLevel(waitSceneIndex);
+	}
+
+	private void StartGame()
+	{
+		if (PhotonNetwork.IsMasterClient)
+		{
+			Debug.Log("starting game");
+			PhotonNetwork.LoadLevel(waitSceneIndex);
+		}
 	}
 }

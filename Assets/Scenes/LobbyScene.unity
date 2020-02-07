@@ -346,7 +346,6 @@ GameObject:
   m_Component:
   - component: {fileID: 250751044}
   - component: {fileID: 250751043}
-  - component: {fileID: 250751045}
   m_Layer: 0
   m_Name: LobbyManager
   m_TagString: Untagged
@@ -376,6 +375,7 @@ MonoBehaviour:
   quickPlay: {fileID: 1356985997}
   quickPlayCancel: {fileID: 1186375864}
   roomSize: 3
+  waitSceneIndex: 1
 --- !u!4 &250751044
 Transform:
   m_ObjectHideFlags: 0
@@ -390,19 +390,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &250751045
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 250751042}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4ddb1cdeec507a54d90593766f46c93a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  multiplayerSceneIndex: 1
 --- !u!1 &273867233
 GameObject:
   m_ObjectHideFlags: 0
@@ -2768,36 +2755,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &1963734329
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1963734330}
-  m_Layer: 0
-  m_Name: quickStartController
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1963734330
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1963734329}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 361.41824, y: 227.97429, z: 4.5221334}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 6
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1971244683
 GameObject:
   m_ObjectHideFlags: 0
@@ -3106,7 +3063,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ddb1cdeec507a54d90593766f46c93a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  multiplayerSceneIndex: 1
+  gameLevelIndex: 0
+  menuSceneIndex: 0
+  minPlayersToStart: 0
+  playerCountDisplay: {fileID: 0}
+  timerToStartDisplay: {fileID: 0}
+  maxWaitTime: 0
+  maxFullGameWaitTime: 0
 --- !u!4 &2005317735
 Transform:
   m_ObjectHideFlags: 0
