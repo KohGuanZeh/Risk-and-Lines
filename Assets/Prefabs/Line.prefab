@@ -9,7 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8264633877485828222}
+  - component: {fileID: 5506912347327240787}
   - component: {fileID: 2090796913703933400}
+  - component: {fileID: 3366647023709449068}
   m_Layer: 0
   m_Name: Line
   m_TagString: Untagged
@@ -31,6 +33,21 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5506912347327240787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2949542022742186996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd3c0c073397bc74dba1f4eb4a35bc96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  line: {fileID: 2090796913703933400}
+  collider: {fileID: 3366647023709449068}
+  dotPos: []
 --- !u!120 &2090796913703933400
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -119,7 +136,7 @@ LineRenderer:
       m_Mode: 0
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
-    numCornerVertices: 0
+    numCornerVertices: 5
     numCapVertices: 0
     alignment: 0
     textureMode: 0
@@ -127,3 +144,19 @@ LineRenderer:
     generateLightingData: 0
   m_UseWorldSpace: 1
   m_Loop: 0
+--- !u!68 &3366647023709449068
+EdgeCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2949542022742186996}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_EdgeRadius: 0
+  m_Points: []
