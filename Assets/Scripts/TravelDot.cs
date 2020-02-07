@@ -9,7 +9,8 @@ public class TravelDot : MonoBehaviour, IPooledObject
 
 	public void OnObjectSpawn()
 	{
-		
+		locked = false;
+		ObjectPooling.inst.poolDictionary[GetPoolTag()].Enqueue(gameObject); //Upon Dequeue, Enqueue. So that there is no need to Check Position every Update to Despawn Dots
 	}
 
 	public void OnObjectDespawn()

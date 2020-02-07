@@ -89,7 +89,12 @@ public class Player : MonoBehaviour
 
 		//To remove the targetDot
 		float distanceToDot = Vector2.Distance(transform.position, targetDot.transform.position);
-		if (distanceToDot <= distanceToStop) targetDot = null;
+		
+		if (distanceToDot <= distanceToStop)
+		{
+			currentTravelLine.OnFinishedTravel(transform.position.x);
+			targetDot = null;
+		} 
 	}
 
 	void BlinkControl()

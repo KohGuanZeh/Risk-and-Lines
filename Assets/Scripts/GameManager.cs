@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     public Vector3 camPos; //Store Separately as this is the Reference Value that will be submitted to Server.
     public float camSpeed = 3.0f;
     public bool moveCam; //If true, Cam will move. Else Cam will stop moving
+    public float CamLeftBounds { get { return transform.position.x - cam.orthographicSize * cam.aspect; } }
 
     [Header("For Spawning Dots")]
     public int dotDensity;

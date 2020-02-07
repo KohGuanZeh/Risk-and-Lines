@@ -8,11 +8,12 @@ public class TravelLine : MonoBehaviour, IPooledObject
 	[SerializeField] LineRenderer line;
 	[SerializeField] EdgeCollider2D collider;
 	[SerializeField] Vector2[] dotPos;
+	[SerializeField] float greatestX;
 
 	#region Interface Functions
 	public void OnObjectSpawn()
 	{
-
+		
 	}
 
 	public void OnObjectDespawn()
@@ -31,6 +32,7 @@ public class TravelLine : MonoBehaviour, IPooledObject
 	{
 		line.positionCount = 2;
 		for (int i = 0; i < line.positionCount; i++) line.SetPosition(i, pos);
+		greatestX = pos.x;
 		UpdateDotPosArray();
 	}
 
@@ -44,7 +46,13 @@ public class TravelLine : MonoBehaviour, IPooledObject
 	public void UpdateLine(Vector3 pos)
 	{
 		line.SetPosition(line.positionCount - 1, pos);
+		if (pos.x > greatestX) greatestX = pos.x;
 		collider.points[line.positionCount - 1] = transform.InverseTransformPoint(pos);
+	}
+
+	public void OnFinishedTravel(float xPos)
+	{
+		if (xPos > greatestX) greatestX = xPos;
 	}
 
 	public void CutLine()
@@ -62,7 +70,12 @@ public class TravelLine : MonoBehaviour, IPooledObject
 	}
 	#endregion
 
-	#region Trigger Functions
+	#region Update and Trigger Functions
+	void Update()
+	{
+		if (GameManager.inst.CamLeftBounds > greatestX) ObjectPooling.inst.ReturnToPool(gameObject, GetPoolTag());
+	}
+
 	void OnTriggerEnter2D(Collider2D other)
 	{
 		if (other.tag == "Player")
