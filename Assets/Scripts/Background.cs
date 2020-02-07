@@ -5,6 +5,7 @@ using UnityEngine;
 //Special Thanks to Code Monkey for Tutorial
 public class Background : MonoBehaviour
 {
+    GameManager gm;
     Camera cam;
 
     [SerializeField] Vector2 parallaxMult;
@@ -14,7 +15,8 @@ public class Background : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        cam = GameManager.inst.cam;
+        gm = GameManager.inst;
+        cam = gm.cam;
         lastCamPos = cam.transform.position;
 
         Sprite spr = GetComponent<SpriteRenderer>().sprite;
@@ -26,8 +28,8 @@ public class Background : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
-        Vector3 moveDelta = cam.transform.position - lastCamPos; //Check how much the Cam Moved
-        transform.position += new Vector3(moveDelta.x * parallaxMult.x, moveDelta.y * parallaxMult.y, 0); //Add Dist Cam Moved * Parallax to create Parallax Effect. Update new BG Position
+        //Vector3 moveDelta = cam.transform.position - lastCamPos; //Check how much the Cam Moved
+        transform.position += new Vector3(gm.moveDelta.x * parallaxMult.x, gm.moveDelta.y * parallaxMult.y, 0); //Add Dist Cam Moved * Parallax to create Parallax Effect. Update new BG Position
         lastCamPos = cam.transform.position; //Update Last Cam Pos so it can be used for next frame
         
         if (Mathf.Abs(cam.transform.position.x - transform.position.x) >= textureUnitSize.x) //If the Position has passed = that of 1 tile of the sprite, Teleport the Sprite

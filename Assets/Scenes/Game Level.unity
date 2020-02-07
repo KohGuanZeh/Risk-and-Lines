@@ -171,6 +171,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Travel Dot (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 2021310505252144825, guid: f9155d4e338f3374b9cae9a280773bc4,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2021310505252144822, guid: f9155d4e338f3374b9cae9a280773bc4,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -349,7 +354,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gm: {fileID: 0}
-  rb: {fileID: 0}
   linePreset: {fileID: 5506912347327240787, guid: 40b964882842aff4181d5c8a16362a9d,
     type: 3}
   travelSpeed: 5
@@ -437,6 +441,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Travel Dot (6)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2021310505252144825, guid: f9155d4e338f3374b9cae9a280773bc4,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2021310505252144822, guid: f9155d4e338f3374b9cae9a280773bc4,
         type: 3}
@@ -618,10 +627,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 0}
+  moveDelta: {x: 0, y: 0, z: 0}
   camPos: {x: 0, y: 0, z: 0}
   camSpeed: 5
   moveCam: 0
   dotDensity: 0
+  minMaxDotSpawn: {x: 2, y: 4}
+  yMargin: 1.5
+  minMaxY: {x: 0, y: 0}
+  xInterval: 0
+  xRemainder: 0
+  lastXSpawn: 0
+  minMaxXInterval: {x: 6, y: 10}
+  minMaxXOffset: {x: 0, y: 3}
 --- !u!114 &1295203684
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -660,6 +678,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Travel Dot
+      objectReference: {fileID: 0}
+    - target: {fileID: 2021310505252144825, guid: f9155d4e338f3374b9cae9a280773bc4,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2021310505252144822, guid: f9155d4e338f3374b9cae9a280773bc4,
         type: 3}
@@ -901,6 +924,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Travel Dot
       objectReference: {fileID: 0}
+    - target: {fileID: 2021310505252144825, guid: f9155d4e338f3374b9cae9a280773bc4,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2021310505252144822, guid: f9155d4e338f3374b9cae9a280773bc4,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -995,6 +1023,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Travel Dot (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 2021310505252144825, guid: f9155d4e338f3374b9cae9a280773bc4,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2021310505252144822, guid: f9155d4e338f3374b9cae9a280773bc4,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1088,6 +1121,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Travel Dot (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2021310505252144825, guid: f9155d4e338f3374b9cae9a280773bc4,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2021310505252144822, guid: f9155d4e338f3374b9cae9a280773bc4,
         type: 3}
@@ -1273,6 +1311,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Travel Dot (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2021310505252144825, guid: f9155d4e338f3374b9cae9a280773bc4,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2021310505252144822, guid: f9155d4e338f3374b9cae9a280773bc4,
         type: 3}
@@ -1463,6 +1506,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Travel Dot (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 2021310505252144825, guid: f9155d4e338f3374b9cae9a280773bc4,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2021310505252144822, guid: f9155d4e338f3374b9cae9a280773bc4,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1556,6 +1604,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Travel Dot
+      objectReference: {fileID: 0}
+    - target: {fileID: 2021310505252144825, guid: f9155d4e338f3374b9cae9a280773bc4,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2021310505252144822, guid: f9155d4e338f3374b9cae9a280773bc4,
         type: 3}

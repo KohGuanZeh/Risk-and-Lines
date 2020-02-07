@@ -9,33 +9,77 @@ public class GameManager : MonoBehaviour
 
     [Header("Camera Items")]
     public Camera cam;
+    public Vector3 moveDelta; //Stores Move Delta of the Camera;
     public Vector3 camPos; //Store Separately as this is the Reference Value that will be submitted to Server.
     public float camSpeed = 3.0f;
     public bool moveCam; //If true, Cam will move. Else Cam will stop moving
 
     [Header("For Spawning Dots")]
     public int dotDensity;
+    public Vector2Int minMaxDotSpawn;
+
+    public float yMargin; //Offset so that the Dot do not spawn at exactly the top of bottom of the Screen
+    public Vector2 minMaxY; //Minimum and Maximum Y that Dot will Spawn
+
+    public float xInterval; //How much X Dist Camera needs to cover before Spawning the next few dots
+    public float xRemainder; //How much X Dist it exceeded from its X Interval
+    public float lastXSpawn; //Last X Position that Spawned the Dots
+    public Vector2 minMaxXInterval, minMaxXOffset; //Min and Max X Interval and Offset
 
     private void Awake()
     {
         inst = this;
         cam = GetComponent<Camera>();
+        camPos = cam.transform.position;
+
+        minMaxY = new Vector2(camPos.y - cam.orthographicSize + yMargin, camPos.y + cam.orthographicSize - yMargin);
     }
 
     void Start()
     {
-        camPos = cam.transform.position;
+        lastXSpawn = cam.transform.position.x;
+        xInterval = Random.Range(minMaxXInterval.x, minMaxXInterval.y);
+        xRemainder = (cam.orthographicSize * 2) * cam.aspect;
+        SpawnDots();
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.A)) moveCam = !moveCam;
         if (moveCam) MoveCamera();
+        SpawnDots();
     }
 
     void MoveCamera()
     {
-        camPos += Vector3.right * camSpeed * Time.deltaTime;
+        moveDelta = Vector3.right * camSpeed * Time.deltaTime;
+        camPos += moveDelta;
         cam.transform.position = camPos;
+    }
+
+    void SpawnDots()
+    {
+        xRemainder += moveDelta.x;
+        while (xRemainder - xInterval > -0.25f)
+        {
+            xRemainder -= xInterval;
+            lastXSpawn += xInterval;
+
+            int dotsToSpawn = Random.Range(minMaxDotSpawn.x, minMaxDotSpawn.y + 1);
+            Vector3[] dotPositions = new Vector3[dotsToSpawn];
+            float yHeight = (cam.orthographicSize - yMargin) * 2;
+            float maxY = yHeight / dotsToSpawn;
+
+            for (int i = 0; i < dotsToSpawn; i++)
+            {
+                float xOffset = Random.Range(minMaxXOffset.x, minMaxXOffset.y);
+                float x = lastXSpawn + xOffset;
+                float y = Random.Range(maxY * i + 1, maxY * (i + 1)) + minMaxY.x; //maxY * i + 1 because 1 is the size of the Circle
+                dotPositions[i] = new Vector3(x, y, 0);
+                ObjectPooling.inst.SpawnFromPool("Dots", dotPositions[i], Quaternion.identity);
+            }
+
+            xInterval = Random.Range(minMaxXInterval.x, minMaxXInterval.y);
+        }
     }
 }
