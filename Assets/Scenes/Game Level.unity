@@ -632,8 +632,8 @@ MonoBehaviour:
   camSpeed: 5
   moveCam: 0
   dotDensity: 0
-  minMaxDotSpawn: {x: 2, y: 4}
-  yMargin: 1.5
+  minMaxDotSpawn: {x: 1, y: 4}
+  yMargin: 2
   minMaxY: {x: 0, y: 0}
   xInterval: 0
   xRemainder: 0
@@ -766,31 +766,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   locked: 0
---- !u!1 &1422266679 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2021310505252144825, guid: f9155d4e338f3374b9cae9a280773bc4,
-    type: 3}
-  m_PrefabInstance: {fileID: 2021310503847450510}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1422266680 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2021310505252144822, guid: f9155d4e338f3374b9cae9a280773bc4,
     type: 3}
   m_PrefabInstance: {fileID: 2021310503847450510}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1422266681
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1422266679}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd65f1f9bf5365946a213c560154f357, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  locked: 0
 --- !u!1 &1468074674
 GameObject:
   m_ObjectHideFlags: 0
