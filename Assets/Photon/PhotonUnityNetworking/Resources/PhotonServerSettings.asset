@@ -45,5 +45,9 @@ MonoBehaviour:
   - InitialisePools
   - ReturnToPool
   - SpawnFromPool
+  - SendInitValues
+  - SendNewCamValues
+  - SendDotValues
+  - UpdateDotSpawnValues
   DisableAutoOpenWizard: 1
   ShowSettings: 1
