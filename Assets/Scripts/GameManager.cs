@@ -70,8 +70,8 @@ public class GameManager : MonoBehaviourPunCallbacks
     void InitialiseValues()
     {
         //Set Standard Cam Position
-        print(cam.transform.position);
         camPos = cam.transform.position;
+        cam.transform.position = camPos;
 
         //Set Spawn Dot Values
         minMaxY = new Vector2(camPos.y - cam.orthographicSize + yMargin, camPos.y + cam.orthographicSize - yMargin);
