@@ -49,5 +49,12 @@ MonoBehaviour:
   - SendNewCamValues
   - SendDotValues
   - UpdateDotSpawnValues
+  - OnPoolObjectCreated
+  - UpdatePoolDictionary
+  - HandleDequeue
+  - HandleEnqueue
+  - UpdatePoolDictionaryOnReturn
+  - UpdatePoolDictionaryOnSpawn
+  - EnqueueOnSpawn
   DisableAutoOpenWizard: 1
   ShowSettings: 1
