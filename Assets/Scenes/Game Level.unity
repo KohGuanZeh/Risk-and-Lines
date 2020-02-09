@@ -1436,6 +1436,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2702712245036865841, guid: 42cc4e963b86bb742874c0425f756bdb,
+        type: 3}
+      propertyPath: pools.Array.data[0].parent
+      value: 
+      objectReference: {fileID: 126314189}
+    - target: {fileID: 2702712245036865841, guid: 42cc4e963b86bb742874c0425f756bdb,
+        type: 3}
+      propertyPath: pools.Array.data[1].parent
+      value: 
+      objectReference: {fileID: 953991473}
     - target: {fileID: 6815817212846397641, guid: 42cc4e963b86bb742874c0425f756bdb,
         type: 3}
       propertyPath: viewIdField
@@ -1504,64 +1514,7 @@ PrefabInstance:
     - target: {fileID: 6654272795268565596, guid: 42cc4e963b86bb742874c0425f756bdb,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 42cc4e963b86bb742874c0425f756bdb, type: 3}
---- !u!1 &7000273846670663602 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7000273845515985646, guid: 42cc4e963b86bb742874c0425f756bdb,
-    type: 3}
-  m_PrefabInstance: {fileID: 7000273846670663601}
-  m_PrefabAsset: {fileID: 0}
---- !u!81 &7000273846670663603
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7000273846670663602}
-  m_Enabled: 1
---- !u!20 &7000273846670663604
-Camera:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7000273846670663602}
-  m_Enabled: 1
-  serializedVersion: 2
-  m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
-  m_projectionMatrixMode: 1
-  m_GateFitMode: 2
-  m_FOVAxisMode: 0
-  m_SensorSize: {x: 36, y: 24}
-  m_LensShift: {x: 0, y: 0}
-  m_FocalLength: 50
-  m_NormalizedViewPortRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
-  near clip plane: 0.3
-  far clip plane: 1000
-  field of view: 100
-  orthographic: 1
-  orthographic size: 10
-  m_Depth: -1
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingPath: -1
-  m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 0
-  m_TargetEye: 3
-  m_HDR: 1
-  m_AllowMSAA: 1
-  m_AllowDynamicResolution: 0
-  m_ForceIntoRT: 0
-  m_OcclusionCulling: 1
-  m_StereoConvergence: 10
-  m_StereoSeparation: 0.022
