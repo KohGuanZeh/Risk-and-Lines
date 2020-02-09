@@ -1,11 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 using Photon.Pun;
 
 public class ObjectPooling : MonoBehaviourPunCallbacks
 {
+    //Cannot Pass any Reference Values. Need Pass Transforms by View Id
     [System.Serializable]
     public struct Pool
     {
@@ -18,11 +20,14 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
     public static ObjectPooling inst;
     [SerializeField] List<Pool> pools;
     public Dictionary<string, Queue<GameObject>> poolDictionary;
+    [SerializeField] List<GameObject> testQueue;
 
     private void Awake()
     {
         inst = this;
+        testQueue = new List<GameObject>();
         if (PhotonNetwork.IsMasterClient) InitialisePools();
+        testQueue = poolDictionary[pools[0].tag].ToList() ;
     }
 
 	#region Initialisation Functions
@@ -33,23 +38,28 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
         poolDictionary = new Dictionary<string, Queue<GameObject>>();
 
         foreach (Pool pool in pools)
-        {
+        { 
             Queue<GameObject> objPool = new Queue<GameObject>();
             for (int i = 0; i < pool.poolAmt; i++)
             {
                 GameObject pooledObj = PhotonNetwork.InstantiateSceneObject(System.IO.Path.Combine("PhotonPrefabs", pool.prefabName), Vector3.zero, Quaternion.identity); //Instantiate(pool.prefab, pool.parent);
-                photonView.RPC("OnPoolObjectCreated", RpcTarget.AllBuffered, pool.parent.gameObject, pooledObj);
+                
+                //photonView.RPC("OnPoolObjectCreated", RpcTarget.AllBuffered, pool, pooledObj); //Use Photon View ID instead
+                pooledObj.transform.parent = pool.parent;
+                pooledObj.SetActive(false);
+
                 objPool.Enqueue(pooledObj);
             }
-            photonView.RPC("UpdatePoolDictionary", RpcTarget.AllBuffered, pool.tag, objPool);
+            //photonView.RPC("UpdatePoolDictionary", RpcTarget.AllBuffered, pool, objPool);
+            poolDictionary.Add(tag, objPool);
         }
     }
 
 	#region For Networking
 	[PunRPC]
-    void OnPoolObjectCreated(GameObject parent, GameObject pooledObj)
+    void OnPoolObjectCreated(Pool pool, GameObject pooledObj)
     {
-        pooledObj.transform.parent = parent.transform;
+        pooledObj.transform.parent = pool.parent;
         pooledObj.SetActive(false);
     }
 
@@ -80,7 +90,11 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
 
         obj.transform.position = spawnPos;
         obj.transform.rotation = spawnRot;
-        photonView.RPC("HandleDequeue", RpcTarget.AllBuffered, obj, parent.gameObject, pool.parent.gameObject);
+
+        //photonView.RPC("HandleDequeue", RpcTarget.AllBuffered, pool, obj, parent);
+        if (parent) obj.transform.parent = parent; //If Parent is not Null, Set New Parent
+        else obj.transform.parent = pool.parent;
+        obj.SetActive(true);
 
         IPooledObject pooledObject = obj.GetComponent<IPooledObject>();
         if (pooledObject != null) pooledObject.OnObjectSpawn();
@@ -91,10 +105,10 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
 	#region Networking Functions
 
 	[PunRPC]
-    void HandleDequeue(GameObject obj, GameObject spawnParent, GameObject poolParent)
+    void HandleDequeue(Pool pool, GameObject obj, Transform parent)
     {
-        if (spawnParent) obj.transform.parent = spawnParent.transform; //If Parent is not Null, Set New Parent
-        else obj.transform.parent = poolParent.transform;
+        if (parent) obj.transform.parent = parent; //If Parent is not Null, Set New Parent
+        else obj.transform.parent = pool.parent;
         obj.SetActive(true);
     }
 
@@ -112,7 +126,8 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
             return;
         }
 
-        photonView.RPC("HanldeEnqueue", RpcTarget.AllBuffered, obj);
+        // photonView.RPC("HanldeEnqueue", RpcTarget.AllBuffered, obj);
+        obj.SetActive(false);
 
         IPooledObject pooledObject = obj.GetComponent<IPooledObject>();
         if (pooledObject != null) pooledObject.OnObjectDespawn();
