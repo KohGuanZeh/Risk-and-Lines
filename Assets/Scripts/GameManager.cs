@@ -1,11 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 public class GameManager : MonoBehaviour
 {
     [Header("General Game Manager Properties")]
     public static GameManager inst;
+    [SerializeField] PhotonView photonView;
+    public Transform playerSpawnPos;
 
     [Header("Camera Items")]
     public Camera cam;
@@ -30,25 +33,52 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         inst = this;
+        photonView = GetComponent<PhotonView>();
         cam = GetComponent<Camera>();
         camPos = cam.transform.position;
 
+        if (!PhotonNetwork.IsConnected) PhotonNetwork.OfflineMode = true;
         minMaxY = new Vector2(camPos.y - cam.orthographicSize + yMargin, camPos.y + cam.orthographicSize - yMargin);
     }
 
     void Start()
     {
+        CreatePlayer();
         lastXSpawn = cam.transform.position.x;
         xInterval = Random.Range(minMaxXInterval.x, minMaxXInterval.y);
         xRemainder = (cam.orthographicSize * 2) * cam.aspect;
-        SpawnDots();
+
+        if (PhotonNetwork.IsConnected) photonView.RPC("SpawnDots", RpcTarget.AllBuffered);
+        else SpawnDots(); 
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.A)) moveCam = !moveCam;
-        if (moveCam) MoveCamera();
-        SpawnDots();
+
+        if (moveCam && PhotonNetwork.IsMasterClient) MoveCamera();
+        photonView.RPC("SpawnDots", RpcTarget.AllBuffered);
+
+        /*if (PhotonNetwork.IsConnected)
+        {
+            if (moveCam && PhotonNetwork.IsMasterClient) MoveCamera();
+            photonView.RPC("SpawnDots", RpcTarget.AllBuffered);
+        }
+        else //Offline Mode
+        {
+            if (moveCam) MoveCamera();
+            SpawnDots();
+        }*/
+    }
+
+    void CreatePlayer()
+    {
+        PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Player"), playerSpawnPos.position, Quaternion.identity);
+        /*for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
+        {
+            Vector3 offset = Vector3.up * 0.5f * i;
+            PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Player"), playerSpawnPos.position + offset, Quaternion.identity);
+        }*/
     }
 
     void MoveCamera()
@@ -58,6 +88,7 @@ public class GameManager : MonoBehaviour
         cam.transform.position = camPos;
     }
 
+    [PunRPC]
     void SpawnDots()
     {
         xRemainder += moveDelta.x;
