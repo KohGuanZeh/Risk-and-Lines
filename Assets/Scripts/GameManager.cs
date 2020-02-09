@@ -146,22 +146,21 @@ public class GameManager : MonoBehaviourPunCallbacks
                 float x = lastXSpawn + xOffset;
                 float y = Random.Range(maxY * i + 1, maxY * (i + 1)) + minMaxY.x; //maxY * i + 1 because 1 is the size of the Circle
                 dotPositions[i] = new Vector3(x, y, 0);
-                ObjectPooling.inst.photonView.RPC("SpawnFromPool", RpcTarget.AllBuffered, "Dots", dotPositions[i], Quaternion.identity);
+                ObjectPooling.inst.SpawnFromPool("Dots", dotPositions[i], Quaternion.identity);
             }
 
             xInterval = Random.Range(minMaxXInterval.x, minMaxXInterval.y);
         }
 
-        photonView.RPC("UpdateDotSpawnValues", RpcTarget.OthersBuffered, xRemainder, xInterval, lastXSpawn, minMaxDotSpawn);
+        photonView.RPC("UpdateDotSpawnValues", RpcTarget.OthersBuffered, xRemainder, xInterval, lastXSpawn);
     }
 
     [PunRPC]
-    void UpdateDotSpawnValues(float xRemainder, float xInterval, float lastXSpawn, Vector2Int minMaxDotSpawn)
+    void UpdateDotSpawnValues(float xRemainder, float xInterval, float lastXSpawn)
     {
         this.xRemainder = xRemainder;
         this.xInterval = xInterval;
         this.lastXSpawn = lastXSpawn;
-        this.minMaxDotSpawn = minMaxDotSpawn;
     }
     #endregion
 

@@ -25,8 +25,9 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
         if (PhotonNetwork.IsMasterClient) InitialisePools();
     }
 
-    [PunRPC]
-    void InitialisePools()
+	#region Initialisation Functions
+
+	void InitialisePools()
     {
         //Setting up all Object Pools at Awake
         poolDictionary = new Dictionary<string, Queue<GameObject>>();
@@ -37,16 +38,33 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
             for (int i = 0; i < pool.poolAmt; i++)
             {
                 GameObject pooledObj = PhotonNetwork.InstantiateSceneObject(System.IO.Path.Combine("PhotonPrefabs", pool.prefabName), Vector3.zero, Quaternion.identity); //Instantiate(pool.prefab, pool.parent);
-                pooledObj.transform.parent = pool.parent;
-                pooledObj.SetActive(false);
+                photonView.RPC("OnPoolObjectCreated", RpcTarget.AllBuffered, pool, pooledObj);
                 objPool.Enqueue(pooledObj);
             }
-            poolDictionary.Add(pool.tag, objPool);
+            photonView.RPC("UpdatePoolDictionary", RpcTarget.AllBuffered, pool, objPool);
         }
     }
 
+	#region For Networking
+	[PunRPC]
+    void OnPoolObjectCreated(Pool pool, GameObject pooledObj)
+    {
+        pooledObj.transform.parent = pool.parent;
+        pooledObj.SetActive(false);
+    }
+
     [PunRPC]
-    public GameObject SpawnFromPool(string tag, Vector3 spawnPos, Quaternion spawnRot, Transform parent = null)
+    void UpdatePoolDictionary(Pool pool, Queue<GameObject> objPool)
+    {
+        poolDictionary.Add(pool.tag, objPool);
+    }
+	#endregion
+
+	#endregion
+
+	#region For Spawning
+
+	public GameObject SpawnFromPool(string tag, Vector3 spawnPos, Quaternion spawnRot, Transform parent = null)
     {
         if (!poolDictionary.ContainsKey(tag))
         {
@@ -62,9 +80,7 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
 
         obj.transform.position = spawnPos;
         obj.transform.rotation = spawnRot;
-        if (parent) obj.transform.parent = parent; //If Parent is not Null, Set New Parent
-        else obj.transform.parent = pool.parent;
-        obj.SetActive(true);
+        photonView.RPC("HandleDequeue", RpcTarget.AllBuffered, pool, obj, parent);
 
         IPooledObject pooledObject = obj.GetComponent<IPooledObject>();
         if (pooledObject != null) pooledObject.OnObjectSpawn();
@@ -72,8 +88,23 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
         return obj;
     }
 
-    [PunRPC]
-    public void ReturnToPool(GameObject obj, string tag)
+	#region Networking Functions
+
+	[PunRPC]
+    void HandleDequeue(Pool pool, GameObject obj, Transform parent)
+    {
+        if (parent) obj.transform.parent = parent; //If Parent is not Null, Set New Parent
+        else obj.transform.parent = pool.parent;
+        obj.SetActive(true);
+    }
+
+	#endregion
+
+	#endregion
+
+	#region For Despawning
+
+	public void ReturnToPool(GameObject obj, string tag)
     {
         if (!poolDictionary.ContainsKey(tag))
         {
@@ -81,7 +112,7 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
             return;
         }
 
-        obj.SetActive(false);
+        photonView.RPC("HanldeEnqueue", RpcTarget.AllBuffered, obj);
 
         IPooledObject pooledObject = obj.GetComponent<IPooledObject>();
         if (pooledObject != null) pooledObject.OnObjectDespawn();
@@ -89,7 +120,19 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
         poolDictionary[tag].Enqueue(obj);
     }
 
-    public Pool GetPool(string tag)
+	#region Networking Functions
+	
+    [PunRPC]
+    void HandleEnqueue(GameObject obj)
+    {
+        obj.SetActive(false);
+    }
+
+	#endregion
+
+	#endregion
+
+	public Pool GetPool(string tag)
     {
         return pools.Find(x => x.tag == tag);
     }

@@ -113,6 +113,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   locked: 0
+  photonView: {fileID: 2931326692516430372}
 --- !u!114 &2931326692516430372
 MonoBehaviour:
   m_ObjectHideFlags: 0
