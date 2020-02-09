@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     private void Awake()
     {
         inst = this;
-        cam = Camera.main;
+        cam = GetComponent<Camera>();
 
         //Only Master Client will handle Camera Movement Changes and Dot Spawning so only Master will need to Initialise this Value and Pass it to the rest
         if (PhotonNetwork.IsMasterClient) photonView.RPC("InitialiseValues", RpcTarget.AllBuffered);

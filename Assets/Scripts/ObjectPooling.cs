@@ -22,7 +22,7 @@ public class ObjectPooling : MonoBehaviour
     private void Awake()
     {
         inst = this;
-        InitialisePools();
+        if (PhotonNetwork.IsMasterClient) InitialisePools();
     }
 
     [PunRPC]
