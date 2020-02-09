@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Photon.Pun;
+
 public class ObjectPooling : MonoBehaviour
 {
     [System.Serializable]
     public struct Pool
     {
         public string tag;
-        public GameObject prefab;
+        public string prefabName;
         public Transform parent;
         public int poolAmt;
     }
@@ -19,6 +21,12 @@ public class ObjectPooling : MonoBehaviour
 
     private void Awake()
     {
+        if (!PhotonNetwork.IsMasterClient)
+        {
+            print("Not Master Client");
+            return;
+        }
+
         inst = this;
 
         //Setting up all Object Pools at Awake
@@ -29,7 +37,8 @@ public class ObjectPooling : MonoBehaviour
             Queue<GameObject> objPool = new Queue<GameObject>();
             for (int i = 0; i < pool.poolAmt; i++)
             {
-                GameObject pooledObj = Instantiate(pool.prefab, pool.parent);
+                GameObject pooledObj = PhotonNetwork.InstantiateSceneObject(System.IO.Path.Combine("PhotonPrefabs", pool.prefabName), Vector3.zero, Quaternion.identity); //Instantiate(pool.prefab, pool.parent);
+                pooledObj.transform.parent = pool.parent;
                 pooledObj.SetActive(false);
                 objPool.Enqueue(pooledObj);
             }
@@ -45,12 +54,16 @@ public class ObjectPooling : MonoBehaviour
             return null;
         }
 
+        Pool pool = GetPool(tag);
+
         //If there is enough Instances of Pooled Object, Get from Pool. If not, instantiate during runtime
-        GameObject obj = poolDictionary[tag].Count > 0 ? poolDictionary[tag].Dequeue() : Instantiate(GetPool(tag).prefab, GetPool(tag).parent);
+        GameObject obj = poolDictionary[tag].Count > 0 ? poolDictionary[tag].Dequeue() : PhotonNetwork.InstantiateSceneObject(System.IO.Path.Combine("PhotonPrefabs", pool.prefabName), Vector3.zero, Quaternion.identity);
+        //Instantiate(GetPool(tag).prefab, GetPool(tag).parent);
 
         obj.transform.position = spawnPos;
         obj.transform.rotation = spawnRot;
         if (parent) obj.transform.parent = parent; //If Parent is not Null, Set New Parent
+        else obj.transform.parent = pool.parent;
         obj.SetActive(true);
 
         IPooledObject pooledObject = obj.GetComponent<IPooledObject>();

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Photon.Pun;
+
 public class Player : MonoBehaviour
 {
 	[Header("General Player Properties")]
