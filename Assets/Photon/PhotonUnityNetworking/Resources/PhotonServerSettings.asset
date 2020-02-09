@@ -36,5 +36,14 @@ MonoBehaviour:
   - RespawnSpaceship
   - RPC_SendTimer
   - SpawnDots
+  - ToggleMoveCam
+  - MoveCamera
+  - SpawnDotsAtStart
+  - SetCamPos
+  - SetSpawnDotValues
+  - InitialiseValues
+  - InitialisePools
+  - ReturnToPool
+  - SpawnFromPool
   DisableAutoOpenWizard: 1
   ShowSettings: 1

@@ -21,17 +21,16 @@ public class ObjectPooling : MonoBehaviour
 
     private void Awake()
     {
-        if (!PhotonNetwork.IsMasterClient)
-        {
-            print("Not Master Client");
-            return;
-        }
-
         inst = this;
+        InitialisePools();
+    }
 
+    [PunRPC]
+    void InitialisePools()
+    {
         //Setting up all Object Pools at Awake
         poolDictionary = new Dictionary<string, Queue<GameObject>>();
-        
+
         foreach (Pool pool in pools)
         {
             Queue<GameObject> objPool = new Queue<GameObject>();
@@ -46,6 +45,7 @@ public class ObjectPooling : MonoBehaviour
         }
     }
 
+    [PunRPC]
     public GameObject SpawnFromPool(string tag, Vector3 spawnPos, Quaternion spawnRot, Transform parent = null)
     {
         if (!poolDictionary.ContainsKey(tag))
@@ -72,6 +72,7 @@ public class ObjectPooling : MonoBehaviour
         return obj;
     }
 
+    [PunRPC]
     public void ReturnToPool(GameObject obj, string tag)
     {
         if (!poolDictionary.ContainsKey(tag))

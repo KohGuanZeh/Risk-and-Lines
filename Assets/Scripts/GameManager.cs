@@ -3,19 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviourPunCallbacks
 {
     [Header("General Game Manager Properties")]
     public static GameManager inst;
-    [SerializeField] PhotonView photonView;
     public Transform playerSpawnPos;
 
     [Header("Camera Items")]
     public Camera cam;
     public Vector3 moveDelta; //Stores Move Delta of the Camera;
     public Vector3 camPos; //Store Separately as this is the Reference Value that will be submitted to Server.
-    public float camSpeed = 3.0f;
-    public bool moveCam; //If true, Cam will move. Else Cam will stop moving
+    public float camSpeed = 0, defaultCamSpeed = 5.0f; //Default is used to Set Values
     public float CamLeftBounds { get { return transform.position.x - cam.orthographicSize * cam.aspect; } }
 
     [Header("For Spawning Dots")]
@@ -33,61 +31,74 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         inst = this;
-        photonView = GetComponent<PhotonView>();
-        cam = GetComponent<Camera>();
-        camPos = cam.transform.position;
+        cam = Camera.main;
 
-        if (!PhotonNetwork.IsConnected) PhotonNetwork.OfflineMode = true;
-        minMaxY = new Vector2(camPos.y - cam.orthographicSize + yMargin, camPos.y + cam.orthographicSize - yMargin);
+        //Only Master Client will handle Camera Movement Changes and Dot Spawning so only Master will need to Initialise this Value and Pass it to the rest
+        if (PhotonNetwork.IsMasterClient) photonView.RPC("InitialiseValues", RpcTarget.AllBuffered);
     }
 
     void Start()
     {
         CreatePlayer();
-        lastXSpawn = cam.transform.position.x;
-        xInterval = Random.Range(minMaxXInterval.x, minMaxXInterval.y);
-        xRemainder = (cam.orthographicSize * 2) * cam.aspect;
 
-        if (PhotonNetwork.IsConnected) photonView.RPC("SpawnDots", RpcTarget.AllBuffered);
-        else SpawnDots(); 
+        //Only Master Client will handle Dot Spawning
+        if (PhotonNetwork.IsMasterClient) photonView.RPC("SpawnDots", RpcTarget.AllBuffered);
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.A)) moveCam = !moveCam;
-
-        if (moveCam && PhotonNetwork.IsMasterClient) MoveCamera();
-        photonView.RPC("SpawnDots", RpcTarget.AllBuffered);
-
-        /*if (PhotonNetwork.IsConnected)
+        //Only Master Client will handle Camera Movement Value Changes and Dot Spawning
+        if (PhotonNetwork.IsMasterClient)
         {
-            if (moveCam && PhotonNetwork.IsMasterClient) MoveCamera();
+            if (Input.GetKeyDown(KeyCode.A)) photonView.RPC("ToggleMoveCam", RpcTarget.AllBuffered, camSpeed != 0);
+            photonView.RPC("MoveCamera", RpcTarget.AllBuffered);
             photonView.RPC("SpawnDots", RpcTarget.AllBuffered);
         }
-        else //Offline Mode
-        {
-            if (moveCam) MoveCamera();
-            SpawnDots();
-        }*/
+
+        cam.transform.position = camPos; //Update Camera Position Locally for each Player
     }
 
     void CreatePlayer()
     {
         PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Player"), playerSpawnPos.position, Quaternion.identity);
-        /*for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
-        {
-            Vector3 offset = Vector3.up * 0.5f * i;
-            PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Player"), playerSpawnPos.position + offset, Quaternion.identity);
-        }*/
     }
 
+    #region Networking Functions
+
+    #region For Initialisation
+    [PunRPC]
+    void InitialiseValues()
+    {
+        //Set Standard Cam Position
+        camPos = cam.transform.position;
+
+        //Set Spawn Dot Values
+        minMaxY = new Vector2(camPos.y - cam.orthographicSize + yMargin, camPos.y + cam.orthographicSize - yMargin);
+        
+        xInterval = Random.Range(minMaxXInterval.x, minMaxXInterval.y);
+        lastXSpawn = cam.transform.position.x - xInterval - 5;
+        xRemainder = (cam.orthographicSize * 2) * cam.aspect;
+    }
+    #endregion
+
+    #region For Camera Movement
+    [PunRPC]
+    void ToggleMoveCam(bool isMoving)
+    {
+        if (isMoving) camSpeed = 0;
+        else camSpeed = defaultCamSpeed;
+    }
+
+    [PunRPC]
     void MoveCamera()
     {
+        if (camSpeed == 0) return;
         moveDelta = Vector3.right * camSpeed * Time.deltaTime;
         camPos += moveDelta;
-        cam.transform.position = camPos;
     }
+    #endregion
 
+    #region For Dot Spawning
     [PunRPC]
     void SpawnDots()
     {
@@ -116,4 +127,7 @@ public class GameManager : MonoBehaviour
             xInterval = Random.Range(minMaxXInterval.x, minMaxXInterval.y);
         }
     }
+    #endregion
+
+    #endregion
 }

@@ -6,10 +6,9 @@ using UnityEngine;
 public class Background : MonoBehaviour
 {
     GameManager gm;
-    Camera cam;
+    [SerializeField] Camera cam;
 
     [SerializeField] Vector2 parallaxMult;
-    [SerializeField] Vector3 lastCamPos;
     [SerializeField] Vector2 textureUnitSize;
 
     // Start is called before the first frame update
@@ -17,7 +16,6 @@ public class Background : MonoBehaviour
     {
         gm = GameManager.inst;
         cam = gm.cam;
-        lastCamPos = cam.transform.position;
 
         Sprite spr = GetComponent<SpriteRenderer>().sprite;
         Texture2D tex = spr.texture;
@@ -30,7 +28,6 @@ public class Background : MonoBehaviour
     {
         //Vector3 moveDelta = cam.transform.position - lastCamPos; //Check how much the Cam Moved
         transform.position += new Vector3(gm.moveDelta.x * parallaxMult.x, gm.moveDelta.y * parallaxMult.y, 0); //Add Dist Cam Moved * Parallax to create Parallax Effect. Update new BG Position
-        lastCamPos = cam.transform.position; //Update Last Cam Pos so it can be used for next frame
         
         if (Mathf.Abs(cam.transform.position.x - transform.position.x) >= textureUnitSize.x) //If the Position has passed = that of 1 tile of the sprite, Teleport the Sprite
         {
