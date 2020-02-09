@@ -19,9 +19,15 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 	[SerializeField] GameObject characterSelect;
 
 
-	// for quick play
 	public GameObject quickPlay,quickPlayCancel;
+	
+	// for the lobby panel
 	[SerializeField] private int roomSize;
+	private string roomName;
+
+	private List<RoomInfo> roomListings; // list of current rooms
+	[SerializeField] Transform roomsContainer; // container for holding all the romm listing
+	[SerializeField] GameObject roomListingPrefab; // prefav for displayer each room in the lobby
 
 	// for the waiting room 
 	public int waitSceneIndex;
@@ -39,6 +45,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 		//PhotonNetwork.JoinLobby(TypedLobby.Default);
 		PhotonNetwork.AutomaticallySyncScene = true;
 		quickPlay.SetActive(true);
+		roomListings = new List<RoomInfo>(); // initializing roomListing
 	}
 
 	// this is to quick start the game 
@@ -98,4 +105,62 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 			PhotonNetwork.LoadLevel(waitSceneIndex);
 		}
 	}
+
+	// for joining the lobby and updating all the rooms in the lobby
+	public void JoinLobbyOnClick()
+	{
+		PhotonNetwork.JoinLobby();
+	}
+
+	public override void OnRoomListUpdate(List<RoomInfo> roomList)
+	{
+		int tempIndex;
+		foreach(RoomInfo room in roomList)
+		{
+			if (roomListings != null) // try to find an existing room
+			{
+				tempIndex = roomListings.FindIndex(ByName(room.Name));
+			}
+			else
+			{
+				tempIndex = -1;
+			}
+			if(tempIndex != -1) // remove listing because it has been closed
+			{
+				roomListings.RemoveAt(tempIndex);
+				Destroy(roomsContainer.GetChild(tempIndex).gameObject);
+			}
+			if(room.PlayerCount>0)// add room listing because it is new
+			{
+				roomListings.Add(room);
+				ListRoom(room);
+			}
+		}
+	}
+
+	static System.Predicate<RoomInfo> ByName(string name) // predicate function for seach through toom
+	{
+		return delegate (RoomInfo room)
+		{
+			return room.Name == name;
+		};
+	}
+	void ListRoom(RoomInfo room) // displays new room listing for the current room
+	{
+		if(room.IsOpen && room.IsVisible)
+		{
+			GameObject tempListing = Instantiate(roomListingPrefab, roomsContainer);
+			RoomButton tempButton = tempListing.GetComponent<RoomButton>();
+			tempButton.SetRoom(room.Name, room.MaxPlayers, room.PlayerCount);
+		}
+	}
+	public void OnRoomNameChanged(string nameIn)
+	{
+		roomName = nameIn; 
+	}
+	public void OnRoomSizeChanged(string sizeIn)
+	{
+		roomSize = int.Parse(sizeIn);
+	}
+	
 }

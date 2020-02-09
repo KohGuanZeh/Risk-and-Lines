@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TravelLine : MonoBehaviour, IPooledObject
 {
-	[SerializeField] Player playerRef;
+	[SerializeField] PlayerController playerRef;
 	[SerializeField] LineRenderer line;
 	[SerializeField] EdgeCollider2D collider;
 	[SerializeField] Vector2[] dotPos;
@@ -80,7 +80,7 @@ public class TravelLine : MonoBehaviour, IPooledObject
 	{
 		if (other.tag == "Player")
 		{
-			Player detectedPlayer = GetComponent<Player>();
+			PlayerController detectedPlayer = GetComponent<PlayerController>();
 			if (detectedPlayer != playerRef) detectedPlayer.Death();
 		}
 	}
