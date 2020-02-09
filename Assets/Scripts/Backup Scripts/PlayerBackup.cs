@@ -1,122 +1,126 @@
-﻿//using System.Collections;
-//using System.Collections.Generic;
-//using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
-//public class PlayerBackup : MonoBehaviour
-//{
-//	[Header("General Player Properties")]
-//	[SerializeField] LineRenderer linePreset; //Stores the Line Prefab that it will Instantiate each time Player travels
+public class PlayerBackup : MonoBehaviour
+{
+	[Header("General Player Properties")]
+	[SerializeField] GameManager gm;
+	[SerializeField] TravelLine linePreset; //Stores the Line Prefab that it will Instantiate each time Player travels
 
-//	[Header("Player Movement Properties")]
-//	[SerializeField] bool isTravelling; //Check if Player is Travelling
-//	[SerializeField] float travelSpeed; //Speed at which the Player Dot travels
-//	[SerializeField] Vector2 travelDir; //Direction at which Player should travel
-//	[SerializeField] TravelDot targetDot, storedDot, blinkDot; //Target Dot at which Player would go to || storedDot is for the blinking || blinnk dot is for the finalised blinking
+	[Header("Player Movement Properties")]
+	[SerializeField] float travelSpeed = 5; //Speed at which the Player Dot travels
+	[SerializeField] TravelLine currentTravelLine; //The Line 
+	[SerializeField] TravelDot targetDot, storedDot; //Target Dot is which Dot Player will travel to. Stored Dot is The Dot that is currently tapped
+	[SerializeField] float doubleTapThreshold; //this is the time before travel and also the time to register a double tap
+	[SerializeField] float distanceToStop;
 
-//	[SerializeField] float doubleTapThreshold; //this is the time before trave and also the time to register a double tap
-//	[SerializeField] float distanceToStop;
+	void Start()
+	{
+		gm = GameManager.inst;
+	}
 
-//	// Start is called before the first frame update
-//	void Start()
-//	{
+	void Update()
+	{
+		//Decrease the Wait Time every frame
+		doubleTapThreshold = Mathf.Max(doubleTapThreshold - Time.deltaTime, 0);
+		if (Input.touchCount > 0) TouchControls();
+		TravelControl();
+	}
 
-//	}
+	void TouchControls()
+	{
+		Touch touch = Input.GetTouch(0); // this is for the first finger that entered the screen
 
-//	// Update is called once per frame
-//	void Update()
-//	{
-//		// decrease th waitTime every frame
-//		doubleTapThreshold -= Time.deltaTime;
+		// Sets the dot to move towards
+		if (touch.phase == TouchPhase.Began)
+		{
+			RaycastHit2D rayHit = Physics2D.GetRayIntersection(gm.cam.ScreenPointToRay(touch.position)); // this to get the direciton of the raycast
 
-//		if (Input.touchCount > 0)
-//		{
-//			TouchControls();
-//		}
-//		TravelControl();
-//	}
+			//Getting the Dot
+			if (rayHit.collider != null)
+			{
+				TravelDot travelDot = rayHit.collider.GetComponent<TravelDot>();
+				if (travelDot != null)
+				{
+					bool blinked = false;
 
-//	void TouchControls()
-//	{
-//		Touch touch = Input.GetTouch(0); // this is for the first finger that entered the screen
+					if (targetDot == null && !travelDot.locked)
+					{
+						print("Detected Touch");
+						travelDot.locked = true;
+						targetDot = travelDot;
 
-//		// sets the dot to move towards
-//		if (touch.phase == TouchPhase.Ended && targetDot == null)
-//		{
-//			RaycastHit2D rayHit = Physics2D.GetRayIntersection(Camera.main.ScreenPointToRay(touch.position)); // this to get the direciton of the raycast
+						if (currentTravelLine) currentTravelLine.AddNewPoint(transform.position);
+						else
+						{
+							currentTravelLine = ObjectPooling.inst.SpawnFromPool("Line", transform.position, Quaternion.identity).GetComponent<TravelLine>(); //Instantiate(linePreset, transform); //Will be changed to Object Pooling
+							currentTravelLine.CreateNewLine(transform.position);
+						}
+					}
+					else if (travelDot == storedDot && doubleTapThreshold > 0) //If there is already a Stored Dot, This is Considered a Double Tap
+					{
+						blinked = true;
+						if (travelDot.locked && targetDot != travelDot)
+						{
+							storedDot = null;
+							return;
+						}
+						BlinkControl();
+					}
 
-//			// getting the dot
-//			if (rayHit.collider.GetComponent<TravelDot>() != null && rayHit.collider.GetComponent<TravelDot>().currentPlayer == null) // ensures that only one player can use it
-//			{
-//				Debug.Log(rayHit.collider.name);
-//				targetDot = rayHit.collider.GetComponent<TravelDot>();
-//				//targetDot.currentPlayer = this;
-//			}
-//		}
-//		//// to blink and cancel the touchphase
-//		if (touch.phase == TouchPhase.Ended)
-//		{
-//			RaycastHit2D rayHit = Physics2D.GetRayIntersection(Camera.main.ScreenPointToRay(touch.position)); // this to get the direciton of the raycast
+					if (!blinked)
+					{
+						storedDot = travelDot;
+						doubleTapThreshold = 0.5f;
+					}
+				}
+			}
+		}
+	}
 
-//			// getting the dot
-//			if ((rayHit.collider.GetComponent<TravelDot>() != null) && rayHit.collider.GetComponent<TravelDot>().currentPlayer == null || rayHit.collider.GetComponent<TravelDot>().currentPlayer == this) // ensures that only one player can use it
-//			{
-//				storedDot = rayHit.collider.GetComponent<TravelDot>();
+	// for normal travel
+	void TravelControl()
+	{
+		if (targetDot == null) return;
 
-//				if (doubleTapThreshold < 0)
-//				{
-//					blinkDot = rayHit.collider.GetComponent<TravelDot>();
-//					doubleTapThreshold = 0.15f;
-//				}
+		transform.position = Vector2.MoveTowards(transform.position, targetDot.transform.position, travelSpeed * Time.deltaTime);
+		currentTravelLine.UpdateLine(transform.position);
 
-//				else if (doubleTapThreshold > 0)
-//				{
-//					BlinkControl();
-//				}
-//			}
-//		}
-//	}
+		//To remove the targetDot
+		float distanceToDot = Vector2.Distance(transform.position, targetDot.transform.position);
 
-//	// for normal travel
-//	void TravelControl()
-//	{
-//		if (targetDot != null)
-//		{
-//			transform.position = Vector3.MoveTowards(transform.position, targetDot.transform.position, travelSpeed * Time.deltaTime);
+		if (distanceToDot <= distanceToStop)
+		{
+			currentTravelLine.OnFinishedTravel(transform.position.x);
+			targetDot = null;
+		}
+	}
 
-//			// to remove the targetDot
-//			float distanceToDot = Vector3.Distance(transform.position, targetDot.transform.position);
-//			if (distanceToDot <= distanceToStop)
-//			{
-//				targetDot = null;
-//			}
-//		}
-//	}
+	void BlinkControl()
+	{
+		//Insert Camera Shake Effect
 
-//	void BlinkControl()
-//	{
-//		if (storedDot == blinkDot)
-//		{
-//			transform.position = storedDot.transform.position;
-//			doubleTapThreshold = 0;
-//			blinkDot = null;
-//			targetDot = null;
-//		}
-//		else
-//		{
-//			doubleTapThreshold = 0;
-//			blinkDot = null;
-//		}
-//	}
+		CutLine(); //Need to be on top before Target Dot is Set to Null
 
-//	void StartTravelTo(TravelDot dot)
-//	{
-//		if (dot.locked) return;
-//		isTravelling = true;
-//	}
+		transform.position = storedDot.transform.position;
+		targetDot.locked = false;
+		targetDot = null;
+		storedDot = null;
+		doubleTapThreshold = 0;
+	}
 
-//	void BlinkTo(TravelDot dot)
-//	{
-//		if (dot.locked) return;
-//		transform.position = dot.transform.position;
-//	}
-//}
+	//Delete the last position and cut out the Travel Line
+	void CutLine()
+	{
+		if (targetDot != null) currentTravelLine.CutLine();
+		currentTravelLine = null;
+	}
+
+	public void Death()
+	{
+		print("Player is Dead");
+		//gameObject.SetActive(false);
+		//Check Player Count. If Player Count is 1. Trigger Win Screen
+	}
+}

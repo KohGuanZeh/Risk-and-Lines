@@ -1,5 +1,6 @@
 ﻿using Photon.Pun;
 using Photon.Realtime;
+using System.Collections;
 using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,7 +11,7 @@ public class WaitingRoomController : MonoBehaviourPunCallbacks
 	private PhotonView myPhotonView;
 
 	//scene navigation indexes
-	[SerializeField] private int gameLevelIndex;
+	[SerializeField] private int gameLevelIndex; // to load the gameLevel 
 	[SerializeField] private int menuSceneIndex;
 
 	// number of players in the room out of the total room size
@@ -32,6 +33,12 @@ public class WaitingRoomController : MonoBehaviourPunCallbacks
 	private float timerToStartGame;
 	private float notFullGameTimer;
 	private float fullGameTimer;
+
+	// to show the players in the room
+	[SerializeField] private Transform playersContainer; // used to display all the players in the room
+	[SerializeField] private GameObject playersListingPrefab;// instantiate to display each player in the room
+
+	[SerializeField] private Text roomNameDisplay; // display the name of the room
 
 
 	// countdown timer reset vatiables
@@ -68,13 +75,6 @@ public class WaitingRoomController : MonoBehaviourPunCallbacks
 		}
 	}
 
-	public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer)
-	{
-		PlayerCountUpdate();
-
-		if (PhotonNetwork.IsMasterClient) myPhotonView.RPC("RPC_SendTimer", RpcTarget.Others, timerToStartGame);
-	}
-
 	[PunRPC]
 	private void RPC_SendTimer(float timeIn)
 	{
@@ -90,6 +90,8 @@ public class WaitingRoomController : MonoBehaviourPunCallbacks
 	public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
 	{
 		PlayerCountUpdate();
+		ClearPlayerListings();
+		ListPlayers();
 	}
 	private void Update()
 	{
@@ -143,5 +145,46 @@ public class WaitingRoomController : MonoBehaviourPunCallbacks
 	{
 		PhotonNetwork.LeaveRoom();
 		SceneManager.LoadScene(menuSceneIndex);
+	}
+
+	void ClearPlayerListings()
+	{
+		for(int i = playersContainer.childCount - 1; i >= 0; i--) // loops through all the child object of the 
+		{
+			Destroy(playersContainer.GetChild(i).gameObject);
+		}
+	}
+	void ListPlayers()
+	{
+		foreach(Player player in PhotonNetwork.PlayerList)
+		{
+			GameObject tempListing = Instantiate(playersListingPrefab, playersContainer);
+			Text tempText = tempListing.transform.GetChild(0).GetComponent<Text>();
+			tempText.text = player.NickName;
+		}
+	}
+
+	public override void OnJoinedRoom() // called when the local player joins the room
+	{
+		ClearPlayerListings();
+		ListPlayers();
+	}
+	public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer) // called whenever a new player enters the room
+	{
+		PlayerCountUpdate();
+		ClearPlayerListings();
+		ListPlayers();
+		if (PhotonNetwork.IsMasterClient) myPhotonView.RPC("RPC_SendTimer", RpcTarget.Others, timerToStartGame);
+	}
+	IEnumerator rejoinLobby()
+	{
+		yield return new WaitForSeconds(1);
+		PhotonNetwork.JoinLobby();
+	}
+	public void BackOnClick() // to avoid the issue of the lobby not updating the rooms
+	{
+		PhotonNetwork.LeaveRoom();
+		PhotonNetwork.LeaveLobby();
+		StartCoroutine(rejoinLobby());
 	}
 }

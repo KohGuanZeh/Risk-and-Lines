@@ -4,7 +4,7 @@ using UnityEngine;
 
 using Photon.Pun;
 
-public class Player : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
 	[Header("General Player Properties")]
 	[SerializeField] GameManager gm;
