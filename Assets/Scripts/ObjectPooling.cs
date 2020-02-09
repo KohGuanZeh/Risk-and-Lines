@@ -38,25 +38,25 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
             for (int i = 0; i < pool.poolAmt; i++)
             {
                 GameObject pooledObj = PhotonNetwork.InstantiateSceneObject(System.IO.Path.Combine("PhotonPrefabs", pool.prefabName), Vector3.zero, Quaternion.identity); //Instantiate(pool.prefab, pool.parent);
-                photonView.RPC("OnPoolObjectCreated", RpcTarget.AllBuffered, pool, pooledObj);
+                photonView.RPC("OnPoolObjectCreated", RpcTarget.AllBuffered, pool.parent, pooledObj);
                 objPool.Enqueue(pooledObj);
             }
-            photonView.RPC("UpdatePoolDictionary", RpcTarget.AllBuffered, pool, objPool);
+            photonView.RPC("UpdatePoolDictionary", RpcTarget.AllBuffered, pool.tag, objPool);
         }
     }
 
 	#region For Networking
 	[PunRPC]
-    void OnPoolObjectCreated(Pool pool, GameObject pooledObj)
+    void OnPoolObjectCreated(Transform parent, GameObject pooledObj)
     {
-        pooledObj.transform.parent = pool.parent;
+        pooledObj.transform.parent = parent;
         pooledObj.SetActive(false);
     }
 
     [PunRPC]
-    void UpdatePoolDictionary(Pool pool, Queue<GameObject> objPool)
+    void UpdatePoolDictionary(string tag, Queue<GameObject> objPool)
     {
-        poolDictionary.Add(pool.tag, objPool);
+        poolDictionary.Add(tag, objPool);
     }
 	#endregion
 
@@ -80,7 +80,7 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
 
         obj.transform.position = spawnPos;
         obj.transform.rotation = spawnRot;
-        photonView.RPC("HandleDequeue", RpcTarget.AllBuffered, pool, obj, parent);
+        photonView.RPC("HandleDequeue", RpcTarget.AllBuffered, obj, parent, pool.parent);
 
         IPooledObject pooledObject = obj.GetComponent<IPooledObject>();
         if (pooledObject != null) pooledObject.OnObjectSpawn();
@@ -91,10 +91,10 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
 	#region Networking Functions
 
 	[PunRPC]
-    void HandleDequeue(Pool pool, GameObject obj, Transform parent)
+    void HandleDequeue(GameObject obj, Transform spawnParent, Transform poolParent)
     {
-        if (parent) obj.transform.parent = parent; //If Parent is not Null, Set New Parent
-        else obj.transform.parent = pool.parent;
+        if (spawnParent) obj.transform.parent = spawnParent; //If Parent is not Null, Set New Parent
+        else obj.transform.parent = poolParent;
         obj.SetActive(true);
     }
 
