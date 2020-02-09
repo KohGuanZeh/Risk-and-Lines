@@ -4,7 +4,7 @@ using UnityEngine;
 
 using Photon.Pun;
 
-public class ObjectPooling : MonoBehaviour
+public class ObjectPooling : MonoBehaviourPunCallbacks
 {
     [System.Serializable]
     public struct Pool

@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         cam = GetComponent<Camera>();
 
         //Only Master Client will handle Camera Movement Changes and Dot Spawning so only Master will need to Initialise this Value and Pass it to the rest
-        if (PhotonNetwork.IsMasterClient) photonView.RPC("InitialiseValues", RpcTarget.AllBuffered);
+        if (PhotonNetwork.IsMasterClient) InitialiseValues();
     }
 
     void Start()
@@ -42,7 +42,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         CreatePlayer();
 
         //Only Master Client will handle Dot Spawning
-        if (PhotonNetwork.IsMasterClient) photonView.RPC("SpawnDots", RpcTarget.AllBuffered);
+        if (PhotonNetwork.IsMasterClient) SpawnDots();
     }
 
     void Update()
@@ -51,8 +51,8 @@ public class GameManager : MonoBehaviourPunCallbacks
         if (PhotonNetwork.IsMasterClient)
         {
             if (Input.GetKeyDown(KeyCode.A)) photonView.RPC("ToggleMoveCam", RpcTarget.AllBuffered, camSpeed != 0);
-            photonView.RPC("MoveCamera", RpcTarget.AllBuffered);
-            photonView.RPC("SpawnDots", RpcTarget.AllBuffered);
+            MoveCamera();
+            SpawnDots();
         }
 
         cam.transform.position = camPos; //Update Camera Position Locally for each Player
@@ -66,12 +66,10 @@ public class GameManager : MonoBehaviourPunCallbacks
     #region Networking Functions
 
     #region For Initialisation
-    [PunRPC]
     void InitialiseValues()
     {
         //Set Standard Cam Position
         camPos = cam.transform.position;
-        cam.transform.position = camPos;
 
         //Set Spawn Dot Values
         minMaxY = new Vector2(camPos.y - cam.orthographicSize + yMargin, camPos.y + cam.orthographicSize - yMargin);
@@ -79,6 +77,20 @@ public class GameManager : MonoBehaviourPunCallbacks
         xInterval = Random.Range(minMaxXInterval.x, minMaxXInterval.y);
         lastXSpawn = cam.transform.position.x - xInterval - 5;
         xRemainder = (cam.orthographicSize * 2) * cam.aspect;
+
+        photonView.RPC("SendInitValues", RpcTarget.OthersBuffered, camPos, minMaxY, xInterval, lastXSpawn, xRemainder);
+    }
+
+    [PunRPC]
+    void SendInitValues(Vector3 camPos, Vector2 minMaxY, float xInterval, float lastXSpawn, float xRemainder)
+    {
+        this.camPos = camPos;
+        cam.transform.position = camPos;
+
+        this.minMaxY = minMaxY;
+        this.xInterval = xInterval;
+        this.lastXSpawn = lastXSpawn;
+        this.xRemainder = xRemainder;
     }
     #endregion
 
@@ -86,21 +98,33 @@ public class GameManager : MonoBehaviourPunCallbacks
     [PunRPC]
     void ToggleMoveCam(bool isMoving)
     {
-        if (isMoving) camSpeed = 0;
+        if (isMoving)
+        {
+            camSpeed = 0;
+            moveDelta = Vector2.zero;
+        } 
         else camSpeed = defaultCamSpeed;
     }
 
-    [PunRPC]
     void MoveCamera()
     {
         if (camSpeed == 0) return;
+
         moveDelta = Vector3.right * camSpeed * Time.deltaTime;
         camPos += moveDelta;
+
+        photonView.RPC("SendNewCamValues", RpcTarget.OthersBuffered, moveDelta, camPos);
+    }
+
+    [PunRPC]
+    void SendNewCamValues(Vector3 moveDelta, Vector3 camPos)
+    {
+        this.moveDelta = moveDelta;
+        this.camPos = camPos;
     }
     #endregion
 
     #region For Dot Spawning
-    [PunRPC]
     void SpawnDots()
     {
         xRemainder += moveDelta.x;
@@ -122,11 +146,22 @@ public class GameManager : MonoBehaviourPunCallbacks
                 float x = lastXSpawn + xOffset;
                 float y = Random.Range(maxY * i + 1, maxY * (i + 1)) + minMaxY.x; //maxY * i + 1 because 1 is the size of the Circle
                 dotPositions[i] = new Vector3(x, y, 0);
-                ObjectPooling.inst.SpawnFromPool("Dots", dotPositions[i], Quaternion.identity);
+                ObjectPooling.inst.photonView.RPC("SpawnFromPool", RpcTarget.AllBuffered, "Dots", dotPositions[i], Quaternion.identity);
             }
 
             xInterval = Random.Range(minMaxXInterval.x, minMaxXInterval.y);
         }
+
+        photonView.RPC("UpdateDotSpawnValues", RpcTarget.OthersBuffered, xRemainder, xInterval, lastXSpawn, minMaxDotSpawn);
+    }
+
+    [PunRPC]
+    void UpdateDotSpawnValues(float xRemainder, float xInterval, float lastXSpawn, Vector2Int minMaxDotSpawn)
+    {
+        this.xRemainder = xRemainder;
+        this.xInterval = xInterval;
+        this.lastXSpawn = lastXSpawn;
+        this.minMaxDotSpawn = minMaxDotSpawn;
     }
     #endregion
 
