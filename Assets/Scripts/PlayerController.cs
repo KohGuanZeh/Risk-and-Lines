@@ -2,13 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-<<<<<<< HEAD:Assets/Scripts/PlayerController.cs
-public class PlayerController : MonoBehaviour
-=======
 using Photon.Pun;
 
-public class Player : MonoBehaviour
->>>>>>> 821bbfe32f70e45003960c6eb4c4b89e9a673fd3:Assets/Scripts/Player.cs
+public class PlayerController : MonoBehaviour
 {
 	[Header("General Player Properties")]
 	[SerializeField] GameManager gm;
