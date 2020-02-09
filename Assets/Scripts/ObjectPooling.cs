@@ -38,7 +38,7 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
             for (int i = 0; i < pool.poolAmt; i++)
             {
                 GameObject pooledObj = PhotonNetwork.InstantiateSceneObject(System.IO.Path.Combine("PhotonPrefabs", pool.prefabName), Vector3.zero, Quaternion.identity); //Instantiate(pool.prefab, pool.parent);
-                photonView.RPC("OnPoolObjectCreated", RpcTarget.AllBuffered, pool.parent, pooledObj);
+                photonView.RPC("OnPoolObjectCreated", RpcTarget.AllBuffered, pool.parent.gameObject, pooledObj);
                 objPool.Enqueue(pooledObj);
             }
             photonView.RPC("UpdatePoolDictionary", RpcTarget.AllBuffered, pool.tag, objPool);
@@ -47,9 +47,9 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
 
 	#region For Networking
 	[PunRPC]
-    void OnPoolObjectCreated(Transform parent, GameObject pooledObj)
+    void OnPoolObjectCreated(GameObject parent, GameObject pooledObj)
     {
-        pooledObj.transform.parent = parent;
+        pooledObj.transform.parent = parent.transform;
         pooledObj.SetActive(false);
     }
 
@@ -80,7 +80,7 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
 
         obj.transform.position = spawnPos;
         obj.transform.rotation = spawnRot;
-        photonView.RPC("HandleDequeue", RpcTarget.AllBuffered, obj, parent, pool.parent);
+        photonView.RPC("HandleDequeue", RpcTarget.AllBuffered, obj, parent.gameObject, pool.parent.gameObject);
 
         IPooledObject pooledObject = obj.GetComponent<IPooledObject>();
         if (pooledObject != null) pooledObject.OnObjectSpawn();
@@ -91,10 +91,10 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
 	#region Networking Functions
 
 	[PunRPC]
-    void HandleDequeue(GameObject obj, Transform spawnParent, Transform poolParent)
+    void HandleDequeue(GameObject obj, GameObject spawnParent, GameObject poolParent)
     {
-        if (spawnParent) obj.transform.parent = spawnParent; //If Parent is not Null, Set New Parent
-        else obj.transform.parent = poolParent;
+        if (spawnParent) obj.transform.parent = spawnParent.transform; //If Parent is not Null, Set New Parent
+        else obj.transform.parent = poolParent.transform;
         obj.SetActive(true);
     }
 
