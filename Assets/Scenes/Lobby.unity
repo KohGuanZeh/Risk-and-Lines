@@ -2448,7 +2448,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3985eae6f6f43a4d8d2a960b933075d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameLevelSceneIndex: 1
+  gameLevelSceneIndex: 2
   lobbyPanel: {fileID: 214345801}
   roomPanel: {fileID: 612917416}
   startButton: {fileID: 855092193}
