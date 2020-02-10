@@ -4,8 +4,6 @@ using System.IO;
 using UnityEngine;
 using Photon.Pun;
 
-
-
 public class GameManager : MonoBehaviourPunCallbacks
 {
     [Header("General Game Manager Properties")]
@@ -33,6 +31,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
 	[Header ("For Spawning of player")]
 	public Transform[] spawnPoints;
+	public int currentPlayer;
 
 	private void Awake()
     {
@@ -70,13 +69,17 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     void CreatePlayer()
     {
-		PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Player"), spawnPoints[PhotonNetwork.PlayerList.Length].position, Quaternion.identity);
+		PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Player"), spawnPoints[currentPlayer].position, Quaternion.identity);
 	}
 
-    #region Networking Functions
+	public override void OnEnable()
+	{
+		currentPlayer = PhotonNetwork.PlayerList.Length - 1;
+	}
+	#region Networking Functions
 
-    #region For Initialisation
-    void InitialiseValues()
+	#region For Initialisation
+	void InitialiseValues()
     {
         //Set Standard Cam Position
         camPos = cam.transform.position;
