@@ -27,7 +27,7 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
         inst = this;
         testQueue = new List<GameObject>();
         if (PhotonNetwork.IsMasterClient) InitialisePools();
-        testQueue = poolDictionary[pools[0].tag].ToList() ;
+        testQueue = poolDictionary[pools[0].tag].ToList();
     }
 
 	#region Initialisation Functions
@@ -40,7 +40,7 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
         foreach (Pool pool in pools)
         { 
             Queue<GameObject> objPool = new Queue<GameObject>();
-            for (int i = 0; i < pool.poolAmt; i++)
+            for (int i = 0; i < pool.poolAmt; i++) //Do if isMaster Check here. Only if Master - Spawn Object. Not sure if it will work
             {
                 GameObject pooledObj = PhotonNetwork.InstantiateSceneObject(System.IO.Path.Combine("PhotonPrefabs", pool.prefabName), Vector3.zero, Quaternion.identity); //Instantiate(pool.prefab, pool.parent);
                 
