@@ -54,7 +54,7 @@ public class PlayerController : MonoBehaviour
 						travelDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, true);
 						targetDot = travelDot;
 
-						if (currentTravelLine) currentTravelLine.AddNewPoint(transform.position);
+						if (currentTravelLine) currentTravelLine.photonView.RPC("AddNewPoint", RpcTarget.AllBuffered, transform.position);
 						else
 						{
 							currentTravelLine = ObjectPooling.inst.SpawnFromPool("Line", transform.position, Quaternion.identity).GetComponent<TravelLine>(); //Instantiate(linePreset, transform); //Will be changed to Object Pooling
@@ -102,11 +102,11 @@ public class PlayerController : MonoBehaviour
 						travelDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, true);
 						targetDot = travelDot;
 
-						if (currentTravelLine) currentTravelLine.AddNewPoint(transform.position);
+						if (currentTravelLine) currentTravelLine.photonView.RPC("AddNewPoint", RpcTarget.AllBuffered, transform.position);
 						else
 						{
 							currentTravelLine = ObjectPooling.inst.SpawnFromPool("Line", transform.position, Quaternion.identity).GetComponent<TravelLine>(); //Instantiate(linePreset, transform); //Will be changed to Object Pooling
-							currentTravelLine.CreateNewLine(transform.position);
+							currentTravelLine.photonView.RPC("CreateNewLine", RpcTarget.AllBuffered, transform.position);
 						}
 					}
 					else if (travelDot == storedDot && doubleTapThreshold > 0) //If there is already a Stored Dot, This is Considered a Double Tap
