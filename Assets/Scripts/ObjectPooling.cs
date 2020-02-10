@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 
 using Photon.Pun;
+using Photon.Realtime;
 
 public class ObjectPooling : MonoBehaviourPunCallbacks
 {
@@ -27,9 +28,9 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
         inst = this;
         testQueue = new List<GameObject>();
         if (PhotonNetwork.IsMasterClient) InitialisePools();
-        testQueue = poolDictionary[pools[0].tag].ToList() ;
+       // testQueue = poolDictionary[pools[0].tag].ToList() ;
     }
-
+	
 	#region Initialisation Functions
 
 	void InitialisePools()
@@ -51,10 +52,17 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
                 objPool.Enqueue(pooledObj);
             }
             //photonView.RPC("UpdatePoolDictionary", RpcTarget.AllBuffered, pool, objPool);
-            poolDictionary.Add(tag, objPool);
+            poolDictionary.Add(pool.tag, objPool);
         }
     }
-
+	public override void OnPlayerLeftRoom(Player otherPlayer)
+	{
+		print("PlayerLeft");
+		foreach (KeyValuePair<string, Queue<GameObject>> poolObj in poolDictionary)
+		{
+			print(poolObj.Key);
+		}
+	}
 	#region For Networking
 	[PunRPC]
     void OnPoolObjectCreated(Pool pool, GameObject pooledObj)
@@ -151,6 +159,10 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
     {
         return pools.Find(x => x.tag == tag);
     }
+	public override void OnDisable()
+	{
+		print(this);
+	}
 }
 
 public interface IPooledObject
