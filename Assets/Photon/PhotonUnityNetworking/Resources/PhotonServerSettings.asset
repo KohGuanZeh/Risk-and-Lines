@@ -56,5 +56,11 @@ MonoBehaviour:
   - UpdatePoolDictionaryOnReturn
   - UpdatePoolDictionaryOnSpawn
   - EnqueueOnSpawn
+  - OnCreateObject
+  - SendCreatedObjValues
+  - OnObjectDespawn
+  - OnObjectSpawn
+  - DequeueForAll
+  - RegisterDequeue
   DisableAutoOpenWizard: 1
   ShowSettings: 1
