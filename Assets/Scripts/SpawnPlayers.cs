@@ -6,15 +6,18 @@ using Photon.Realtime;
 
 public class SpawnPlayers : MonoBehaviourPunCallbacks
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+	private PhotonView pv;
+	public List<Player> playerInts;
+	private void Start()
+	{
+		pv = GetComponent<PhotonView>();
+	//	playerInts = new List<int>();
+		print(pv.ViewID);
+	//	playerInts = PhotonNetwork.PlayerList;
+	}
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+	public override void OnJoinedLobby()
+	{
+	//	playerInts.Add(GetComponent<PhotonView>().ViewID);
+	}
 }
