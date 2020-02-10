@@ -79,11 +79,11 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
         }
         else obj = PhotonNetwork.InstantiateSceneObject(System.IO.Path.Combine("PhotonPrefabs", pool.prefabName), Vector3.zero, Quaternion.identity);
 
-        IPooledObject pooledObject = obj.GetComponent<IPooledObject>();
-        if (pooledObject != null) obj.GetPhotonView().RPC("OnObjectSpawn", RpcTarget.AllBuffered, parentId);
-
         obj.transform.position = spawnPos;
         obj.transform.rotation = spawnRot;
+
+        IPooledObject pooledObject = obj.GetComponent<IPooledObject>();
+        if (pooledObject != null) obj.GetPhotonView().RPC("OnObjectSpawn", RpcTarget.AllBuffered, parentId);
 
         return obj;
     }

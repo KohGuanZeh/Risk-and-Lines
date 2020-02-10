@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour
 		//Decrease the Wait Time every frame
 		doubleTapThreshold = Mathf.Max(doubleTapThreshold - Time.deltaTime, 0);
         if (Input.touchCount > 0) TouchControls();
+		MouseControls();
 		TravelControl();
     }
 
@@ -60,6 +61,54 @@ public class PlayerController : MonoBehaviour
 							currentTravelLine.CreateNewLine(transform.position);
 						}
 					} 
+					else if (travelDot == storedDot && doubleTapThreshold > 0) //If there is already a Stored Dot, This is Considered a Double Tap
+					{
+						blinked = true;
+						if (travelDot.locked && targetDot != travelDot)
+						{
+							storedDot = null;
+							return;
+						}
+						BlinkControl();
+					}
+
+					if (!blinked)
+					{
+						storedDot = travelDot;
+						doubleTapThreshold = 0.5f;
+					}
+				}
+			}
+		}
+	}
+
+	void MouseControls()
+	{
+		if (Input.GetMouseButtonDown(0))
+		{
+			RaycastHit2D rayHit = Physics2D.GetRayIntersection(gm.cam.ScreenPointToRay(Input.mousePosition)); // this to get the direciton of the raycast
+
+			//Getting the Dot
+			if (rayHit.collider != null)
+			{
+				TravelDot travelDot = rayHit.collider.GetComponent<TravelDot>();
+				if (travelDot != null)
+				{
+					bool blinked = false;
+
+					if (targetDot == null && !travelDot.locked)
+					{
+						print("Detected Touch");
+						travelDot.locked = true;
+						targetDot = travelDot;
+
+						if (currentTravelLine) currentTravelLine.AddNewPoint(transform.position);
+						else
+						{
+							currentTravelLine = ObjectPooling.inst.SpawnFromPool("Line", transform.position, Quaternion.identity).GetComponent<TravelLine>(); //Instantiate(linePreset, transform); //Will be changed to Object Pooling
+							currentTravelLine.CreateNewLine(transform.position);
+						}
+					}
 					else if (travelDot == storedDot && doubleTapThreshold > 0) //If there is already a Stored Dot, This is Considered a Double Tap
 					{
 						blinked = true;
