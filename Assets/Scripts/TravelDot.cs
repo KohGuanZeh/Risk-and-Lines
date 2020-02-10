@@ -16,7 +16,6 @@ public class TravelDot : MonoBehaviour, IPooledObject
 
 		ObjectPooling.inst.poolDictionary[GetPoolTag()].Enqueue(gameObject);
 		transform.parent = pool.parent;
-		print(ObjectPooling.inst.poolDictionary[GetPoolTag()].Count);
 		gameObject.SetActive(false);
 	}
 
@@ -25,6 +24,7 @@ public class TravelDot : MonoBehaviour, IPooledObject
 	{
 		//Execute Spawn Functions Here
 		locked = false;
+		ObjectPooling.inst.poolDictionary[GetPoolTag()].Enqueue(gameObject);
 
 		if (parentId > 0) gameObject.transform.parent = PhotonNetwork.GetPhotonView(parentId).transform; //If Parent is not Null, Set New Parent
 		else gameObject.transform.parent = ObjectPooling.inst.GetPool(GetPoolTag()).parent;
@@ -44,11 +44,5 @@ public class TravelDot : MonoBehaviour, IPooledObject
 	public string GetPoolTag()
 	{
 		return "Dots";	
-	}
-
-	[PunRPC] //Upon Dequeue, Enqueue. So that there is no need to Check Position every Update to Despawn Dots
-	void EnqueueOnSpawn()
-	{ 
-		ObjectPooling.inst.poolDictionary[GetPoolTag()].Enqueue(gameObject);
 	}
 }

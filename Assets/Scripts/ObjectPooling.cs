@@ -21,7 +21,7 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
     public static ObjectPooling inst;
     [SerializeField] List<Pool> pools;
     public Dictionary<string, Queue<GameObject>> poolDictionary;
-    public List<GameObject> myTestQueue;
+    //public List<GameObject> myTestQueue;
 
     private void Awake()
     {
@@ -32,14 +32,14 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
 
         if (PhotonNetwork.IsMasterClient) InitialisePools();
 
-        myTestQueue = new List<GameObject>();
-        myTestQueue = poolDictionary["Dots"].ToList();
+        //myTestQueue = new List<GameObject>();
+        //myTestQueue = poolDictionary["Dots"].ToList();
     }
 
-    private void LateUpdate()
+    /*private void LateUpdate()
     {
         myTestQueue = poolDictionary["Dots"].ToList();
-    }
+    }*/
 
     #region Initialisation Functions
     void InitialisePools()
@@ -70,7 +70,6 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
         Pool pool = GetPool(tag);
 
         GameObject obj = null;
-        bool newlyCreated = false;
 
         //If there is enough Instances of Pooled Object, Get from Pool. If not, instantiate during runtime
         if (poolDictionary[tag].Count > 0)
@@ -78,19 +77,9 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
             obj = poolDictionary[tag].Dequeue();
             photonView.RPC("RegisterDequeue", RpcTarget.OthersBuffered, tag);
         }
-        else
-        {
-            obj = PhotonNetwork.InstantiateSceneObject(System.IO.Path.Combine("PhotonPrefabs", pool.prefabName), Vector3.zero, Quaternion.identity);
-            newlyCreated = true;
-        }
+        else obj = PhotonNetwork.InstantiateSceneObject(System.IO.Path.Combine("PhotonPrefabs", pool.prefabName), Vector3.zero, Quaternion.identity);
 
         IPooledObject pooledObject = obj.GetComponent<IPooledObject>();
-        if (newlyCreated)
-        {
-            //In Case On Create Object is Getting Components
-            obj.GetPhotonView().RPC("OnCreateObject", RpcTarget.AllBuffered);
-            photonView.RPC("RegisterDequeue", RpcTarget.AllBuffered);
-        } 
         if (pooledObject != null) obj.GetPhotonView().RPC("OnObjectSpawn", RpcTarget.AllBuffered, parentId);
 
         obj.transform.position = spawnPos;
