@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using System.IO;
+
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
@@ -28,7 +30,10 @@ public class GameManager : MonoBehaviourPunCallbacks
     public float lastXSpawn; //Last X Position that Spawned the Dots
     public Vector2 minMaxXInterval, minMaxXOffset; //Min and Max X Interval and Offset
 
-    private void Awake()
+	[Header ("For Spawning of player")]
+	public Transform[] spawnPoints;
+
+	private void Awake()
     {
         inst = this;
         cam = GetComponent<Camera>();
@@ -65,7 +70,9 @@ public class GameManager : MonoBehaviourPunCallbacks
     void CreatePlayer()
     {
         PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Player"), playerSpawnPos.position, Quaternion.identity);
-    }
+		GameObject currentPlayer = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "Player"), Vector3.zero, Quaternion.identity);
+		currentPlayer.transform.position = spawnPoints[PhotonNetwork.PlayerList.Length].position;
+	}
 
     #region Networking Functions
 
