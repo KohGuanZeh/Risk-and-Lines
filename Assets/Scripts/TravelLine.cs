@@ -109,7 +109,7 @@ public class TravelLine : MonoBehaviour, IPooledObject
 		if (other.tag == "Player")
 		{
 			PlayerController detectedPlayer = GetComponent<PlayerController>();
-			if (detectedPlayer != playerRef) detectedPlayer.Death();
+			if (detectedPlayer != playerRef) detectedPlayer.photonView.RPC("Death", RpcTarget.AllBuffered);
 		}
 	}
 	#endregion

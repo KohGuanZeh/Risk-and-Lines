@@ -136,7 +136,7 @@ public class PlayerController : MonoBehaviourPun
 	{
 		if (targetDot == null) return;
 
-		transform.position = Vector2.MoveTowards(transform.position, targetDot.transform.position, travelSpeed * Time.deltaTime);
+		transform.position = Vector2.MoveTowards(transform.position, targetDot.transform.position, (gm.camSpeed + travelSpeed) * Time.deltaTime);
 		currentTravelLine.photonView.RPC("UpdateLine", RpcTarget.AllBuffered, transform.position);
 
 		//To remove the targetDot
@@ -169,6 +169,7 @@ public class PlayerController : MonoBehaviourPun
 		currentTravelLine = null;
 	}
 
+	[PunRPC]
 	public void Death()
 	{
 		print("Player is Dead");
