@@ -263,6 +263,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   locked: 0
+  photonView: {fileID: 0}
 --- !u!1 &953991472
 GameObject:
   m_ObjectHideFlags: 0
@@ -398,6 +399,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   locked: 0
+  photonView: {fileID: 0}
 --- !u!1001 &1332503380
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -502,6 +504,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   locked: 0
+  photonView: {fileID: 0}
 --- !u!4 &1422266680 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2021310505252144822, guid: f9155d4e338f3374b9cae9a280773bc4,
@@ -733,6 +736,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   locked: 0
+  photonView: {fileID: 0}
 --- !u!1001 &1750448061
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -837,6 +841,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   locked: 0
+  photonView: {fileID: 0}
 --- !u!1001 &1903056910
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -941,6 +946,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   locked: 0
+  photonView: {fileID: 0}
 --- !u!1 &1925947370
 GameObject:
   m_ObjectHideFlags: 0
@@ -1136,6 +1142,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   locked: 0
+  photonView: {fileID: 0}
 --- !u!1001 &2072603429
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1350,6 +1357,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   locked: 0
+  photonView: {fileID: 0}
 --- !u!1001 &2021310503847450510
 PrefabInstance:
   m_ObjectHideFlags: 0

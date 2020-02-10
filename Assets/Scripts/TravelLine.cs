@@ -7,6 +7,7 @@ using Photon.Pun;
 public class TravelLine : MonoBehaviour, IPooledObject
 {
 	[SerializeField] PlayerController playerRef;
+	public PhotonView photonView;
 	[SerializeField] LineRenderer line;
 	[SerializeField] EdgeCollider2D collider;
 	[SerializeField] Vector2[] dotPos;
@@ -49,6 +50,7 @@ public class TravelLine : MonoBehaviour, IPooledObject
 	#endregion
 
 	#region Line Renderer Related Functions
+	[PunRPC]
 	public void CreateNewLine(Vector3 pos)
 	{
 		line.positionCount = 2;
@@ -57,6 +59,7 @@ public class TravelLine : MonoBehaviour, IPooledObject
 		UpdateDotPosArray();
 	}
 
+	[PunRPC]
 	public void AddNewPoint(Vector3 pos)
 	{
 		line.positionCount++;
@@ -64,6 +67,7 @@ public class TravelLine : MonoBehaviour, IPooledObject
 		UpdateDotPosArray();
 	}
 
+	[PunRPC]
 	public void UpdateLine(Vector3 pos)
 	{
 		line.SetPosition(line.positionCount - 1, pos);
@@ -71,11 +75,13 @@ public class TravelLine : MonoBehaviour, IPooledObject
 		collider.points[line.positionCount - 1] = transform.InverseTransformPoint(pos);
 	}
 
+	[PunRPC]
 	public void OnFinishedTravel(float xPos)
 	{
 		if (xPos > greatestX) greatestX = xPos;
 	}
 
+	[PunRPC]
 	public void CutLine()
 	{
 		line.positionCount--;
@@ -83,6 +89,7 @@ public class TravelLine : MonoBehaviour, IPooledObject
 		if (line.positionCount == 1) ObjectPooling.inst.ReturnToPool(gameObject, GetPoolTag());
 	}
 
+	[PunRPC]
 	void UpdateDotPosArray()
 	{
 		dotPos = new Vector2[line.positionCount];

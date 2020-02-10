@@ -51,14 +51,14 @@ public class PlayerController : MonoBehaviour
 					if (targetDot == null && !travelDot.locked)
 					{
 						print("Detected Touch");
-						travelDot.locked = true;
+						travelDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, true);
 						targetDot = travelDot;
 
 						if (currentTravelLine) currentTravelLine.AddNewPoint(transform.position);
 						else
 						{
 							currentTravelLine = ObjectPooling.inst.SpawnFromPool("Line", transform.position, Quaternion.identity).GetComponent<TravelLine>(); //Instantiate(linePreset, transform); //Will be changed to Object Pooling
-							currentTravelLine.CreateNewLine(transform.position);
+							currentTravelLine.photonView.RPC("CreateNewLine", RpcTarget.AllBuffered, transform.position);
 						}
 					} 
 					else if (travelDot == storedDot && doubleTapThreshold > 0) //If there is already a Stored Dot, This is Considered a Double Tap
@@ -99,7 +99,7 @@ public class PlayerController : MonoBehaviour
 					if (targetDot == null && !travelDot.locked)
 					{
 						print("Detected Touch");
-						travelDot.locked = true;
+						travelDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, true);
 						targetDot = travelDot;
 
 						if (currentTravelLine) currentTravelLine.AddNewPoint(transform.position);
@@ -136,14 +136,14 @@ public class PlayerController : MonoBehaviour
 		if (targetDot == null) return;
 
 		transform.position = Vector2.MoveTowards(transform.position, targetDot.transform.position, travelSpeed * Time.deltaTime);
-		currentTravelLine.UpdateLine(transform.position);
+		currentTravelLine.photonView.RPC("UpdateLine", RpcTarget.AllBuffered, transform.position);
 
 		//To remove the targetDot
 		float distanceToDot = Vector2.Distance(transform.position, targetDot.transform.position);
 		
 		if (distanceToDot <= distanceToStop)
 		{
-			currentTravelLine.OnFinishedTravel(transform.position.x);
+			currentTravelLine.photonView.RPC("OnFinishedTravel", RpcTarget.AllBuffered, transform.position.x);
 			targetDot = null;
 		} 
 	}
@@ -155,7 +155,7 @@ public class PlayerController : MonoBehaviour
 		CutLine(); //Need to be on top before Target Dot is Set to Null
 
 		transform.position = storedDot.transform.position;
-		targetDot.locked = false;
+		targetDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, false);
 		targetDot = null;
 		storedDot = null;
 		doubleTapThreshold = 0;
@@ -164,7 +164,7 @@ public class PlayerController : MonoBehaviour
 	//Delete the last position and cut out the Travel Line
 	void CutLine()
 	{
-		if (targetDot != null) currentTravelLine.CutLine();
+		if (targetDot != null) currentTravelLine.photonView.RPC("CutLine", RpcTarget.AllBuffered);
 		currentTravelLine = null;
 	}
 

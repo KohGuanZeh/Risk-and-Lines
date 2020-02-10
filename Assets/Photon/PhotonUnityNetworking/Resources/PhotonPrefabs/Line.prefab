@@ -48,6 +48,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerRef: {fileID: 0}
+  photonView: {fileID: 7515888793474031798}
   line: {fileID: 2090796913703933400}
   collider: {fileID: 3366647023709449068}
   dotPos: []

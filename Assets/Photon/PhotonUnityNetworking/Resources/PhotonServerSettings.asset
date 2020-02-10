@@ -62,5 +62,12 @@ MonoBehaviour:
   - OnObjectSpawn
   - DequeueForAll
   - RegisterDequeue
+  - LockTravelDot
+  - CreateNewLine
+  - AddNewPoint
+  - UpdateLine
+  - CutLine
+  - OnFinishedTravel
+  - UpdateDotPosArray
   DisableAutoOpenWizard: 1
   ShowSettings: 1
