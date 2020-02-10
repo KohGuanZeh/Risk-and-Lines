@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using Photon.Pun;
+using Photon.Realtime;
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
@@ -69,13 +70,13 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     void CreatePlayer()
     {
-		PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Player"), spawnPoints[currentPlayer].position, Quaternion.identity);
+		PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Player"), spawnPoints[PhotonNetwork.LocalPlayer.ActorNumber].position, Quaternion.identity);
 	}
 
-	public override void OnEnable()
+	/*public override void OnEnable()
 	{
 		currentPlayer = PhotonNetwork.PlayerList.Length - 1;
-	}
+	}*/
 	#region Networking Functions
 
 	#region For Initialisation
