@@ -4,7 +4,7 @@ using UnityEngine;
 
 using Photon.Pun;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviourPun
 {
 	[Header("General Player Properties")]
 	[SerializeField] GameManager gm;
@@ -25,11 +25,14 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
 		//Decrease the Wait Time every frame
-		doubleTapThreshold = Mathf.Max(doubleTapThreshold - Time.deltaTime, 0);
-        if (Input.touchCount > 0) TouchControls();
-		MouseControls();
-		TravelControl();
-    }
+		if (photonView.IsMine)
+		{
+			doubleTapThreshold = Mathf.Max(doubleTapThreshold - Time.deltaTime, 0);
+			if (Input.touchCount > 0) TouchControls();
+			MouseControls();
+			TravelControl();
+		}
+	}
 
 	void TouchControls()
 	{
@@ -50,7 +53,6 @@ public class PlayerController : MonoBehaviour
 
 					if (targetDot == null && !travelDot.locked)
 					{
-						print("Detected Touch");
 						travelDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, true);
 						targetDot = travelDot;
 
@@ -98,7 +100,6 @@ public class PlayerController : MonoBehaviour
 
 					if (targetDot == null && !travelDot.locked)
 					{
-						print("Detected Touch");
 						travelDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, true);
 						targetDot = travelDot;
 
