@@ -156,6 +156,7 @@ public class PlayerController : MonoBehaviourPun
 		CutLine(); //Need to be on top before Target Dot is Set to Null
 
 		transform.position = storedDot.transform.position;
+		storedDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, true);
 		targetDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, false);
 		targetDot = null;
 		storedDot = null;
