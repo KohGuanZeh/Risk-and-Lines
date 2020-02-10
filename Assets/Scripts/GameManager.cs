@@ -70,7 +70,8 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     void CreatePlayer()
     {
-		PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Player"), spawnPoints[PhotonNetwork.LocalPlayer.ActorNumber].position, Quaternion.identity);
+        Debug.LogError(PhotonNetwork.LocalPlayer.ActorNumber - 1);
+		PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Player"), spawnPoints[PhotonNetwork.LocalPlayer.ActorNumber-1].position, Quaternion.identity);
 	}
 
 	/*public override void OnEnable()
