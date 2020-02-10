@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 
 using Photon.Pun;
+using Photon.Realtime;
 
 public class ObjectPooling : MonoBehaviourPunCallbacks
 {
@@ -38,12 +39,12 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
         poolDictionary = new Dictionary<string, Queue<GameObject>>();
 
         foreach (Pool pool in pools)
-        { 
+        {
             Queue<GameObject> objPool = new Queue<GameObject>();
             for (int i = 0; i < pool.poolAmt; i++) //Do if isMaster Check here. Only if Master - Spawn Object. Not sure if it will work
             {
                 GameObject pooledObj = PhotonNetwork.InstantiateSceneObject(System.IO.Path.Combine("PhotonPrefabs", pool.prefabName), Vector3.zero, Quaternion.identity); //Instantiate(pool.prefab, pool.parent);
-                
+
                 //photonView.RPC("OnPoolObjectCreated", RpcTarget.AllBuffered, pool, pooledObj); //Use Photon View ID instead
                 pooledObj.transform.parent = pool.parent;
                 pooledObj.SetActive(false);
@@ -51,10 +52,17 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
                 objPool.Enqueue(pooledObj);
             }
             //photonView.RPC("UpdatePoolDictionary", RpcTarget.AllBuffered, pool, objPool);
-            poolDictionary.Add(tag, objPool);
+            poolDictionary.Add(pool.tag, objPool);
         }
     }
-
+	public override void OnPlayerLeftRoom(Player otherPlayer)
+	{
+		print("PlayerLeft");
+		foreach (KeyValuePair<string, Queue<GameObject>> poolObj in poolDictionary)
+		{
+			print(poolObj.Key);
+		}
+	}
 	#region For Networking
 	[PunRPC]
     void OnPoolObjectCreated(Pool pool, GameObject pooledObj)
@@ -136,7 +144,7 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
     }
 
 	#region Networking Functions
-	
+
     [PunRPC]
     void HandleEnqueue(GameObject obj)
     {
@@ -151,6 +159,10 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
     {
         return pools.Find(x => x.tag == tag);
     }
+	public override void OnDisable()
+	{
+		print(this);
+	}
 }
 
 public interface IPooledObject

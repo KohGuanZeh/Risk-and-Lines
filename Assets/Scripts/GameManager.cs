@@ -56,6 +56,10 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
 
         cam.transform.position = camPos; //Update Camera Position Locally for each Player
+		if (Input.GetKey(KeyCode.G))
+		{
+			PhotonNetwork.LeaveRoom();
+		}
     }
 
     void CreatePlayer()
