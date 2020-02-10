@@ -23,6 +23,7 @@ public class TravelLine : MonoBehaviour, IPooledObject
 		gameObject.SetActive(false);
 	}
 
+	[PunRPC]
 	public void OnObjectSpawn(int parentId)
 	{
 		//Execute Spawn Functions Here
@@ -32,6 +33,7 @@ public class TravelLine : MonoBehaviour, IPooledObject
 		gameObject.SetActive(true);
 	}
 
+	[PunRPC]
 	public void OnObjectDespawn()
 	{
 		//Execute Despawn Functions Here

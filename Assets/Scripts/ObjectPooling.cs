@@ -21,6 +21,7 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
     public static ObjectPooling inst;
     [SerializeField] List<Pool> pools;
     public Dictionary<string, Queue<GameObject>> poolDictionary;
+    public List<GameObject> myTestQueue;
 
     private void Awake()
     {
@@ -30,6 +31,14 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
         foreach (Pool pool in pools) poolDictionary.Add(pool.tag, new Queue<GameObject>());
 
         if (PhotonNetwork.IsMasterClient) InitialisePools();
+
+        myTestQueue = new List<GameObject>();
+        myTestQueue = poolDictionary["Dots"].ToList();
+    }
+
+    private void LateUpdate()
+    {
+        myTestQueue = poolDictionary["Dots"].ToList();
     }
 
     #region Initialisation Functions
