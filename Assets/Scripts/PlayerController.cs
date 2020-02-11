@@ -44,14 +44,14 @@ public class PlayerController : MonoBehaviourPun
 			RaycastHit2D rayHit = Physics2D.GetRayIntersection(gm.cam.ScreenPointToRay(touch.position)); // this to get the direciton of the raycast
 
 			//Getting the Dot
-			if (rayHit.collider != null)
+			if (!ReferenceEquals(rayHit.collider,null))
 			{
 				TravelDot travelDot = rayHit.collider.GetComponent<TravelDot>();
-				if (travelDot != null)
+				if (!ReferenceEquals(travelDot, null))
 				{
 					bool blinked = false;
 
-					if (targetDot == null && !travelDot.locked)
+					if (ReferenceEquals(targetDot, null) && !travelDot.locked)
 					{
 						travelDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, true);
 						targetDot = travelDot;
@@ -63,7 +63,7 @@ public class PlayerController : MonoBehaviourPun
 							currentTravelLine.photonView.RPC("CreateNewLine", RpcTarget.AllBuffered, transform.position);
 						}
 					} 
-					else if (travelDot == storedDot && doubleTapThreshold > 0) //If there is already a Stored Dot, This is Considered a Double Tap
+					else if (ReferenceEquals(travelDot, storedDot) && doubleTapThreshold > 0) //If there is already a Stored Dot, This is Considered a Double Tap
 					{
 						blinked = true;
 						if (travelDot.locked && targetDot != travelDot)
@@ -91,14 +91,14 @@ public class PlayerController : MonoBehaviourPun
 			RaycastHit2D rayHit = Physics2D.GetRayIntersection(gm.cam.ScreenPointToRay(Input.mousePosition)); // this to get the direciton of the raycast
 
 			//Getting the Dot
-			if (rayHit.collider != null)
+			if (!ReferenceEquals(rayHit.collider, null))
 			{
 				TravelDot travelDot = rayHit.collider.GetComponent<TravelDot>();
-				if (travelDot != null)
+				if (!ReferenceEquals(travelDot, null))
 				{
 					bool blinked = false;
 
-					if (targetDot == null && !travelDot.locked)
+					if (ReferenceEquals(targetDot, null) && !travelDot.locked)
 					{
 						travelDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, true);
 						targetDot = travelDot;
@@ -110,7 +110,7 @@ public class PlayerController : MonoBehaviourPun
 							currentTravelLine.photonView.RPC("CreateNewLine", RpcTarget.AllBuffered, transform.position);
 						}
 					}
-					else if (travelDot == storedDot && doubleTapThreshold > 0) //If there is already a Stored Dot, This is Considered a Double Tap
+					else if (ReferenceEquals(travelDot, storedDot) && doubleTapThreshold > 0) //If there is already a Stored Dot, This is Considered a Double Tap
 					{
 						blinked = true;
 						if (travelDot.locked && targetDot != travelDot)
@@ -134,7 +134,7 @@ public class PlayerController : MonoBehaviourPun
 	// for normal travel
 	void TravelControl()
 	{
-		if (targetDot == null) return;
+		if (ReferenceEquals(targetDot, null)) return;
 
 		transform.position = Vector2.MoveTowards(transform.position, targetDot.transform.position, (gm.camSpeed + travelSpeed) * Time.deltaTime);
 		currentTravelLine.photonView.RPC("UpdateLine", RpcTarget.AllBuffered, transform.position);
@@ -166,7 +166,7 @@ public class PlayerController : MonoBehaviourPun
 	//Delete the last position and cut out the Travel Line
 	void CutLine()
 	{
-		if (targetDot != null) currentTravelLine.photonView.RPC("CutLine", RpcTarget.AllBuffered);
+		if (!ReferenceEquals(targetDot, null)) currentTravelLine.photonView.RPC("CutLine", RpcTarget.AllBuffered);
 		currentTravelLine = null;
 	}
 
@@ -174,6 +174,7 @@ public class PlayerController : MonoBehaviourPun
 	public void Death()
 	{
 		print("Player is Dead");
+		gameObject.SetActive(false);
 		//gameObject.SetActive(false);
 		//Check Player Count. If Player Count is 1. Trigger Win Screen
 	}
