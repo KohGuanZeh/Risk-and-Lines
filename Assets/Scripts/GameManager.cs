@@ -48,7 +48,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         CreatePlayer();
 
         //Only Master Client will handle Dot Spawning
-        //if (PhotonNetwork.IsMasterClient) SpawnDots();
+        if (PhotonNetwork.IsMasterClient) SpawnDots();
     }
 
     void Update()
@@ -58,7 +58,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         {
             if (Input.GetKeyDown(KeyCode.A)) photonView.RPC("ToggleMoveCam", RpcTarget.AllBuffered, camSpeed != 0);
             MoveCamera();
-            //SpawnDots();
+            SpawnDots();
         }
 
         cam.transform.position = camPos; //Update Camera Position Locally for each Player
