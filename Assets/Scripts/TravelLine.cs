@@ -106,10 +106,10 @@ public class TravelLine : MonoBehaviour, IPooledObject
 
 	void OnTriggerEnter2D(Collider2D other)
 	{
-		if (other.tag == "Player")
+		if (other.CompareTag("Player"))
 		{
 			PlayerController detectedPlayer = GetComponent<PlayerController>();
-			if (detectedPlayer != playerRef) detectedPlayer.photonView.RPC("Death", RpcTarget.AllBuffered);
+			if (ReferenceEquals(detectedPlayer, playerRef)) detectedPlayer.photonView.RPC("Death", RpcTarget.AllBuffered);
 		}
 	}
 	#endregion

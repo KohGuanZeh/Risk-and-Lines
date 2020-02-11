@@ -51,7 +51,7 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
                 GameObject obj = PhotonNetwork.InstantiateSceneObject(System.IO.Path.Combine("PhotonPrefabs", pool.prefabName), Vector3.zero, Quaternion.identity); //Instantiate(pool.prefab, pool.parent);
                 
                 IPooledObject pooledObj = obj.GetComponent<IPooledObject>();
-                if (pooledObj != null) obj.GetPhotonView().RPC("OnCreateObject", RpcTarget.AllBuffered);
+                if (!ReferenceEquals(pooledObj, null)) obj.GetPhotonView().RPC("OnCreateObject", RpcTarget.AllBuffered);
             }
         }
     }
@@ -82,8 +82,8 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
         obj.transform.position = spawnPos;
         obj.transform.rotation = spawnRot;
 
-        IPooledObject pooledObject = obj.GetComponent<IPooledObject>();
-        if (pooledObject != null) obj.GetPhotonView().RPC("OnObjectSpawn", RpcTarget.AllBuffered, parentId);
+        IPooledObject pooledObj = obj.GetComponent<IPooledObject>();
+        if (!ReferenceEquals(pooledObj, null)) obj.GetPhotonView().RPC("OnObjectSpawn", RpcTarget.AllBuffered, parentId);
 
         return obj;
     }
@@ -99,8 +99,8 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
             return;
         }
 
-        IPooledObject pooledObject = obj.GetComponent<IPooledObject>();
-        if (pooledObject != null) obj.GetPhotonView().RPC("OnObjectDespawn", RpcTarget.AllBuffered);
+        IPooledObject pooledObj = obj.GetComponent<IPooledObject>();
+        if (!ReferenceEquals(pooledObj, null)) obj.GetPhotonView().RPC("OnObjectDespawn", RpcTarget.AllBuffered);
     }
 
     #endregion

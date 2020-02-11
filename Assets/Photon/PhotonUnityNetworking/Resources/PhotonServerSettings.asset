@@ -70,5 +70,6 @@ MonoBehaviour:
   - OnFinishedTravel
   - UpdateDotPosArray
   - SpawnPlayer
+  - Death
   DisableAutoOpenWizard: 1
   ShowSettings: 1
