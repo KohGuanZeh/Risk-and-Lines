@@ -71,5 +71,6 @@ MonoBehaviour:
   - UpdateDotPosArray
   - SpawnPlayer
   - Death
+  - SetPlayerRefId
   DisableAutoOpenWizard: 1
   ShowSettings: 1

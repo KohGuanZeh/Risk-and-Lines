@@ -6,7 +6,7 @@ using Photon.Pun;
 
 public class TravelLine : MonoBehaviour, IPooledObject
 {
-	[SerializeField] PlayerController playerRef;
+	[SerializeField] int playerRefId;
 	public PhotonView photonView;
 	[SerializeField] LineRenderer line;
 	[SerializeField] EdgeCollider2D collider;
@@ -27,6 +27,8 @@ public class TravelLine : MonoBehaviour, IPooledObject
 	[PunRPC]
 	public void OnObjectSpawn(int parentId)
 	{
+		playerRefId = -1;
+
 		//Execute Spawn Functions Here
 		if (parentId > 0) gameObject.transform.parent = PhotonNetwork.GetPhotonView(parentId).transform; //If Parent is not Null, Set New Parent
 		else gameObject.transform.parent = ObjectPooling.inst.GetPool(GetPoolTag()).parent;
@@ -51,6 +53,12 @@ public class TravelLine : MonoBehaviour, IPooledObject
 
 	#region Line Renderer Related Functions
 	[PunRPC]
+	public void SetPlayerRefId(int id)
+	{
+		playerRefId = id;
+	}
+
+	[PunRPC]
 	public void CreateNewLine(Vector3 pos)
 	{
 		line.positionCount = 2;
@@ -72,7 +80,8 @@ public class TravelLine : MonoBehaviour, IPooledObject
 	{
 		line.SetPosition(line.positionCount - 1, pos);
 		if (pos.x > greatestX) greatestX = pos.x;
-		collider.points[line.positionCount - 1] = transform.InverseTransformPoint(pos);
+		UpdateDotPosArray();
+		//collider.points[line.positionCount - 1] = transform.InverseTransformPoint(pos); //Doesnt Work
 	}
 
 	[PunRPC]
@@ -95,6 +104,7 @@ public class TravelLine : MonoBehaviour, IPooledObject
 		dotPos = new Vector2[line.positionCount];
 		for (int i = 0; i < dotPos.Length; i++) dotPos[i] = transform.InverseTransformPoint(line.GetPosition(i));
 		collider.points = dotPos;
+		//foreach (Vector2 pt in collider.points) Debug.LogError(pt);
 	}
 	#endregion
 
@@ -108,8 +118,9 @@ public class TravelLine : MonoBehaviour, IPooledObject
 	{
 		if (other.CompareTag("Player"))
 		{
-			PlayerController detectedPlayer = GetComponent<PlayerController>();
-			if (ReferenceEquals(detectedPlayer, playerRef)) detectedPlayer.photonView.RPC("Death", RpcTarget.AllBuffered);
+			print("Detected");
+			PlayerController detectedPlayer = other.GetComponent<PlayerController>();
+			if (!ReferenceEquals(detectedPlayer, null) && playerRefId != detectedPlayer.photonView.ViewID) detectedPlayer.photonView.RPC("Death", RpcTarget.AllBuffered);
 		}
 	}
 	#endregion

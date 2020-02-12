@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviourPun
 {
 	[Header("General Player Properties")]
 	[SerializeField] GameManager gm;
+	[SerializeField] Rigidbody2D rb;
     [SerializeField] TravelLine linePreset; //Stores the Line Prefab that it will Instantiate each time Player travels
 
     [Header("Player Movement Properties")]
@@ -17,9 +18,17 @@ public class PlayerController : MonoBehaviourPun
 	[SerializeField] float doubleTapThreshold; //this is the time before travel and also the time to register a double tap
 	[SerializeField] float distanceToStop;
 
+	[Header("For Blink")]
+	[SerializeField] int blinkCount = 3;
+	[SerializeField] float blinkCd; //Timer used to check whether it should restore a Blink.
+	[SerializeField] float maxCdTime = 5f; //Max Time for Blink to refill
+
     void Start()
     {
 		gm = GameManager.inst;
+		rb = GetComponent<Rigidbody2D>();
+
+		blinkCd = maxCdTime;
     }
 
     void Update()
@@ -27,10 +36,14 @@ public class PlayerController : MonoBehaviourPun
 		//Decrease the Wait Time every frame
 		if (photonView.IsMine)
 		{
+			UpdateBlinkCd();
+
 			doubleTapThreshold = Mathf.Max(doubleTapThreshold - Time.deltaTime, 0);
 			if (Input.touchCount > 0) TouchControls();
 			MouseControls();
 			TravelControl();
+
+			if (transform.position.x < gm.CamLeftBounds) photonView.RPC("Death", RpcTarget.AllBuffered);
 		}
 	}
 
@@ -61,9 +74,10 @@ public class PlayerController : MonoBehaviourPun
 						{
 							currentTravelLine = ObjectPooling.inst.SpawnFromPool("Line", transform.position, Quaternion.identity).GetComponent<TravelLine>(); //Instantiate(linePreset, transform); //Will be changed to Object Pooling
 							currentTravelLine.photonView.RPC("CreateNewLine", RpcTarget.AllBuffered, transform.position);
+							currentTravelLine.photonView.RPC("SetPlayerRefId", RpcTarget.AllBuffered, photonView.ViewID);
 						}
 					} 
-					else if (ReferenceEquals(travelDot, storedDot) && doubleTapThreshold > 0) //If there is already a Stored Dot, This is Considered a Double Tap
+					else if (ReferenceEquals(travelDot, storedDot) && doubleTapThreshold > 0 && blinkCount > 0) //If there is already a Stored Dot, This is Considered a Double Tap
 					{
 						blinked = true;
 						if (travelDot.locked && targetDot != travelDot)
@@ -108,9 +122,10 @@ public class PlayerController : MonoBehaviourPun
 						{
 							currentTravelLine = ObjectPooling.inst.SpawnFromPool("Line", transform.position, Quaternion.identity).GetComponent<TravelLine>(); //Instantiate(linePreset, transform); //Will be changed to Object Pooling
 							currentTravelLine.photonView.RPC("CreateNewLine", RpcTarget.AllBuffered, transform.position);
+							currentTravelLine.photonView.RPC("SetPlayerRefId", RpcTarget.AllBuffered, photonView.ViewID);
 						}
 					}
-					else if (ReferenceEquals(travelDot, storedDot) && doubleTapThreshold > 0) //If there is already a Stored Dot, This is Considered a Double Tap
+					else if (ReferenceEquals(travelDot, storedDot) && doubleTapThreshold > 0 && blinkCount > 0) //If there is already a Stored Dot, This is Considered a Double Tap
 					{
 						blinked = true;
 						if (travelDot.locked && targetDot != travelDot)
@@ -161,6 +176,8 @@ public class PlayerController : MonoBehaviourPun
 		targetDot = null;
 		storedDot = null;
 		doubleTapThreshold = 0;
+
+		blinkCount--;
 	}
 
 	//Delete the last position and cut out the Travel Line
@@ -170,12 +187,25 @@ public class PlayerController : MonoBehaviourPun
 		currentTravelLine = null;
 	}
 
+	void UpdateBlinkCd()
+	{
+		if (blinkCount < 3)
+		{
+			blinkCd -= Time.deltaTime; //Or Time.fixedDeltaTime/0.002f
+
+			if (blinkCd <= 0)
+			{
+				blinkCount++;
+				blinkCd = maxCdTime;
+			}
+		}
+	}
+
 	[PunRPC]
 	public void Death()
 	{
 		print("Player is Dead");
 		gameObject.SetActive(false);
-		//gameObject.SetActive(false);
 		//Check Player Count. If Player Count is 1. Trigger Win Screen
 	}
 }

@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: -7669608662386807076}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -98,6 +98,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gm: {fileID: 0}
+  rb: {fileID: 0}
   linePreset: {fileID: 5506912347327240787, guid: 40b964882842aff4181d5c8a16362a9d,
     type: 3}
   travelSpeed: 5
@@ -106,6 +107,9 @@ MonoBehaviour:
   storedDot: {fileID: 0}
   doubleTapThreshold: 0.15
   distanceToStop: 0
+  blinkCount: 3
+  blinkCd: 0
+  maxCdTime: 5
 --- !u!58 &195885749232753354
 CircleCollider2D:
   m_ObjectHideFlags: 0

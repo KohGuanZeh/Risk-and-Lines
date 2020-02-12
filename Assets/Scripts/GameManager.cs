@@ -57,21 +57,17 @@ public class GameManager : MonoBehaviourPunCallbacks
         if (PhotonNetwork.IsMasterClient)
         {
             if (Input.GetKeyDown(KeyCode.A)) photonView.RPC("ToggleMoveCam", RpcTarget.AllBuffered, camSpeed != 0);
-            MoveCamera();
             SpawnDots();
         }
 
+        MoveCamera();
         cam.transform.position = camPos; //Update Camera Position Locally for each Player
 		
-        if (Input.GetKey(KeyCode.G))
-		{
-			PhotonNetwork.LeaveRoom();
-		}
+        if (Input.GetKey(KeyCode.G)) PhotonNetwork.LeaveRoom();
     }
 
     void CreatePlayer()
     {
-        //Debug.LogError(PhotonNetwork.LocalPlayer.ActorNumber - 1);
         Vector3 pos = spawnPoints[PhotonNetwork.LocalPlayer.ActorNumber - 1].position;
         pos.z = 0;
         PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Player"), pos, Quaternion.identity);
@@ -124,10 +120,8 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
         if (camSpeed == 0) return;
 
-        moveDelta = Vector3.right * camSpeed * Time.deltaTime;
+        moveDelta = Vector3.right * camSpeed * Time.fixedDeltaTime;
         camPos += moveDelta;
-
-        photonView.RPC("SendNewCamValues", RpcTarget.OthersBuffered, moveDelta, camPos);
     }
 
     [PunRPC]
