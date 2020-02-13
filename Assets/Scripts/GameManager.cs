@@ -19,7 +19,8 @@ public class GameManager : MonoBehaviourPunCallbacks
     public float CamLeftBounds { get { return transform.position.x - cam.orthographicSize * cam.aspect; } }
 
     [Header("For Spawning Dots")]
-    public int dotDensity;
+    public float spawnFreq; //Frequency that Dots will Spawn
+    [Range(0,1)] public float dotDensity; //Average Dot that should be on Screen
     public Vector2Int minMaxDotSpawn;
 
     public float yMargin; //Offset so that the Dot do not spawn at exactly the top of bottom of the Screen
@@ -141,9 +142,11 @@ public class GameManager : MonoBehaviourPunCallbacks
             xRemainder -= xInterval;
             lastXSpawn += xInterval;
 
-            int dotsToSpawn = Random.Range(minMaxDotSpawn.x, minMaxDotSpawn.y + 1);
+            /*int dotsToSpawn = Random.Range(minMaxDotSpawn.x, minMaxDotSpawn.y + 1);
             minMaxDotSpawn.x = Random.Range(0f, 100f) > 50 ? 2 : 1;
-            minMaxDotSpawn.y = Random.Range(0f, 100f) > 50 ? 5 : 2;
+            minMaxDotSpawn.y = Random.Range(0f, 100f) > 50 ? 5 : 2;*/
+            float dotDensity = Random.Range(this.dotDensity, 1); //Spawning of 1 dot should be the least frequent
+            int dotsToSpawn = Mathf.RoundToInt(3 * Mathf.Cos(Mathf.PI * 0.5f * dotDensity) + 1); //Get the Y based off Dot Density
             Vector3[] dotPositions = new Vector3[dotsToSpawn];
             float yHeight = (cam.orthographicSize - yMargin) * 2;
             float maxY = yHeight / dotsToSpawn;
@@ -161,6 +164,12 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
 
         photonView.RPC("UpdateDotSpawnValues", RpcTarget.OthersBuffered, xRemainder, xInterval, lastXSpawn);
+    }
+
+    void AdjustSpawnAlgorithm (float dotDensity, float spawnFreq) 
+    {
+        minMaxDotSpawn.x = Random.Range(0f, 100f) > 50 ? 2 : 1;
+        minMaxDotSpawn.y = Random.Range(0f, 100f) > 50 ? 5 : 2;
     }
 
     [PunRPC]

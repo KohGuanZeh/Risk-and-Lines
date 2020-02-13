@@ -136,6 +136,7 @@ MonoBehaviour:
   camPos: {x: 0, y: 0, z: 0}
   camSpeed: 0
   defaultCamSpeed: 5
+  spawnFreq: 0
   dotDensity: 0
   minMaxDotSpawn: {x: 1, y: 4}
   yMargin: 2
@@ -145,6 +146,8 @@ MonoBehaviour:
   lastXSpawn: 0
   minMaxXInterval: {x: 6, y: 10}
   minMaxXOffset: {x: 0, y: 3}
+  spawnPoints: []
+  currentPlayer: 0
 --- !u!114 &2702712245036865841
 MonoBehaviour:
   m_ObjectHideFlags: 0
