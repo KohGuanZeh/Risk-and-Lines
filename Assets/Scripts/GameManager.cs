@@ -60,11 +60,14 @@ public class GameManager : MonoBehaviourPunCallbacks
             if (Input.GetKeyDown(KeyCode.A)) photonView.RPC("ToggleMoveCam", RpcTarget.AllBuffered, camSpeed != 0);
             SpawnDots();
         }
-
-        MoveCamera();
-        cam.transform.position = camPos; //Update Camera Position Locally for each Player
 		
         if (Input.GetKey(KeyCode.G)) PhotonNetwork.LeaveRoom();
+    }
+
+    private void FixedUpdate()
+    {
+        MoveCamera();
+        cam.transform.position = camPos; //Update Camera Position Locally for each Player
     }
 
     #region For Spawning of player
