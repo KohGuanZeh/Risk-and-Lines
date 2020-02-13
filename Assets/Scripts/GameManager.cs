@@ -31,7 +31,6 @@ public class GameManager : MonoBehaviourPunCallbacks
     public Vector2 minMaxXInterval, minMaxXOffset; //Min and Max X Interval and Offset
 
 	[Header ("For Spawning of player")]
-
 	public Transform playerSpawnPos;
 	public int currentPlayer;
     [SerializeField] private float spawnDistIntv; // spawn distance intervals between each player
@@ -39,19 +38,18 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
         inst = this;
         cam = GetComponent<Camera>();
+        camPos = cam.transform.position;
 
         //Only Master Client will handle Camera Movement Changes and Dot Spawning so only Master will need to Initialise this Value and Pass it to the rest
-        if (PhotonNetwork.IsMasterClient)
-        {
-             InitialiseValues();
-             CreatePlayer();
-        }
+        if (PhotonNetwork.IsMasterClient) InitialiseValues();
     }
 
     void Start()
     {
-		//Only Master Client will handle Dot Spawning
-		if (PhotonNetwork.IsMasterClient) SpawnDots();
+        CreatePlayer();
+
+        //Only Master Client will handle Dot Spawning
+        if (PhotonNetwork.IsMasterClient) SpawnDots();
     }
 
     void Update()
@@ -70,10 +68,9 @@ public class GameManager : MonoBehaviourPunCallbacks
     }
 
     #region For Spawning of player
-
-
     void CreatePlayer()
     {
+        //Spawn Players Evenly
         float minY = cam.transform.position.y - cam.orthographicSize;
         float maxY = cam.transform.position.y + cam.orthographicSize;
 
@@ -88,9 +85,6 @@ public class GameManager : MonoBehaviourPunCallbacks
 	#region For Initialisation
 	void InitialiseValues()
     {
-        //Set Standard Cam Position
-        camPos = cam.transform.position;
-
         //Set Spawn Dot Values
         minMaxY = new Vector2(camPos.y - cam.orthographicSize + yMargin, camPos.y + cam.orthographicSize - yMargin);
         
@@ -98,21 +92,16 @@ public class GameManager : MonoBehaviourPunCallbacks
         lastXSpawn = cam.transform.position.x - xInterval - 5;
         xRemainder = (cam.orthographicSize * 2) * cam.aspect;
 
-        photonView.RPC("SendInitValues", RpcTarget.OthersBuffered, camPos, minMaxY, xInterval, lastXSpawn, xRemainder);
+        photonView.RPC("SendInitValues", RpcTarget.OthersBuffered, minMaxY, xInterval, lastXSpawn, xRemainder);
     }
 
     [PunRPC]
-    void SendInitValues(Vector3 camPos, Vector2 minMaxY, float xInterval, float lastXSpawn, float xRemainder)
+    void SendInitValues(Vector2 minMaxY, float xInterval, float lastXSpawn, float xRemainder)
     {
-        this.camPos = camPos;
-        cam.transform.position = camPos;
-
         this.minMaxY = minMaxY;
         this.xInterval = xInterval;
         this.lastXSpawn = lastXSpawn;
         this.xRemainder = xRemainder;
-
-        CreatePlayer();
     }
     #endregion
 
