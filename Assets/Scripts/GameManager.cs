@@ -9,8 +9,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 {
     [Header("General Game Manager Properties")]
     public static GameManager inst;
-    public Transform playerSpawnPos;
-
+   
     [Header("Camera Items")]
     public Camera cam;
     public Vector3 moveDelta; //Stores Move Delta of the Camera;
@@ -31,24 +30,27 @@ public class GameManager : MonoBehaviourPunCallbacks
     public Vector2 minMaxXInterval, minMaxXOffset; //Min and Max X Interval and Offset
 
 	[Header ("For Spawning of player")]
-	public Transform[] spawnPoints;
-	public int currentPlayer;
 
+	public Transform playerSpawnPos;
+	public int currentPlayer;
+    [SerializeField] private float spawnDistIntv; // spawn distance intervals between each player
 	private void Awake()
     {
         inst = this;
         cam = GetComponent<Camera>();
 
         //Only Master Client will handle Camera Movement Changes and Dot Spawning so only Master will need to Initialise this Value and Pass it to the rest
-        if (PhotonNetwork.IsMasterClient) InitialiseValues();
+        if (PhotonNetwork.IsMasterClient)
+        {
+             InitialiseValues();
+             CreatePlayer();
+        }
     }
 
     void Start()
     {
-        CreatePlayer();
-
-        //Only Master Client will handle Dot Spawning
-        if (PhotonNetwork.IsMasterClient) SpawnDots();
+		//Only Master Client will handle Dot Spawning
+		if (PhotonNetwork.IsMasterClient) SpawnDots();
     }
 
     void Update()
@@ -66,13 +68,20 @@ public class GameManager : MonoBehaviourPunCallbacks
         if (Input.GetKey(KeyCode.G)) PhotonNetwork.LeaveRoom();
     }
 
+    #region For Spawning of player
+
+
     void CreatePlayer()
     {
-        Vector3 pos = spawnPoints[PhotonNetwork.LocalPlayer.ActorNumber - 1].position;
-        pos.z = 0;
-        PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Player"), pos, Quaternion.identity);
-	}
+        float minY = cam.transform.position.y - cam.orthographicSize;
+        float maxY = cam.transform.position.y + cam.orthographicSize;
 
+		spawnDistIntv = (maxY - minY) / (PhotonNetwork.PlayerList.Length + 1);
+		Vector3 spawnPos = new Vector3(playerSpawnPos.position.x, maxY - spawnDistIntv * (PhotonNetwork.LocalPlayer.ActorNumber), 0);
+        PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Player"), spawnPos , Quaternion.identity);
+	}
+    #endregion
+    
 	#region Networking Functions
 
 	#region For Initialisation
@@ -101,6 +110,8 @@ public class GameManager : MonoBehaviourPunCallbacks
         this.xInterval = xInterval;
         this.lastXSpawn = lastXSpawn;
         this.xRemainder = xRemainder;
+
+        CreatePlayer();
     }
     #endregion
 
