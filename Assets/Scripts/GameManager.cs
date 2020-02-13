@@ -52,7 +52,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         if (PhotonNetwork.IsMasterClient) SpawnDots();
     }
 
-    void Update()
+    void FixedUpdate()
     {
         //Only Master Client will handle Camera Movement Value Changes and Dot Spawning
         if (PhotonNetwork.IsMasterClient)
@@ -60,14 +60,11 @@ public class GameManager : MonoBehaviourPunCallbacks
             if (Input.GetKeyDown(KeyCode.A)) photonView.RPC("ToggleMoveCam", RpcTarget.AllBuffered, camSpeed != 0);
             SpawnDots();
         }
-		
-        if (Input.GetKey(KeyCode.G)) PhotonNetwork.LeaveRoom();
-    }
 
-    private void FixedUpdate()
-    {
         MoveCamera();
         cam.transform.position = camPos; //Update Camera Position Locally for each Player
+		
+        if (Input.GetKey(KeyCode.G)) PhotonNetwork.LeaveRoom();
     }
 
     #region For Spawning of player
