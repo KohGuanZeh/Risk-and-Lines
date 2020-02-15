@@ -98,6 +98,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gm: {fileID: 0}
+  gui: {fileID: 0}
   rb: {fileID: 0}
   linePreset: {fileID: 5506912347327240787, guid: 40b964882842aff4181d5c8a16362a9d,
     type: 3}
@@ -162,7 +163,7 @@ MonoBehaviour:
   ObservedComponentsFoldoutOpen: 1
   Group: 0
   prefixField: -1
-  Synchronization: 3
+  Synchronization: 1
   OwnershipTransfer: 0
   ObservedComponents:
   - {fileID: -7669608662386807076}

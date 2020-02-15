@@ -2430,7 +2430,7 @@ GameObject:
   - component: {fileID: 1682580278}
   - component: {fileID: 1682580277}
   m_Layer: 0
-  m_Name: roomController
+  m_Name: RoomController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

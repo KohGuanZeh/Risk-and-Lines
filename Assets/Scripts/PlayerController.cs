@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviourPun
 {
 	[Header("General Player Properties")]
 	[SerializeField] GameManager gm;
+	[SerializeField] UIManager gui;
 	[SerializeField] Rigidbody2D rb;
     [SerializeField] TravelLine linePreset; //Stores the Line Prefab that it will Instantiate each time Player travels
 
@@ -26,6 +27,8 @@ public class PlayerController : MonoBehaviourPun
     void Start()
     {
 		gm = GameManager.inst;
+		gui = UIManager.inst;
+		gui.AssignPlayerController(this); //May need photonView.IsMine
 		rb = GetComponent<Rigidbody2D>();
 
 		blinkCd = maxCdTime;
@@ -43,7 +46,7 @@ public class PlayerController : MonoBehaviourPun
 			MouseControls();
 			TravelControl();
 
-			if (transform.position.x < gm.CamLeftBounds) photonView.RPC("Death", RpcTarget.AllBuffered);
+			if (transform.position.x < gm.CamLeftBounds) Death();
 		}
 	}
 
@@ -178,6 +181,7 @@ public class PlayerController : MonoBehaviourPun
 		doubleTapThreshold = 0;
 
 		blinkCount--;
+		gui.UpdateBlinkCount(blinkCount);
 	}
 
 	//Delete the last position and cut out the Travel Line
@@ -191,21 +195,51 @@ public class PlayerController : MonoBehaviourPun
 	{
 		if (blinkCount < 3)
 		{
-			blinkCd -= Time.deltaTime; //Or Time.fixedDeltaTime/0.002f
+			blinkCd -= Time.fixedDeltaTime; //0.002f
+			gui.UpdateBlinkCd(blinkCd/maxCdTime); //BlinkCd will always go back to MaxCdTime. Hence need to Update Cd here
 
 			if (blinkCd <= 0)
 			{
 				blinkCount++;
 				blinkCd = maxCdTime;
+				gui.UpdateBlinkCount(blinkCount);
 			}
 		}
 	}
 
-	[PunRPC]
 	public void Death()
 	{
-		print("Player is Dead");
 		gameObject.SetActive(false);
-		//Check Player Count. If Player Count is 1. Trigger Win Screen
+
+		//Check Player Count. If Player Count <= 1. Trigger End Screen
+		gm.playersAlive--;
+		gui.SwitchToSpectateMode(true);
+		if (gm.playersAlive <= 1) gm.EndGame();
+		gui.UpdateLeaderboard();
+
+		photonView.RPC("SendDeathEvent", RpcTarget.OthersBuffered, gm.playersAlive);
+	}
+
+	[PunRPC]
+	public void SendDeathEvent(int playersAlive)
+	{
+		gameObject.SetActive(false);
+		gm.playersAlive = playersAlive;
+		if (gm.playersAlive <= 1) gm.EndGame();
+		gui.UpdateLeaderboard(); //Update Rankings each time Player dies
+	}
+
+	void OnTriggerEnter2D(Collider2D other)
+	{
+		if (other.CompareTag("Player"))
+		{
+			PlayerController detectedPlayer = other.GetComponent<PlayerController>();
+			
+			if (!ReferenceEquals(detectedPlayer, null))
+			{
+				detectedPlayer.Death();
+				Death();
+			}
+		}
 	}
 }

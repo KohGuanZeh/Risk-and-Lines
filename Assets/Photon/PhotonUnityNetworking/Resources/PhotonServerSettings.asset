@@ -73,5 +73,6 @@ MonoBehaviour:
   - Death
   - SetPlayerRefId
   - IncreaseDifficulty
+  - SendDeathEvent
   DisableAutoOpenWizard: 1
   ShowSettings: 1

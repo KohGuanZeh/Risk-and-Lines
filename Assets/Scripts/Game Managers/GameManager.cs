@@ -7,8 +7,9 @@ using Photon.Realtime;
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
-    [Header("General Game Manager Properties")]
+    [Header("General Variables")]
     public static GameManager inst;
+    [SerializeField] UIManager gui;
    
     [Header("Camera Items")]
     public Camera cam;
@@ -32,9 +33,13 @@ public class GameManager : MonoBehaviourPunCallbacks
     public float lastXSpawn; //Last X Position that Spawned the Dots
     public Vector2 minMaxXInterval, minMaxXOffset; //Min and Max X Interval and Offset //No Longer Used
 
-	[Header ("For Spawning of player")]
+	[Header("For Player Spawn")]
 	public Transform playerSpawnPos;
-	public int currentPlayer;
+
+    [Header("For Game End")]
+    public bool gameEnded;
+    public int playersAlive;
+
 
 	private void Awake()
     {
@@ -48,6 +53,8 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     void Start()
     {
+        playersAlive = PhotonNetwork.PlayerList.Length;
+        gui = UIManager.inst;
         CreatePlayer();
 
         //Only Master Client will handle Dot Spawning
@@ -190,4 +197,15 @@ public class GameManager : MonoBehaviourPunCallbacks
     #endregion
 
     #endregion
+
+    #region For Game End
+    public void EndGame() //Called in RPC Function
+    {
+        gameEnded = true;
+        ToggleMoveCam(false);
+        gui.HideSpectateButton();
+        gui.ShowHideEndScreen(true);
+        gui.SwitchToSpectateMode(false); //In the case where we want to hide Spectate UI on End
+    }
+	#endregion
 }
