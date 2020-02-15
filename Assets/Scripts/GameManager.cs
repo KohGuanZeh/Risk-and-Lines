@@ -18,9 +18,11 @@ public class GameManager : MonoBehaviourPunCallbacks
     public float CamLeftBounds { get { return transform.position.x - cam.orthographicSize * cam.aspect; } }
 
     [Header("For Spawning Dots")]
-    public float spawnFreq; //Frequency that Dots will Spawn
-    [Range(0,1)] public float dotDensity; //Average Dot that should be on Screen
-    public Vector2Int minMaxDotSpawn;
+    [Range(0,1)] public float minSpawnIntervalCoeff; //> Coeff, > Interval Dist
+    [Range(0,1)] public float maxSpawnIntervalCoeff; //> Coeff, > Interval Dist
+    [Range(0,1)] public float minDotSpawnCoeff; //Coefficient that affects Dot Spawning. > Coeff, < Dots Spawn
+    [Range(0,1)] public float maxDotSpawnCoeff; //Coefficient that affects Dot Spawning. > Coeff, < Dots Spawn
+    //public Vector2Int minMaxDotSpawn;
 
     public float yMargin; //Offset so that the Dot do not spawn at exactly the top of bottom of the Screen
     public Vector2 minMaxY; //Minimum and Maximum Y that Dot will Spawn
@@ -28,12 +30,12 @@ public class GameManager : MonoBehaviourPunCallbacks
     public float xInterval; //How much X Dist Camera needs to cover before Spawning the next few dots
     public float xRemainder; //How much X Dist it exceeded from its X Interval
     public float lastXSpawn; //Last X Position that Spawned the Dots
-    public Vector2 minMaxXInterval, minMaxXOffset; //Min and Max X Interval and Offset
+    public Vector2 minMaxXInterval, minMaxXOffset; //Min and Max X Interval and Offset //No Longer Used
 
 	[Header ("For Spawning of player")]
 	public Transform playerSpawnPos;
 	public int currentPlayer;
-    [SerializeField] private float spawnDistIntv; // spawn distance intervals between each player
+
 	private void Awake()
     {
         inst = this;
@@ -55,7 +57,8 @@ public class GameManager : MonoBehaviourPunCallbacks
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.A) && PhotonNetwork.IsMasterClient) photonView.RPC("ToggleMoveCam", RpcTarget.AllBuffered, camSpeed != 0);
-        if (Input.GetKey(KeyCode.G)) PhotonNetwork.LeaveRoom();
+        if (Input.GetKeyDown(KeyCode.G)) PhotonNetwork.LeaveRoom();
+        if (Input.GetKeyDown(KeyCode.Q)) photonView.RPC("IncreaseDifficulty", RpcTarget.AllBuffered);
     }
 
     void FixedUpdate()
@@ -74,8 +77,8 @@ public class GameManager : MonoBehaviourPunCallbacks
         float minY = cam.transform.position.y - cam.orthographicSize;
         float maxY = cam.transform.position.y + cam.orthographicSize;
 
-		spawnDistIntv = (maxY - minY) / (PhotonNetwork.PlayerList.Length + 1);
-		Vector3 spawnPos = new Vector3(playerSpawnPos.position.x, maxY - spawnDistIntv * (PhotonNetwork.LocalPlayer.ActorNumber), 0);
+		float interval = (maxY - minY) / (PhotonNetwork.PlayerList.Length + 1);
+		Vector3 spawnPos = new Vector3(playerSpawnPos.position.x, maxY - interval * (PhotonNetwork.LocalPlayer.ActorNumber), 0);
         PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Player"), spawnPos , Quaternion.identity);
 	}
     #endregion
@@ -142,34 +145,28 @@ public class GameManager : MonoBehaviourPunCallbacks
             xRemainder -= xInterval;
             lastXSpawn += xInterval;
 
-            /*int dotsToSpawn = Random.Range(minMaxDotSpawn.x, minMaxDotSpawn.y + 1);
-            minMaxDotSpawn.x = Random.Range(0f, 100f) > 50 ? 2 : 1;
-            minMaxDotSpawn.y = Random.Range(0f, 100f) > 50 ? 5 : 2;*/
-            float dotDensity = Random.Range(this.dotDensity, 1); //Spawning of 1 dot should be the least frequent
-            int dotsToSpawn = Mathf.RoundToInt(3 * Mathf.Cos(Mathf.PI * 0.5f * dotDensity) + 1); //Get the Y based off Dot Density
+            float dotSpawnCoeff = Random.Range(minDotSpawnCoeff, maxDotSpawnCoeff); //Spawning of 1 dot should be the least frequent
+            int dotsToSpawn = Mathf.RoundToInt(3 * Mathf.Cos(Mathf.PI * 0.5f * dotSpawnCoeff) + 1); //Get the Y based off Dot Density
             Vector3[] dotPositions = new Vector3[dotsToSpawn];
+
+            float spawnIntervalCoeff = Random.Range(minSpawnIntervalCoeff, maxSpawnIntervalCoeff);
+            xInterval = (minMaxXInterval.y - minMaxXInterval.x) * Mathf.Sin(Mathf.PI * 0.5f * spawnIntervalCoeff) + minMaxXInterval.x; //Get next X Interval
+
             float yHeight = (cam.orthographicSize - yMargin) * 2;
             float maxY = yHeight / dotsToSpawn;
 
             for (int i = 0; i < dotsToSpawn; i++)
             {
-                float xOffset = Random.Range(minMaxXOffset.x, minMaxXOffset.y);
+                //Edit Min Max Offset Based on next Interval
+                float xOffset = Random.Range(0, 0.666f) * xInterval; //Max Offset will be 2/3 of X Interval
                 float x = lastXSpawn + xOffset;
                 float y = Random.Range(maxY * i + 1, maxY * (i + 1)) + minMaxY.x; //maxY * i + 1 because 1 is the size of the Circle
                 dotPositions[i] = new Vector3(x, y, 0);
                 ObjectPooling.inst.SpawnFromPool("Dots", dotPositions[i], Quaternion.identity);
             }
-
-            xInterval = Random.Range(minMaxXInterval.x, minMaxXInterval.y);
         }
 
         photonView.RPC("UpdateDotSpawnValues", RpcTarget.OthersBuffered, xRemainder, xInterval, lastXSpawn);
-    }
-
-    void AdjustSpawnAlgorithm (float dotDensity, float spawnFreq) 
-    {
-        minMaxDotSpawn.x = Random.Range(0f, 100f) > 50 ? 2 : 1;
-        minMaxDotSpawn.y = Random.Range(0f, 100f) > 50 ? 5 : 2;
     }
 
     [PunRPC]
@@ -178,6 +175,17 @@ public class GameManager : MonoBehaviourPunCallbacks
         this.xRemainder = xRemainder;
         this.xInterval = xInterval;
         this.lastXSpawn = lastXSpawn;
+    }
+
+    [PunRPC]
+    void IncreaseDifficulty()
+    {
+        //Increase Minimum such that X Interval will be greater than before, making Dots more spread
+        minSpawnIntervalCoeff = Mathf.Clamp(minSpawnIntervalCoeff + 0.1f, 0, 1);
+        //Increase Minimum such that Number of Dots that spawn will be less than before, making less Dots in Cam View
+        minDotSpawnCoeff = Mathf.Clamp(minDotSpawnCoeff + 0.1f, 0, 1);
+        //Increase Cam Speed such that it moves faster
+        camSpeed = Mathf.Clamp(camSpeed + 0.5f, defaultCamSpeed, 12.5f);
     }
     #endregion
 

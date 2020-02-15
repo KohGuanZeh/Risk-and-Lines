@@ -72,5 +72,6 @@ MonoBehaviour:
   - SpawnPlayer
   - Death
   - SetPlayerRefId
+  - IncreaseDifficulty
   DisableAutoOpenWizard: 1
   ShowSettings: 1

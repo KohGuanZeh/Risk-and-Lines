@@ -130,15 +130,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e4affc6f0cf9f74b8bed4605f65b298, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerSpawnPos: {fileID: 831214271}
   cam: {fileID: 117266251327048048}
   moveDelta: {x: 0, y: 0, z: 0}
   camPos: {x: 0, y: 0, z: 0}
   camSpeed: 0
   defaultCamSpeed: 5
-  spawnFreq: 0
-  dotDensity: 0
-  minMaxDotSpawn: {x: 1, y: 4}
+  minSpawnIntervalCoeff: 0
+  maxSpawnIntervalCoeff: 1
+  minDotSpawnCoeff: 0
+  maxDotSpawnCoeff: 1
   yMargin: 2
   minMaxY: {x: 0, y: 0}
   xInterval: 0
@@ -146,7 +146,7 @@ MonoBehaviour:
   lastXSpawn: 0
   minMaxXInterval: {x: 6, y: 10}
   minMaxXOffset: {x: 0, y: 3}
-  spawnPoints: []
+  playerSpawnPos: {fileID: 831214271}
   currentPlayer: 0
 --- !u!114 &2702712245036865841
 MonoBehaviour:
