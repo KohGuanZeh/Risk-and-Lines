@@ -3133,6 +3133,9 @@ MonoBehaviour:
   textPrefab: {fileID: 6242853161914615043, guid: 2c0fb5d696b46b643a35627200add189,
     type: 3}
   chatRect: {fileID: 1910860869}
+  testRect: {fileID: 0}
+  childRects: []
+  chatSize: 0
 --- !u!114 &1532165318
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4272,14 +4275,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 0
+    m_Left: 5
     m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
+    m_Top: 5
+    m_Bottom: 5
   m_ChildAlignment: 0
   m_Spacing: 0
   m_ChildForceExpandWidth: 0
-  m_ChildForceExpandHeight: 1
+  m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
