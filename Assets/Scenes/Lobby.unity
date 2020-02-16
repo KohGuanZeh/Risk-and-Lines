@@ -785,7 +785,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1928063195}
-        m_MethodName: MatchMakingCanel
+        m_MethodName: MatchMakingCancel
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2233,7 +2233,7 @@ MonoBehaviour:
   m_InputType: 0
   m_AsteriskChar: 42
   m_KeyboardType: 0
-  m_LineType: 0
+  m_LineType: 2
   m_HideMobileInput: 0
   m_CharacterValidation: 0
   m_CharacterLimit: 0
@@ -2351,7 +2351,7 @@ MonoBehaviour:
     m_Alignment: 0
     m_AlignByGeometry: 0
     m_RichText: 0
-    m_HorizontalOverflow: 1
+    m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: 
@@ -4359,6 +4359,7 @@ MonoBehaviour:
   roomsContainer: {fileID: 1570081045}
   roomListingPrefab: {fileID: 7351965176612305922, guid: 211e1c49cd5a6204a9c4ed893277107c,
     type: 3}
+  roomPrefabs: []
 --- !u!4 &1928063196
 Transform:
   m_ObjectHideFlags: 0
