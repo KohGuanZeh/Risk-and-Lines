@@ -118,9 +118,8 @@ public class TravelLine : MonoBehaviour, IPooledObject
 	{
 		if (other.CompareTag("Player"))
 		{
-			print("Detected");
 			PlayerController detectedPlayer = other.GetComponent<PlayerController>();
-			if (!ReferenceEquals(detectedPlayer, null) && playerRefId != detectedPlayer.photonView.ViewID) detectedPlayer.photonView.RPC("Death", RpcTarget.AllBuffered);
+			if (!ReferenceEquals(detectedPlayer, null) && playerRefId != detectedPlayer.photonView.ViewID) detectedPlayer.Death();
 		}
 	}
 	#endregion
