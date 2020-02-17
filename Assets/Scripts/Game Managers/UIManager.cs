@@ -72,20 +72,20 @@ public class UIManager : MonoBehaviour
 
     public void UpdateLeaderboard()
     {
-        string text = string.Empty;
-        string winnerText = string.Empty;
-        int ranksToIncrease = 0;
         for (int i = gm.playerInfos.Length - 1; i >= 0; i--)
         {
-            if (gm.playerInfos[i].deathTime < 0)
-            {
-                winnerText = string.Format("{0}. {1}. Death Time: {2} <br>", gm.playerInfos.Length - i, gm.playerInfos[i].playerName, "-");
-                ranksToIncrease++;
-            }
-            else text = string.Format("{0}. {1}. Death Time: {2} <br>", i + ranksToIncrease + 1, gm.playerInfos[i].playerName, gm.playerInfos[i].deathTime) + text;
+            if (gm.playerInfos[i].deathTime < 0) gm.playerInfos[i].deathTime = gm.playerInfos[0].deathTime + 1;
+            else break;
         }
 
-        leaderboard.text = winnerText + text;
+        System.Array.Sort(gm.playerInfos, (x, y) => y.deathTime.CompareTo(x.deathTime));
+
+        string text = string.Empty;
+
+        for (int i = 0; i < gm.playerInfos.Length; i++)
+        {
+            text += string.Format("{0}. {1} Time Survived: {2}", i, gm.playerInfos[i].playerName, gm.playerInfos[i].deathTime);
+        }
     }
 
     public void ShowHideEndScreen(bool show)

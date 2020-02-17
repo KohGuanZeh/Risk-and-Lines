@@ -76,5 +76,7 @@ MonoBehaviour:
   - SendMsg
   - UpdateMessageBox
   - SendDeathEvent
+  - InitialiseLeaderboard
+  - UpdateLeaderboard
   DisableAutoOpenWizard: 1
   ShowSettings: 1
