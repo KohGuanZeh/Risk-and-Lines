@@ -234,7 +234,7 @@ public class PlayerController : MonoBehaviourPun
 		gameObject.SetActive(false);
 		gm.playersAlive = playersAlive;
 
-		if ((ignoreGameEnd && gm.playersAlive > 0) || gm.playersAlive > 1) return;
+		if (ignoreGameEnd || gm.playersAlive > 1) return;
 
 		gm.EndGame();
 		gui.UpdateLeaderboard(); //Update Rankings each time Player dies
