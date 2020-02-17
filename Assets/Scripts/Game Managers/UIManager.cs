@@ -27,6 +27,7 @@ public class UIManager : MonoBehaviour
     [Header("End Screen")]
     [SerializeField] GameObject endScreen;
     [SerializeField] GameObject spectateButton;
+    [SerializeField] TextMeshProUGUI leaderboard;
 
     private void Awake()
     {
@@ -71,7 +72,20 @@ public class UIManager : MonoBehaviour
 
     public void UpdateLeaderboard()
     {
-        print("Updated");
+        string text = string.Empty;
+        string winnerText = string.Empty;
+        int ranksToIncrease = 0;
+        for (int i = gm.playerInfos.Length - 1; i >= 0; i--)
+        {
+            if (gm.playerInfos[i].deathTime < 0)
+            {
+                winnerText = string.Format("{0}. {1}. Death Time: {2} <br>", gm.playerInfos.Length - i, gm.playerInfos[i].playerName, "-");
+                ranksToIncrease++;
+            }
+            else text = string.Format("{0}. {1}. Death Time: {2} <br>", i + ranksToIncrease + 1, gm.playerInfos[i].playerName, gm.playerInfos[i].deathTime) + text;
+        }
+
+        leaderboard.text = winnerText + text;
     }
 
     public void ShowHideEndScreen(bool show)

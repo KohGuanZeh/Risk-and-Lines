@@ -1159,6 +1159,7 @@ MonoBehaviour:
   spectatingTxt: {fileID: 641522123}
   endScreen: {fileID: 1364784356}
   spectateButton: {fileID: 1715568292}
+  leaderboard: {fileID: 1748208241}
 --- !u!1001 &1181335640
 PrefabInstance:
   m_ObjectHideFlags: 0

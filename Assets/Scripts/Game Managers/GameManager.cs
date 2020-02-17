@@ -1,9 +1,26 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.IO;
+using System.Text;
+using System.Linq;
+
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+
+[System.Serializable]
+public struct PlayerInfo
+{
+    public int actorId;
+    public string playerName;
+    public float deathTime;
+
+    public PlayerInfo(int id, string name, float time)
+    {
+        actorId = id;
+        playerName = name;
+        deathTime = time;
+    }
+}
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
@@ -39,7 +56,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     [Header("For Game End")]
     public bool gameEnded;
     public int playersAlive;
-
+    public PlayerInfo[] playerInfos;
 
 	private void Awake()
     {
@@ -48,7 +65,11 @@ public class GameManager : MonoBehaviourPunCallbacks
         camPos = cam.transform.position;
 
         //Only Master Client will handle Camera Movement Changes and Dot Spawning so only Master will need to Initialise this Value and Pass it to the rest
-        if (PhotonNetwork.IsMasterClient) InitialiseValues();
+        if (PhotonNetwork.IsMasterClient)
+        {
+            InitialiseValues();
+            GetPlayerInfoAtStart();
+        } 
     }
 
     void Start()
@@ -83,7 +104,6 @@ public class GameManager : MonoBehaviourPunCallbacks
         //Spawn Players Evenly
         float minY = cam.transform.position.y - cam.orthographicSize;
         float maxY = cam.transform.position.y + cam.orthographicSize;
-
 		float interval = (maxY - minY) / (PhotonNetwork.PlayerList.Length + 1);
 		Vector3 spawnPos = new Vector3(playerSpawnPos.position.x, maxY - interval * (PhotonNetwork.LocalPlayer.ActorNumber), 0);
         PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Player"), spawnPos , Quaternion.identity);
@@ -112,6 +132,38 @@ public class GameManager : MonoBehaviourPunCallbacks
         this.xInterval = xInterval;
         this.lastXSpawn = lastXSpawn;
         this.xRemainder = xRemainder;
+    }
+
+    void GetPlayerInfoAtStart()
+    {
+        Player[] players = PhotonNetwork.PlayerList;
+        int[] ids = new int[players.Length];
+        string[] names = new string[players.Length];
+        float[] time = new float[players.Length];
+
+        for (int i = 0; i < players.Length; i++)
+        {
+            ids[i] = players[i].ActorNumber;
+            names[i] = players[i].NickName;
+            time[i] = -1;
+        }
+
+        photonView.RPC("InitialiseLeaderboard", RpcTarget.AllBuffered, ids, names, time);
+    }
+
+    [PunRPC]
+    void InitialiseLeaderboard(int[] ids, string[] names, float[] time)
+    {
+        playerInfos = new PlayerInfo[ids.Length];
+        for (int i = 0; i < ids.Length; i++) playerInfos[i] = new PlayerInfo(ids[i], names[i], time[i]);
+    }
+
+    [PunRPC]
+    void UpdateLeaderboard(int id, float time)
+    {
+        int idx = System.Array.IndexOf(playerInfos, playerInfos.Where(info => info.actorId == id).First());
+        playerInfos[idx].deathTime = time;
+        System.Array.Sort(playerInfos, (x,y) => y.deathTime.CompareTo(x.deathTime));
     }
     #endregion
 

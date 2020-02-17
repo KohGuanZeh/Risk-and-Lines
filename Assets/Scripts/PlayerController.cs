@@ -39,14 +39,17 @@ public class PlayerController : MonoBehaviourPun
 		//Decrease the Wait Time every frame
 		if (photonView.IsMine)
 		{
-			UpdateBlinkCd();
+			if (!gm.gameEnded)
+			{
+				UpdateBlinkCd();
 
-			doubleTapThreshold = Mathf.Max(doubleTapThreshold - Time.deltaTime, 0);
-			if (Input.touchCount > 0) TouchControls();
-			MouseControls();
-			TravelControl();
+				doubleTapThreshold = Mathf.Max(doubleTapThreshold - Time.deltaTime, 0);
+				if (Input.touchCount > 0) TouchControls();
+				MouseControls();
+				TravelControl();
 
-			if (transform.position.x < gm.CamLeftBounds) Death();
+				if (transform.position.x < gm.CamLeftBounds) Death();
+			}
 		}
 	}
 
@@ -207,25 +210,33 @@ public class PlayerController : MonoBehaviourPun
 		}
 	}
 
-	public void Death()
+	public void Death(bool ignoreGameEnd = false)
 	{
 		gameObject.SetActive(false);
 
 		//Check Player Count. If Player Count <= 1. Trigger End Screen
 		gm.playersAlive--;
-		gui.SwitchToSpectateMode(true);
-		if (gm.playersAlive <= 1) gm.EndGame();
-		gui.UpdateLeaderboard();
 
-		photonView.RPC("SendDeathEvent", RpcTarget.OthersBuffered, gm.playersAlive);
+		//Update Dead Players
+		gui.SwitchToSpectateMode(true);
+		gm.photonView.RPC("UpdateLeaderboard", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.ActorNumber, (float)PhotonNetwork.Time);
+		photonView.RPC("SendDeathEvent", RpcTarget.OthersBuffered, gm.playersAlive, ignoreGameEnd);
+
+		if (ignoreGameEnd || gm.playersAlive > 1) return;
+
+		gm.EndGame();
+		gui.UpdateLeaderboard();
 	}
 
 	[PunRPC]
-	public void SendDeathEvent(int playersAlive)
+	public void SendDeathEvent(int playersAlive, bool ignoreGameEnd)
 	{
 		gameObject.SetActive(false);
 		gm.playersAlive = playersAlive;
-		if (gm.playersAlive <= 1) gm.EndGame();
+
+		if (ignoreGameEnd || gm.playersAlive > 1) return;
+
+		gm.EndGame();
 		gui.UpdateLeaderboard(); //Update Rankings each time Player dies
 	}
 
@@ -237,7 +248,7 @@ public class PlayerController : MonoBehaviourPun
 			
 			if (!ReferenceEquals(detectedPlayer, null))
 			{
-				detectedPlayer.Death();
+				detectedPlayer.Death(true);
 				Death();
 			}
 		}
