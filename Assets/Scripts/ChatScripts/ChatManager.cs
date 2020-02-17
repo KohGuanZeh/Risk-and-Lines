@@ -37,8 +37,9 @@ public class ChatManager : MonoBehaviourPun {
 			textObj.GetComponent<Text>().text = msg; // sets the text of the prefab and acts as a message
 			textObj.transform.parent = chatContainer;
 			textObj.transform.localScale = new Vector3(1, 1, 1);
-			chatInput.text = ""; // clears the text inputtext after the message has been sent
-
+			//if (photonView.IsMine) chatInput.text = ""; // clears the text inputtext after the message has been sent
+			if (chatInput.GetComponent<PhotonView>().IsMine) chatInput.text = "";
+			
 			StartCoroutine(ChangeChatSize());
 		}
 	}
@@ -48,7 +49,7 @@ public class ChatManager : MonoBehaviourPun {
 		for (int i = 0; i < childRects.Length; i++) {
 			if (i >= 1) {
 				chatSize += childRects[i].sizeDelta.y;
-				
+
 				// checks each time after it adds
 				if (chatSize >= chatRect.sizeDelta.y - 20) {
 					chatRect.sizeDelta = new Vector2(chatRect.sizeDelta.x, chatRect.sizeDelta.y + childRects[i].sizeDelta.y + 30f);
