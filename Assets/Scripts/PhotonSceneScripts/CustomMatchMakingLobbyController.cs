@@ -26,12 +26,21 @@ public class CustomMatchMakingLobbyController : MonoBehaviourPunCallbacks {
 	// to reset the room listing
 	public List<RoomButton> roomPrefabs;
 
-	private void Awake() {
+	private void Awake() 
+	{
 		if (instance != null) Destroy(this.gameObject);
-		else {
-			instance = this;
+		else instance = this;
+
+		//Checking Lobby State
+		int lobbyState = PlayerPrefs.GetInt("Lobby State", 0);
+
+		if (lobbyState == 1)
+		{
+			mainPanel.SetActive(false);
+			lobbyPanel.SetActive(true);
 		}
 	}
+
 	private void Start() {
 		PhotonNetwork.ConnectUsingSettings(); // connects to photon master servers
 		roomPrefabs = new List<RoomButton>();
@@ -134,5 +143,10 @@ public class CustomMatchMakingLobbyController : MonoBehaviourPunCallbacks {
 			Destroy(rm.gameObject);
 		}
 		roomPrefabs.Clear();
+	}
+
+	private void OnApplicationQuit()
+	{
+		PlayerPrefs.DeleteKey("Lobby State");
 	}
 }

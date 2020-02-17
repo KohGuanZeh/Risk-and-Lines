@@ -22,9 +22,20 @@ public class CustomMatchMakingRoomController : MonoBehaviourPunCallbacks
 
 	[SerializeField] private Text roomNameDisplay; // display the name of the room
 
-	private void Start()
+	private void Awake()
 	{
+		int lobbyState = PlayerPrefs.GetInt("Lobby State", 0);
 		
+		if (lobbyState == 2)
+		{
+			lobbyPanel.SetActive(false);
+			roomPanel.SetActive(true);
+
+			roomNameDisplay.text = PhotonNetwork.CurrentRoom.Name; // update the room name display
+
+			if (PhotonNetwork.IsMasterClient) startButton.SetActive(true);
+			else startButton.SetActive(false);
+		}
 	}
 
 	void ClearPlayerListings()
@@ -95,6 +106,11 @@ public class CustomMatchMakingRoomController : MonoBehaviourPunCallbacks
 		PhotonNetwork.LeaveRoom();
 		PhotonNetwork.LeaveLobby();
 		StartCoroutine(rejoinLobby());
+	}
+
+	private void OnApplicationQuit()
+	{
+		PlayerPrefs.DeleteKey("Lobby State");
 	}
 }
 	
