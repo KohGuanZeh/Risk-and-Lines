@@ -48,7 +48,7 @@ public class PlayerController : MonoBehaviourPun
 				MouseControls();
 				TravelControl();
 
-				if (transform.position.x < gm.CamLeftBounds) Death(true);
+				if (transform.position.x < gm.CamLeftBounds) Death();
 			}
 		}
 	}
@@ -222,7 +222,7 @@ public class PlayerController : MonoBehaviourPun
 		gm.photonView.RPC("UpdateLeaderboard", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.ActorNumber, (float)PhotonNetwork.Time);
 		photonView.RPC("SendDeathEvent", RpcTarget.OthersBuffered, gm.playersAlive, ignoreGameEnd);
 
-		if ((ignoreGameEnd && gm.playersAlive > 0) || gm.playersAlive > 1) return;
+		if (ignoreGameEnd || gm.playersAlive > 1) return;
 
 		gm.EndGame();
 		gui.UpdateLeaderboard();
