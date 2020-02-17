@@ -4,7 +4,7 @@ using UnityEngine;
 
 using Photon.Pun;
 
-public class PlayerController : MonoBehaviourPun
+public class PlayerController : MonoBehaviourPunCallbacks
 {
 	[Header("General Player Properties")]
 	[SerializeField] GameManager gm;
@@ -252,5 +252,11 @@ public class PlayerController : MonoBehaviourPun
 				Death();
 			}
 		}
+	}
+
+	public override void OnLeftRoom()
+	{
+		base.OnLeftRoom();
+		Death();
 	}
 }

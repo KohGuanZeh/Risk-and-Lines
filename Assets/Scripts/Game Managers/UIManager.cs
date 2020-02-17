@@ -48,11 +48,11 @@ public class UIManager : MonoBehaviour
 
     public void AssignPlayerController(PlayerController player)
     {
-        this.player = player;
+       this.player = player;
     }
 
-	#region For Blink
-	public void UpdateBlinkCd(float cdRatio)
+    #region For Blink
+    public void UpdateBlinkCd(float cdRatio)
     {
         if (cdRatio < 0) cdRatio = 0;
         blinkIconOverlay.fillAmount = cdRatio;
@@ -110,5 +110,5 @@ public class UIManager : MonoBehaviour
         PhotonNetwork.LeaveRoom();
         SceneManager.LoadScene(0);
     }
-	#endregion
+    #endregion
 }

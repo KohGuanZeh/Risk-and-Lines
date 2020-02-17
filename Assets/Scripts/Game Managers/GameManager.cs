@@ -6,6 +6,7 @@ using System.Linq;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using Photon.Pun.UtilityScripts;
 
 [System.Serializable]
 public struct PlayerInfo
@@ -105,7 +106,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         float minY = cam.transform.position.y - cam.orthographicSize;
         float maxY = cam.transform.position.y + cam.orthographicSize;
 		float interval = (maxY - minY) / (PhotonNetwork.PlayerList.Length + 1);
-		Vector3 spawnPos = new Vector3(playerSpawnPos.position.x, maxY - interval * (PhotonNetwork.LocalPlayer.ActorNumber), 0);
+		Vector3 spawnPos = new Vector3(playerSpawnPos.position.x, maxY - interval * (PhotonNetwork.LocalPlayer.GetPlayerNumber()), 0);
         PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Player"), spawnPos , Quaternion.identity);
 	}
     #endregion

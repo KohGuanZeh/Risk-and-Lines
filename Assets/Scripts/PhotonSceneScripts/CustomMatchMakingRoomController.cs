@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Photon.Pun;
+using Photon.Pun.UtilityScripts;
 using Photon.Realtime;
 using UnityEngine.UI;
 
@@ -21,6 +22,11 @@ public class CustomMatchMakingRoomController : MonoBehaviourPunCallbacks
 
 	[SerializeField] private Text roomNameDisplay; // display the name of the room
 
+	private void Start()
+	{
+		
+	}
+
 	void ClearPlayerListings()
 	{
 		for (int i = playersContainer.childCount - 1; i >= 0; i--) // loops through all the child object of the 
@@ -30,11 +36,13 @@ public class CustomMatchMakingRoomController : MonoBehaviourPunCallbacks
 	}
 	void ListPlayers()
 	{
-		foreach (Player player in PhotonNetwork.PlayerList)
+		Player[] players = PhotonNetwork.PlayerList;
+		for (int i = 0; i < players.Length; i++)
 		{
 			GameObject tempListing = Instantiate(playerListingPrefab, playersContainer);
 			Text tempText = tempListing.transform.GetChild(0).GetComponent<Text>();
-			tempText.text = player.NickName;
+			tempText.text = players[i].NickName;
+			players[i].SetPlayerNumber(i + 1);
 		}
 	}
 	public override void OnJoinedRoom()
