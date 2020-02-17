@@ -26,6 +26,7 @@ public class ChatManager : MonoBehaviourPun {
 	}
 	public void deliverMsg() {
 		photonView.RPC("SendMsg", RpcTarget.All, PhotonNetwork.NickName + ": " + chatInput.text); // to send the others this message
+		chatInput.text = ""; // clears the text inputtext after the message has been sent
 	}
 
 	[PunRPC]
@@ -37,9 +38,7 @@ public class ChatManager : MonoBehaviourPun {
 			textObj.GetComponent<Text>().text = msg; // sets the text of the prefab and acts as a message
 			textObj.transform.parent = chatContainer;
 			textObj.transform.localScale = new Vector3(1, 1, 1);
-			//if (photonView.IsMine) chatInput.text = ""; // clears the text inputtext after the message has been sent
-			if (chatInput.GetComponent<PhotonView>().IsMine) chatInput.text = "";
-			
+
 			StartCoroutine(ChangeChatSize());
 		}
 	}
