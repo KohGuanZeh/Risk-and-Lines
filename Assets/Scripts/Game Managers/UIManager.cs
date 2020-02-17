@@ -84,8 +84,10 @@ public class UIManager : MonoBehaviour
 
         for (int i = 0; i < gm.playerInfos.Length; i++)
         {
-            text += string.Format("{0}. {1} Time Survived: {2}", i, gm.playerInfos[i].playerName, gm.playerInfos[i].deathTime);
+            text += string.Format("{0}. {1} Time Survived: {2} <br>", i, gm.playerInfos[i].playerName, gm.playerInfos[i].deathTime);
         }
+
+        leaderboard.text = text;
     }
 
     public void ShowHideEndScreen(bool show)
