@@ -35,6 +35,7 @@ public class CustomMatchMakingRoomController : MonoBehaviourPunCallbacks
 
 			if (PhotonNetwork.IsMasterClient) startButton.SetActive(true);
 			else startButton.SetActive(false);
+			ListPlayers(); // relist all current player listings
 		}
 	}
 
@@ -106,11 +107,6 @@ public class CustomMatchMakingRoomController : MonoBehaviourPunCallbacks
 		PhotonNetwork.LeaveRoom();
 		PhotonNetwork.LeaveLobby();
 		StartCoroutine(rejoinLobby());
-	}
-
-	private void OnApplicationQuit()
-	{
-		PlayerPrefs.DeleteKey("Lobby State");
 	}
 }
 	

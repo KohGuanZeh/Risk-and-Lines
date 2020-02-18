@@ -78,5 +78,12 @@ MonoBehaviour:
   - SendDeathEvent
   - InitialiseLeaderboard
   - UpdateLeaderboard
+  - IncreaseDifficultyTest
+  - IncreaseDifficultyAll
+  - EndGame
+  - RegisterStartTime
+  - RegisterTargetTime
+  - RegisterTimeStamp
+  - SyncScene
   DisableAutoOpenWizard: 1
   ShowSettings: 1

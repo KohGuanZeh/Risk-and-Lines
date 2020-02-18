@@ -54,6 +54,15 @@ public class GameManager : MonoBehaviourPunCallbacks
 	[Header("For Player Spawn")]
 	public Transform playerSpawnPos;
 
+	[Header("For Game Difficulty")]
+	[SerializeField] int difficultyStage;
+	[SerializeField] float timeStamp;
+	[SerializeField] bool gameStarted;
+
+	[Header("Test Different Game Difficulty")]
+	[SerializeField] bool increaseAllDiff;
+	[SerializeField] bool cohesive;
+
 	[Header("For Game End")]
 	public bool gameEnded;
 	public int playersAlive;
@@ -85,7 +94,13 @@ public class GameManager : MonoBehaviourPunCallbacks
 
 	private void Update()
 	{
-		if (Input.GetKeyDown(KeyCode.A) && PhotonNetwork.IsMasterClient) photonView.RPC("ToggleMoveCam", RpcTarget.AllBuffered, camSpeed != 0);
+		if (Input.GetKeyDown(KeyCode.A) && PhotonNetwork.IsMasterClient)
+		{
+			photonView.RPC("ToggleMoveCam", RpcTarget.AllBuffered, camSpeed != 0);
+
+			//Temporary Check for when Game Started. Wait till we have a Coroutine or what not that registers when to move
+			if (timeStamp <= 0) photonView.RPC("RegisterTimeStamp", RpcTarget.AllBuffered, 0f, true);
+		}
 		if (Input.GetKeyDown(KeyCode.G)) PhotonNetwork.LeaveRoom();
 		if (Input.GetKeyDown(KeyCode.Q)) photonView.RPC("IncreaseDifficulty", RpcTarget.AllBuffered);
 	}
@@ -93,7 +108,29 @@ public class GameManager : MonoBehaviourPunCallbacks
 	void FixedUpdate()
 	{
 		//Only Master Client will handle Camera Movement Value Changes and Dot Spawning
-		if (PhotonNetwork.IsMasterClient) SpawnDots();
+		if (PhotonNetwork.IsMasterClient)
+		{
+			#region Temp Difficulty Testing
+			if (gameStarted)
+			{
+				timeStamp += Time.fixedDeltaTime;
+				
+				if (timeStamp >= 30)
+				{
+					if (increaseAllDiff) photonView.RPC("IncreaseDifficultyAll", RpcTarget.AllBuffered, cohesive);
+					else
+					{
+						difficultyStage++;
+						photonView.RPC("IncreaseDifficulty", RpcTarget.AllBuffered, difficultyStage, cohesive);
+					}
+
+					photonView.RPC("RegisterTimeStamp", RpcTarget.AllBuffered, 0f, false);
+				}
+				else photonView.RPC("RegisterTimeStamp", RpcTarget.OthersBuffered, timeStamp, false);
+			}
+			#endregion
+			SpawnDots();
+		}
 
 		MoveCamera();
 		cam.transform.position = camPos; //Update Camera Position Locally for each Player
@@ -236,24 +273,35 @@ public class GameManager : MonoBehaviourPunCallbacks
 		this.xInterval = xInterval;
 		this.lastXSpawn = lastXSpawn;
 	}
-	
-	//Difficulty Increase over time
-	//Selectively Increase the Min and Max Coeffs? //Not sure if want to increase both at same time and how
-	//Increase Camera Speed by a Step
+
 	[PunRPC]
-	void IncreaseDifficulty()
+	void IncreaseDifficultyAll(bool cohesive)
 	{
-		//Increase Minimum such that X Interval will be greater than before, making Dots more spread
-		minSpawnIntervalCoeff = Mathf.Clamp(minSpawnIntervalCoeff + 0.1f, 0, 1);
-		//Increase Minimum such that Number of Dots that spawn will be less than before, making less Dots in Cam View
-		minDotSpawnCoeff = Mathf.Clamp(minDotSpawnCoeff + 0.1f, 0, 1);
-		//Increase Cam Speed such that it moves faster
-		camSpeed = Mathf.Clamp(camSpeed + 0.5f, defaultCamSpeed, 12.5f);
+		if (cohesive)
+		{
+			//For Cohesive Increase
+			maxDotSpawnCoeff = Mathf.Clamp(maxDotSpawnCoeff + 0.1f, 0, 1);
+			minDotSpawnCoeff = Mathf.Clamp(minDotSpawnCoeff + 0.1f, 0, 1);
+			//For Cohesive Increase
+			maxSpawnIntervalCoeff = Mathf.Clamp(maxSpawnIntervalCoeff + 0.1f, 0, 1);
+			minSpawnIntervalCoeff = Mathf.Clamp(minSpawnIntervalCoeff + 0.1f, 0, 1);
+		}
+		else
+		{
+			//For Affecting Separately
+			if (maxDotSpawnCoeff != 1) maxDotSpawnCoeff = Mathf.Clamp(maxDotSpawnCoeff + 0.1f, 0, 1);
+			else minDotSpawnCoeff = Mathf.Clamp(minDotSpawnCoeff + 0.1f, 0, 1);
+			//For Affecting Separately
+			if (maxSpawnIntervalCoeff != 1) maxSpawnIntervalCoeff = Mathf.Clamp(maxSpawnIntervalCoeff + 0.1f, 0, 1);
+			else minSpawnIntervalCoeff = Mathf.Clamp(minSpawnIntervalCoeff + 0.1f, 0, 1);
+		}
+
+		defaultCamSpeed = Mathf.Clamp(defaultCamSpeed + 0.5f, defaultCamSpeed, 12.5f);
+		camSpeed = defaultCamSpeed;
 	}
 
 	[PunRPC]
-	//Increase every 30s?
-	void IncreaseDifficultyTest(int stage, bool cohesive)
+	void IncreaseDifficulty(int stage, bool cohesive)
 	{
 		if (stage % 2 != 0) //If Stage is Odd
 		{
@@ -288,6 +336,13 @@ public class GameManager : MonoBehaviourPunCallbacks
 
 		defaultCamSpeed = Mathf.Clamp(defaultCamSpeed + 0.5f, defaultCamSpeed, 12.5f);
 		camSpeed = defaultCamSpeed;
+	}
+
+	[PunRPC]
+	void RegisterTimeStamp(float time, bool setGameStart)
+	{
+		timeStamp = time;
+		if (setGameStart) gameStarted = true;
 	}
 	#endregion
 

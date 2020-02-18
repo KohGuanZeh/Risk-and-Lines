@@ -34,22 +34,22 @@ public class CustomMatchMakingLobbyController : MonoBehaviourPunCallbacks {
 		//Checking Lobby State
 		int lobbyState = PlayerPrefs.GetInt("Lobby State", 0);
 
-		if (lobbyState == 1)
-		{
-			mainPanel.SetActive(false);
-			lobbyPanel.SetActive(true);
-		}
+		if (lobbyState != 0) mainPanel.SetActive(false); //Lobby State may be 2... Have to do it this way since the Room and Lobby are different scripts
+		if (lobbyState == 1) lobbyPanel.SetActive(true);
 	}
 
-	private void Start() {
+	private void Start() 
+	{
 		PhotonNetwork.ConnectUsingSettings(); // connects to photon master servers
 		roomPrefabs = new List<RoomButton>();
 	}
 
-	public override void OnConnectedToMaster() {
+	public override void OnConnectedToMaster() 
+	{
 		PhotonNetwork.AutomaticallySyncScene = true;
-		lobbyConnectButton.SetActive(true);
 		roomListings = new List<RoomInfo>();
+
+		lobbyConnectButton.SetActive(true);
 
 		// check for player name saved to player prefs
 		if (PlayerPrefs.HasKey("NickName")) {

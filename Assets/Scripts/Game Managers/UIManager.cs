@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 
@@ -32,6 +31,7 @@ public class UIManager : MonoBehaviour
     private void Awake()
     {
         inst = this;
+        PhotonNetwork.AutomaticallySyncScene = false;
     }
 
     // Start is called before the first frame update
@@ -102,13 +102,15 @@ public class UIManager : MonoBehaviour
 
     public void BackToWaitRoom()
     {
-        SceneManager.LoadScene(0);
+        PlayerPrefs.SetInt("Lobby State", 2);
+        PhotonNetwork.LoadLevel(0);
     }
 
     public void BackToLobby()
     {
+        PlayerPrefs.SetInt("Lobby State", 1);
         PhotonNetwork.LeaveRoom();
-        SceneManager.LoadScene(0);
+        PhotonNetwork.LoadLevel(0);
     }
     #endregion
 }
