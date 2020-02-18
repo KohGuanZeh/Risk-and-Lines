@@ -80,7 +80,9 @@ public class CustomMatchMakingLobbyController : MonoBehaviourPunCallbacks {
 			if (roomListings != null) // try to find an existing room
 			{
 				tempIndex = roomListings.FindIndex(ByName(room.Name));
-			} else {
+			} 
+			else 
+			{
 				tempIndex = -1;
 			}
 			if (tempIndex != -1) // remove listing because it has been closed

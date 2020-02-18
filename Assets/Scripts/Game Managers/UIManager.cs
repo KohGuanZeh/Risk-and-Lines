@@ -31,19 +31,12 @@ public class UIManager : MonoBehaviour
     private void Awake()
     {
         inst = this;
-        PhotonNetwork.AutomaticallySyncScene = false;
     }
 
     // Start is called before the first frame update
     void Start()
     {
         gm = GameManager.inst;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 
     public void AssignPlayerController(PlayerController player)
@@ -103,6 +96,7 @@ public class UIManager : MonoBehaviour
     public void BackToWaitRoom()
     {
         PlayerPrefs.SetInt("Lobby State", 2);
+        PhotonNetwork.AutomaticallySyncScene = false;
         PhotonNetwork.LoadLevel(0);
     }
 
