@@ -10,9 +10,9 @@ public class RoomButton : MonoBehaviourPunCallbacks {
 	[SerializeField] private Text nameText; // display roomName
 	[SerializeField] private Text sizeText; // display roomSize
 
-	private string roomName; // string for saving the room name
-	private int roomSize; // int for saving the room size
-	private int playerCount;
+	public string roomName; // string for saving the room name
+	public int roomSize; // int for saving the room size
+	public int playerCount;
 
 	[Header("KickPlayer")]
 	public Player currentPlayer; // stores the player so that the player can be kicked
@@ -31,7 +31,7 @@ public class RoomButton : MonoBehaviourPunCallbacks {
 		roomSize = sizeInput;
 		playerCount = countInput;
 		nameText.text = nameInput;
-		sizeText.text = countInput + "/" + sizeInput;
+		if (sizeText) sizeText.text = countInput + "/" + sizeInput;
 	}
 	public void KickPlayer() {
 		photonView.RPC("CloseRoom",currentPlayer);
