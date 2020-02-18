@@ -85,5 +85,9 @@ MonoBehaviour:
   - RegisterTargetTime
   - RegisterTimeStamp
   - SyncScene
+  - CloseRoom
+  - SetReady
+  - RemoveReadyPlayer
+  - UnReady
   DisableAutoOpenWizard: 1
   ShowSettings: 1

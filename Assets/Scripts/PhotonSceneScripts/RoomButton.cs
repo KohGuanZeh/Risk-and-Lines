@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
+using Photon.Realtime;
+using Photon.Pun.UtilityScripts;
 
-public class RoomButton : MonoBehaviour
-{
+public class RoomButton : MonoBehaviourPunCallbacks {
 	[SerializeField] private Text nameText; // display roomName
 	[SerializeField] private Text sizeText; // display roomSize
 
@@ -13,8 +14,14 @@ public class RoomButton : MonoBehaviour
 	public int roomSize; // int for saving the room size
 	public int playerCount;
 
-	public void JoinRoomOnClick()
-	{
+	[Header("KickPlayer")]
+	public Player currentPlayer; // stores the player so that the player can be kicked
+	public GameObject kickButton;
+	[SerializeField] CustomMatchMakingRoomController roomController;
+	 private void Start() {
+		roomController = FindObjectOfType<CustomMatchMakingRoomController>();
+	}
+	public void JoinRoomOnClick() {
 		PhotonNetwork.JoinRoom(roomName);
 		CustomMatchMakingLobbyController.instance.resetLobby();
 	}
@@ -25,5 +32,16 @@ public class RoomButton : MonoBehaviour
 		playerCount = countInput;
 		nameText.text = nameInput;
 		if (sizeText) sizeText.text = countInput + "/" + sizeInput;
+	}
+	public void KickPlayer() {
+		photonView.RPC("CloseRoom",currentPlayer);
+	}
+	[PunRPC]
+	void CloseRoom(){
+		print("Kappa");
+		roomController.lobbyPanel.SetActive(true);
+		roomController.roomPanel.SetActive(false);
+		PhotonNetwork.LeaveRoom();
+		PhotonNetwork.LeaveLobby();
 	}
 }
