@@ -3,9 +3,11 @@ using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 using Photon.Pun;
 using Photon.Realtime;
+using Photon.Pun.UtilityScripts;
 
 public class Matchmake : MonoBehaviourPunCallbacks
 {
@@ -17,22 +19,28 @@ public class Matchmake : MonoBehaviourPunCallbacks
 	[SerializeField] GameObject roomPanel;
 
 	[Header("For Main")]
-	[SerializeField] InputField nameInput;
+	[SerializeField] TMP_InputField nameInput;
 	[SerializeField] GameObject lobbyConnectButton;
 
 	[Header("For Lobby Panel")]
-	[SerializeField] InputField rmName;
-	public List<RoomInfo> rms;
+	[SerializeField] TMP_InputField rmName;
+
 	public Transform rmContainer;
-	[SerializeField] RoomButton rmButtonPrefab;
-	public List<RoomButton> rmButtons;
+	public List<RoomList> rmButtons;
+	[SerializeField] RoomList rmButtonPrefab;
 
 	[Header("For Room Panel")]
-	[SerializeField] GameObject startButton;
-	[SerializeField] Transform playersContainer; // used to display all the players in the current room
-	[SerializeField] RoomButton playerListingPrefab; // Instantiate to display each player in the room
-	[SerializeField] List<RoomButton> playerList;
-	[SerializeField] Text roomNameDisplay; // display the name of the room
+	[SerializeField] TextMeshProUGUI roomNameDisplay; // display the name of the room
+	[SerializeField] Button startReadyButton;
+	[SerializeField] TextMeshProUGUI startReadyButtonTxt;
+
+	[SerializeField] Transform playerContainer; // used to display all the players in the current room
+	[SerializeField] List<PlayerList> playerLists;
+	[SerializeField] PlayerList playerListPrefab; // Instantiate to display each player in the room
+
+	[Header("For Game Start")]
+	[SerializeField] List<int> playersReady;
+	[SerializeField] bool isReady;
 
 	private void Awake()
 	{
@@ -47,9 +55,8 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		string name = PlayerPrefs.GetString("NickName", string.Empty);
 		nameInput.text = name;
 
-		rms = new List<RoomInfo>();
-		rmButtons = new List<RoomButton>();
-		playerList = new List<RoomButton>();
+		rmButtons = new List<RoomList>();
+		playerLists = new List<PlayerList>();
 
 		UpdateSceneOnLobbyState();
 		PhotonNetwork.AutomaticallySyncScene = true;
@@ -75,15 +82,26 @@ public class Matchmake : MonoBehaviourPunCallbacks
 
 			if (idx > -1)
 			{
-				if (!room.IsOpen || !room.IsVisible || room.PlayerCount == room.MaxPlayers)
+				if (!room.IsOpen || !room.IsVisible || room.PlayerCount == room.MaxPlayers || room.PlayerCount < 1)
 				{
-					RoomButton rmButton = rmButtons[idx];
+					RoomList rmButton = rmButtons[idx];
 					rmButtons.RemoveAt(idx);
-					Destroy(rmButton);
+					Destroy(rmButton.gameObject);
 				}
+				else rmButtons[idx].UpdatePlayerCount(room.PlayerCount);
 			}
-			else if (room.IsOpen && room.IsVisible && room.PlayerCount < room.MaxPlayers) ListRoom(room);
+			else if (room.IsOpen && room.IsVisible && room.PlayerCount < room.MaxPlayers)
+			{
+				RoomList rmButton = ListRoom(room);
+				rmButton.UpdatePlayerCount(room.PlayerCount);
+			}
 		}
+	}
+
+	public override void OnDisconnected(DisconnectCause cause)
+	{
+		LeaveRoom();
+		PhotonNetwork.Reconnect();
 	}
 
 	public override void OnJoinedRoom()
@@ -92,20 +110,47 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		lobbyPanel.SetActive(false);
 
 		roomNameDisplay.text = PhotonNetwork.CurrentRoom.Name; //Display Room Name
-		foreach (Player player in PhotonNetwork.PlayerList) ListPlayer(player);
-		if (PhotonNetwork.IsMasterClient) startButton.SetActive(true);
-		else startButton.SetActive(false);
+
+		Player[] players = PhotonNetwork.PlayerList;
+		foreach (Player player in players) ListPlayer(player);
+		PhotonNetwork.LocalPlayer.SetPlayerNumber(players.Length);
+
+		SetStartReadyButton();
+	}
+
+	public override void OnLeftRoom()
+	{
+		lobbyPanel.SetActive(true);
+		roomPanel.SetActive(false);
+
+		foreach (PlayerList playerList in playerLists) Destroy(playerList.gameObject);
+		playerLists.Clear();
+
+		isReady = false;
+		playersReady.Clear();
 	}
 
 	public override void OnPlayerEnteredRoom(Player newPlayer)
 	{
 		ListPlayer(newPlayer);
+		if (PhotonNetwork.IsMasterClient) photonView.RPC("SendCurrentReadyList", newPlayer, playersReady.ToArray());
 	}
 
 	public override void OnPlayerLeftRoom(Player otherPlayer)
 	{
+		Player[] players = PhotonNetwork.PlayerList;
+		for (int i = 0; i < players.Length; i++) players[i].SetPlayerNumber(i + 1);
+
 		RemovePlayerFromListing(otherPlayer.ActorNumber);
-		if (PhotonNetwork.IsMasterClient) startButton.SetActive(true);
+		foreach (PlayerList playerList in playerLists) playerList.UpdateKickButtonDisplay();
+
+		SetStartReadyButton();
+
+		if (PhotonNetwork.IsMasterClient)
+		{
+			photonView.RPC("SendReadyUnready", RpcTarget.AllBuffered, false, otherPlayer.ActorNumber);
+			if (playersReady.Count == PhotonNetwork.CurrentRoom.PlayerCount - 1 && playersReady.Count > 0) startReadyButton.interactable = true;
+		} 
 	}
 	#endregion
 
@@ -118,9 +163,8 @@ public class Matchmake : MonoBehaviourPunCallbacks
 				mainPanel.SetActive(false);
 				lobbyPanel.SetActive(true);
 
-				//Need to Update Room List?
-
 				break;
+
 			case 2: //Show Room Panel
 
 				mainPanel.SetActive(false);
@@ -128,9 +172,7 @@ public class Matchmake : MonoBehaviourPunCallbacks
 				roomPanel.SetActive(true);
 
 				roomNameDisplay.text = PhotonNetwork.CurrentRoom.Name; // update the room name display
-
-				if (PhotonNetwork.IsMasterClient) startButton.SetActive(true);
-				else startButton.SetActive(false);
+				SetStartReadyButton();
 
 				foreach (Player player in PhotonNetwork.PlayerList) ListPlayer(player);
 
@@ -138,12 +180,48 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		}
 	}
 
-	public void StartGame()
+	public void StartGameOrReady()
 	{
 		if (PhotonNetwork.IsMasterClient)
 		{
+			if (playersReady.Count != PhotonNetwork.CurrentRoom.PlayerCount - 1) return; //Master will not be registered under Ready
 			PhotonNetwork.CurrentRoom.IsOpen = false;
 			PhotonNetwork.LoadLevel(2);
+		}
+		else
+		{
+			isReady = !isReady;
+			startReadyButtonTxt.text = isReady ? "Cancel" : "Ready";
+			photonView.RPC("SendReadyUnready", RpcTarget.AllBuffered, isReady, PhotonNetwork.LocalPlayer.ActorNumber);
+		}
+	}
+
+	[PunRPC]
+	public void SendReadyUnready(bool ready, int playerId)
+	{
+		if (ready) playersReady.Add(playerId);
+		else playersReady.Remove(playerId);
+
+		if (PhotonNetwork.IsMasterClient && playersReady.Count == PhotonNetwork.CurrentRoom.PlayerCount - 1 && playersReady.Count > 0) startReadyButton.interactable = true;
+	}
+
+	[PunRPC]
+	public void SendCurrentReadyList(int[] readyPlayers)
+	{
+		playersReady.AddRange(readyPlayers);
+	}
+
+	void SetStartReadyButton()
+	{
+		if (PhotonNetwork.IsMasterClient)
+		{
+			startReadyButton.interactable = false;
+			startReadyButtonTxt.text = "Start Game";
+		}
+		else
+		{
+			startReadyButton.interactable = true;
+			startReadyButtonTxt.text = "Ready";
 		}
 	}
 
@@ -179,34 +257,51 @@ public class Matchmake : MonoBehaviourPunCallbacks
 
 	public void LeaveRoom()
 	{
-		lobbyPanel.SetActive(true);
-		roomPanel.SetActive(false);
+		PhotonNetwork.LeaveRoom();
+		PhotonNetwork.LeaveLobby();
+
+		//Have to Reconnect in order for Room List to Update...
+		StartCoroutine(ReconnectBackToLobby());
+	}
+
+	IEnumerator ReconnectBackToLobby()
+	{
+		//When Leave Lobby, State Becomes Authenticating. Hence just wait till its connected to Master Server 
+		yield return new WaitUntil(() => PhotonNetwork.NetworkClientState == ClientState.ConnectedToMasterServer);
+		PhotonNetwork.JoinLobby();
+		print("Joined Lobby");
 	}
 	#endregion
 
 	#region Listing Functions
-	void ListRoom(RoomInfo room)
+	RoomList ListRoom(RoomInfo room) //return the Room List so I can Update the Player Count in OnRoomListUpdate
 	{
-		RoomButton rmButton = Instantiate(rmButtonPrefab, rmContainer);
-		rmButton.SetRoom(room.Name, room.MaxPlayers, room.PlayerCount);
+		RoomList rmButton = Instantiate(rmButtonPrefab, rmContainer);
+		rmButton.SetRoom(room.Name, room.MaxPlayers);
 		rmButtons.Add(rmButton);
+		return rmButton;
 	}
 
 	void ListPlayer(Player player)
 	{
-		RoomButton playerListing = Instantiate(playerListingPrefab, playersContainer);
-		playerListing.SetRoom(player.NickName, player.ActorNumber, 0);
-		playerList.Add(playerListing);
+		PlayerList playerList = Instantiate(playerListPrefab, playerContainer);
+		playerList.SetPlayerInfo(player.NickName, player.ActorNumber);
+		playerLists.Add(playerList);
 	}
 
 	void RemovePlayerFromListing(int actorId)
 	{
-		int idx = playerList.FindIndex(x => x.roomSize == actorId);
+		int idx = playerLists.FindIndex(x => x.playerId == actorId);
 		if (idx < 0) return;
 
-		RoomButton playerListing = playerList[idx];
-		playerList.RemoveAt(idx);
-		Destroy(playerListing);
+		PlayerList playerList = playerLists[idx];
+		playerLists.RemoveAt(idx);
+		Destroy(playerList.gameObject);
 	}
 	#endregion
+
+	private void OnApplicationQuit()
+	{
+		PlayerPrefs.DeleteKey("Lobby State");
+	}
 }

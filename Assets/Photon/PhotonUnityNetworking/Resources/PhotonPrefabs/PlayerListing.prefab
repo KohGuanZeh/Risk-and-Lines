@@ -197,7 +197,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8180181413516805355}
+      - m_Target: {fileID: 0}
         m_MethodName: KickPlayer
         m_Mode: 1
         m_Arguments:
@@ -219,7 +219,6 @@ GameObject:
   - component: {fileID: 2147581314477845683}
   - component: {fileID: 5410704594956631718}
   - component: {fileID: 8010079287280730878}
-  - component: {fileID: 8180181413516805355}
   - component: {fileID: -3893990766786003477}
   m_Layer: 5
   m_Name: PlayerListing
@@ -285,22 +284,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8180181413516805355
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4396663981584387289}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa0e4b2e39c5b274fabd0707c264a650, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  nameText: {fileID: 1375835790854858466}
-  sizeText: {fileID: 0}
-  kickButton: {fileID: 2890567090656359352}
-  roomController: {fileID: 0}
 --- !u!114 &-3893990766786003477
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -318,7 +301,8 @@ MonoBehaviour:
   prefixField: -1
   Synchronization: 0
   OwnershipTransfer: 0
-  ObservedComponents: []
+  ObservedComponents:
+  - {fileID: 0}
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0

@@ -89,5 +89,10 @@ MonoBehaviour:
   - SetReady
   - RemoveReadyPlayer
   - UnReady
+  - KickPlayer
+  - SetStartReadyButton
+  - SendReadyUnreadyToMaster
+  - SendReadyUnready
+  - SendCurrentReadyList
   DisableAutoOpenWizard: 1
   ShowSettings: 1
