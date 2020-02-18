@@ -9,7 +9,7 @@ using Photon.Realtime;
 
 public class Matchmake : MonoBehaviourPunCallbacks
 {
-	public Matchmake inst;
+	public static Matchmake inst;
 
 	[Header("Panels")]
 	[SerializeField] GameObject mainPanel;
@@ -67,7 +67,8 @@ public class Matchmake : MonoBehaviourPunCallbacks
 	}
 
 	public override void OnRoomListUpdate(List<RoomInfo> roomList)
-	{   
+	{
+		print("Room List Updated");
 		foreach (RoomInfo room in roomList)
 		{
 			int idx = rmButtons.FindIndex(x => x.roomName == room.Name);
@@ -91,6 +92,7 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		lobbyPanel.SetActive(false);
 
 		roomNameDisplay.text = PhotonNetwork.CurrentRoom.Name; //Display Room Name
+		foreach (Player player in PhotonNetwork.PlayerList) ListPlayer(player);
 		if (PhotonNetwork.IsMasterClient) startButton.SetActive(true);
 		else startButton.SetActive(false);
 	}
@@ -136,6 +138,15 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		}
 	}
 
+	public void StartGame()
+	{
+		if (PhotonNetwork.IsMasterClient)
+		{
+			PhotonNetwork.CurrentRoom.IsOpen = false;
+			PhotonNetwork.LoadLevel(2);
+		}
+	}
+
 	#region Join Quit Button Functions
 	public void JoinNetworkLobby() //When you Click Connect Button
 	{
@@ -161,7 +172,7 @@ public class Matchmake : MonoBehaviourPunCallbacks
 	public void CreateRoom()
 	{
 		string name = rmName.text;
-		if (string.IsNullOrEmpty(name) || string.IsNullOrWhiteSpace(name)) name = "Player_" + Random.Range(0, 100).ToString("000");
+		if (string.IsNullOrEmpty(name) || string.IsNullOrWhiteSpace(name)) name = "Room_" + Random.Range(0, 100).ToString("000");
 		PhotonNetwork.CreateRoom(name, new RoomOptions() { IsVisible = true, IsOpen = true, MaxPlayers = (byte)4 });
 		rmName.text = string.Empty;
 	}

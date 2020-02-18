@@ -37,6 +37,7 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         gm = GameManager.inst;
+        PhotonNetwork.AutomaticallySyncScene = false;
     }
 
     public void AssignPlayerController(PlayerController player)
@@ -96,7 +97,6 @@ public class UIManager : MonoBehaviour
     public void BackToWaitRoom()
     {
         PlayerPrefs.SetInt("Lobby State", 2);
-        PhotonNetwork.AutomaticallySyncScene = false;
         PhotonNetwork.LoadLevel(0);
     }
 
