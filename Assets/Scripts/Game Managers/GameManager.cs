@@ -356,6 +356,8 @@ public class GameManager : MonoBehaviourPunCallbacks
 		gui.HideSpectateButton();
 		gui.ShowHideEndScreen(true);
 		gui.SwitchToSpectateMode(false); //In the case where we want to hide Spectate UI on End
+
+		PhotonNetwork.CurrentRoom.IsOpen = true;
 	}
 	#endregion
 

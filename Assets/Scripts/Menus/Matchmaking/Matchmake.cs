@@ -59,7 +59,6 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		playerLists = new List<PlayerList>();
 
 		UpdateSceneOnLobbyState();
-		PhotonNetwork.AutomaticallySyncScene = true;
 	}
 
 	#region Pun Callback Functions
@@ -128,12 +127,17 @@ public class Matchmake : MonoBehaviourPunCallbacks
 
 		isReady = false;
 		playersReady.Clear();
+		PhotonNetwork.AutomaticallySyncScene = false;
 	}
 
 	public override void OnPlayerEnteredRoom(Player newPlayer)
 	{
 		ListPlayer(newPlayer);
-		if (PhotonNetwork.IsMasterClient) photonView.RPC("SendCurrentReadyList", newPlayer, playersReady.ToArray());
+		if (PhotonNetwork.IsMasterClient)
+		{
+			photonView.RPC("SendCurrentReadyList", newPlayer, playersReady.ToArray());
+			startReadyButton.interactable = false;
+		} 
 	}
 
 	public override void OnPlayerLeftRoom(Player otherPlayer)
@@ -146,11 +150,7 @@ public class Matchmake : MonoBehaviourPunCallbacks
 
 		SetStartReadyButton();
 
-		if (PhotonNetwork.IsMasterClient)
-		{
-			photonView.RPC("SendReadyUnready", RpcTarget.AllBuffered, false, otherPlayer.ActorNumber);
-			if (playersReady.Count == PhotonNetwork.CurrentRoom.PlayerCount - 1 && playersReady.Count > 0) startReadyButton.interactable = true;
-		} 
+		if (PhotonNetwork.IsMasterClient) photonView.RPC("SendReadyUnready", RpcTarget.AllBuffered, false, otherPlayer.ActorNumber);
 	}
 	#endregion
 
@@ -162,6 +162,11 @@ public class Matchmake : MonoBehaviourPunCallbacks
 
 				mainPanel.SetActive(false);
 				lobbyPanel.SetActive(true);
+
+				PhotonNetwork.LeaveRoom();
+				PhotonNetwork.LeaveLobby();
+
+				StartCoroutine(ReconnectBackToLobby());
 
 				break;
 
@@ -202,7 +207,16 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		if (ready) playersReady.Add(playerId);
 		else playersReady.Remove(playerId);
 
-		if (PhotonNetwork.IsMasterClient && playersReady.Count == PhotonNetwork.CurrentRoom.PlayerCount - 1 && playersReady.Count > 0) startReadyButton.interactable = true;
+		if (playersReady.Count == PhotonNetwork.CurrentRoom.PlayerCount - 1 && playersReady.Count > 0)
+		{
+			if (PhotonNetwork.IsMasterClient) startReadyButton.interactable = true;
+			PhotonNetwork.AutomaticallySyncScene = true;
+		}
+		else
+		{
+			if (PhotonNetwork.IsMasterClient) startReadyButton.interactable = false;
+			PhotonNetwork.AutomaticallySyncScene = false;
+		}
 	}
 
 	[PunRPC]

@@ -103,7 +103,6 @@ public class UIManager : MonoBehaviour
     public void BackToLobby()
     {
         PlayerPrefs.SetInt("Lobby State", 1);
-        PhotonNetwork.LeaveRoom();
         PhotonNetwork.LoadLevel(0);
     }
     #endregion
