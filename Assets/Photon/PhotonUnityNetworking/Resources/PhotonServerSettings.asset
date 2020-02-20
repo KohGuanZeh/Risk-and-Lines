@@ -94,5 +94,7 @@ MonoBehaviour:
   - SendReadyUnreadyToMaster
   - SendReadyUnready
   - SendCurrentReadyList
+  - CamShake
+  - CamShakeDuration
   DisableAutoOpenWizard: 1
   ShowSettings: 1

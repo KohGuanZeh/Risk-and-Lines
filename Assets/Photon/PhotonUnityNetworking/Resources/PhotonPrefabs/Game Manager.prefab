@@ -130,6 +130,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e4affc6f0cf9f74b8bed4605f65b298, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gui: {fileID: 0}
   cam: {fileID: 117266251327048048}
   moveDelta: {x: 0, y: 0, z: 0}
   camPos: {x: 0, y: 0, z: 0}
@@ -147,7 +148,14 @@ MonoBehaviour:
   minMaxXInterval: {x: 6, y: 10}
   minMaxXOffset: {x: 0, y: 3}
   playerSpawnPos: {fileID: 831214271}
-  currentPlayer: 0
+  difficultyStage: 0
+  timeStamp: 0
+  gameStarted: 0
+  increaseAllDiff: 0
+  cohesive: 0
+  gameEnded: 0
+  playersAlive: 0
+  playerInfos: []
 --- !u!114 &2702712245036865841
 MonoBehaviour:
   m_ObjectHideFlags: 0

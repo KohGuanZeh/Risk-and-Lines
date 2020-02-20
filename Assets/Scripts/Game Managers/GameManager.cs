@@ -9,26 +9,23 @@ using Photon.Realtime;
 using Photon.Pun.UtilityScripts;
 
 [System.Serializable]
-public struct PlayerInfo
-{
+public struct PlayerInfo {
 	public int actorId;
 	public string playerName;
 	public float deathTime;
 
-	public PlayerInfo(int id, string name, float time)
-	{
+	public PlayerInfo(int id, string name, float time) {
 		actorId = id;
 		playerName = name;
 		deathTime = time;
 	}
 }
 
-public class GameManager : MonoBehaviourPunCallbacks
-{
+public class GameManager : MonoBehaviourPunCallbacks {
 	[Header("General Variables")]
 	public static GameManager inst;
 	[SerializeField] UIManager gui;
-   
+
 	[Header("Camera Items")]
 	public Camera cam;
 	public Vector3 moveDelta; //Stores Move Delta of the Camera;
@@ -37,11 +34,11 @@ public class GameManager : MonoBehaviourPunCallbacks
 	public float CamLeftBounds { get { return transform.position.x - cam.orthographicSize * cam.aspect; } }
 
 	[Header("For Spawning Dots")]
-	[Range(0,1)] public float minSpawnIntervalCoeff; //> Coeff, > Interval Dist
-	[Range(0,1)] public float maxSpawnIntervalCoeff; //> Coeff, > Interval Dist
-	[Range(0,1)] public float minDotSpawnCoeff; //Coefficient that affects Dot Spawning. > Coeff, < Dots Spawn
-	[Range(0,1)] public float maxDotSpawnCoeff; //Coefficient that affects Dot Spawning. > Coeff, < Dots Spawn
-	//public Vector2Int minMaxDotSpawn;
+	[Range(0, 1)] public float minSpawnIntervalCoeff; //> Coeff, > Interval Dist
+	[Range(0, 1)] public float maxSpawnIntervalCoeff; //> Coeff, > Interval Dist
+	[Range(0, 1)] public float minDotSpawnCoeff; //Coefficient that affects Dot Spawning. > Coeff, < Dots Spawn
+	[Range(0, 1)] public float maxDotSpawnCoeff; //Coefficient that affects Dot Spawning. > Coeff, < Dots Spawn
+												 //public Vector2Int minMaxDotSpawn;
 
 	public float yMargin; //Offset so that the Dot do not spawn at exactly the top of bottom of the Screen
 	public Vector2 minMaxY; //Minimum and Maximum Y that Dot will Spawn
@@ -68,22 +65,25 @@ public class GameManager : MonoBehaviourPunCallbacks
 	public int playersAlive;
 	public PlayerInfo[] playerInfos;
 
-	private void Awake()
-	{
+	[Header("CamShake")]
+	[SerializeField] float shakeDuration = 0f;
+	[SerializeField] float setShakeDuration;
+	[SerializeField] float shakeAmount = 0f;
+	[SerializeField] float decreaseFactor = 1.0f;
+
+	private void Awake() {
 		inst = this;
 		cam = GetComponent<Camera>();
 		camPos = cam.transform.position;
 
 		//Only Master Client will handle Camera Movement Changes and Dot Spawning so only Master will need to Initialise this Value and Pass it to the rest
-		if (PhotonNetwork.IsMasterClient)
-		{
+		if (PhotonNetwork.IsMasterClient) {
 			InitialiseValues();
 			GetPlayerInfoAtStart();
-		} 
+		}
 	}
 
-	void Start()
-	{
+	void Start() {
 		playersAlive = PhotonNetwork.PlayerList.Length;
 		gui = UIManager.inst;
 		CreatePlayer();
@@ -92,10 +92,8 @@ public class GameManager : MonoBehaviourPunCallbacks
 		if (PhotonNetwork.IsMasterClient) SpawnDots();
 	}
 
-	private void Update()
-	{
-		if (Input.GetKeyDown(KeyCode.A) && PhotonNetwork.IsMasterClient)
-		{
+	private void Update() {
+		if (Input.GetKeyDown(KeyCode.A) && PhotonNetwork.IsMasterClient) {
 			photonView.RPC("ToggleMoveCam", RpcTarget.AllBuffered, camSpeed != 0);
 
 			//Temporary Check for when Game Started. Wait till we have a Coroutine or what not that registers when to move
@@ -103,30 +101,28 @@ public class GameManager : MonoBehaviourPunCallbacks
 		}
 		if (Input.GetKeyDown(KeyCode.G)) PhotonNetwork.LeaveRoom();
 		if (Input.GetKeyDown(KeyCode.Q)) photonView.RPC("IncreaseDifficulty", RpcTarget.AllBuffered);
+		if (Input.GetKeyDown(KeyCode.C)) {
+			shakeDuration = setShakeDuration;
+		}
+		CamShake();
 	}
 
-	void FixedUpdate()
-	{
+	void FixedUpdate() {
 		//Only Master Client will handle Camera Movement Value Changes and Dot Spawning
-		if (PhotonNetwork.IsMasterClient)
-		{
+		if (PhotonNetwork.IsMasterClient) {
 			#region Temp Difficulty Testing
-			if (gameStarted)
-			{
+			if (gameStarted) {
 				timeStamp += Time.fixedDeltaTime;
-				
-				if (timeStamp >= 30)
-				{
+
+				if (timeStamp >= 30) {
 					if (increaseAllDiff) photonView.RPC("IncreaseDifficultyAll", RpcTarget.AllBuffered, cohesive);
-					else
-					{
+					else {
 						difficultyStage++;
 						photonView.RPC("IncreaseDifficulty", RpcTarget.AllBuffered, difficultyStage, cohesive);
 					}
 
 					photonView.RPC("RegisterTimeStamp", RpcTarget.AllBuffered, 0f, false);
-				}
-				else photonView.RPC("RegisterTimeStamp", RpcTarget.OthersBuffered, timeStamp, false);
+				} else photonView.RPC("RegisterTimeStamp", RpcTarget.OthersBuffered, timeStamp, false);
 			}
 			#endregion
 			SpawnDots();
@@ -137,25 +133,23 @@ public class GameManager : MonoBehaviourPunCallbacks
 	}
 
 	#region For Spawning of player
-	void CreatePlayer()
-	{
+	void CreatePlayer() {
 		//Spawn Players Evenly
 		float minY = cam.transform.position.y - cam.orthographicSize;
 		float maxY = cam.transform.position.y + cam.orthographicSize;
 		float interval = (maxY - minY) / (PhotonNetwork.PlayerList.Length + 1);
 		Vector3 spawnPos = new Vector3(playerSpawnPos.position.x, maxY - interval * (PhotonNetwork.LocalPlayer.GetPlayerNumber()), 0);
-		PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Player"), spawnPos , Quaternion.identity);
+		PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Player"), spawnPos, Quaternion.identity);
 	}
 	#endregion
-	
+
 	#region Networking Functions
 
 	#region For Initialisation
-	void InitialiseValues()
-	{
+	void InitialiseValues() {
 		//Set Spawn Dot Values
 		minMaxY = new Vector2(camPos.y - cam.orthographicSize + yMargin, camPos.y + cam.orthographicSize - yMargin);
-		
+
 		xInterval = Random.Range(minMaxXInterval.x, minMaxXInterval.y);
 		lastXSpawn = cam.transform.position.x - xInterval - 5;
 		xRemainder = (cam.orthographicSize * 2) * cam.aspect;
@@ -164,23 +158,20 @@ public class GameManager : MonoBehaviourPunCallbacks
 	}
 
 	[PunRPC]
-	void SendInitValues(Vector2 minMaxY, float xInterval, float lastXSpawn, float xRemainder)
-	{
+	void SendInitValues(Vector2 minMaxY, float xInterval, float lastXSpawn, float xRemainder) {
 		this.minMaxY = minMaxY;
 		this.xInterval = xInterval;
 		this.lastXSpawn = lastXSpawn;
 		this.xRemainder = xRemainder;
 	}
 
-	void GetPlayerInfoAtStart()
-	{
+	void GetPlayerInfoAtStart() {
 		Player[] players = PhotonNetwork.PlayerList;
 		int[] ids = new int[players.Length];
 		string[] names = new string[players.Length];
 		float[] time = new float[players.Length];
 
-		for (int i = 0; i < players.Length; i++)
-		{
+		for (int i = 0; i < players.Length; i++) {
 			ids[i] = players[i].ActorNumber;
 			names[i] = players[i].NickName;
 			time[i] = -1;
@@ -190,35 +181,29 @@ public class GameManager : MonoBehaviourPunCallbacks
 	}
 
 	[PunRPC]
-	void InitialiseLeaderboard(int[] ids, string[] names, float[] time)
-	{
+	void InitialiseLeaderboard(int[] ids, string[] names, float[] time) {
 		playerInfos = new PlayerInfo[ids.Length];
 		for (int i = 0; i < ids.Length; i++) playerInfos[i] = new PlayerInfo(ids[i], names[i], time[i]);
 	}
 
 	[PunRPC]
-	void UpdateLeaderboard(int id, float time)
-	{
+	void UpdateLeaderboard(int id, float time) {
 		int idx = System.Array.IndexOf(playerInfos, playerInfos.Where(info => info.actorId == id).First());
 		playerInfos[idx].deathTime = time;
-		System.Array.Sort(playerInfos, (x,y) => y.deathTime.CompareTo(x.deathTime));
+		System.Array.Sort(playerInfos, (x, y) => y.deathTime.CompareTo(x.deathTime));
 	}
 	#endregion
 
 	#region For Camera Movement
 	[PunRPC]
-	void ToggleMoveCam(bool isMoving)
-	{
-		if (isMoving)
-		{
+	void ToggleMoveCam(bool isMoving) {
+		if (isMoving) {
 			camSpeed = 0;
 			moveDelta = Vector2.zero;
-		} 
-		else camSpeed = defaultCamSpeed;
+		} else camSpeed = defaultCamSpeed;
 	}
 
-	void MoveCamera()
-	{
+	void MoveCamera() {
 		if (camSpeed == 0) return;
 
 		moveDelta = Vector3.right * camSpeed * Time.fixedDeltaTime;
@@ -226,19 +211,16 @@ public class GameManager : MonoBehaviourPunCallbacks
 	}
 
 	[PunRPC]
-	void SendNewCamValues(Vector3 moveDelta, Vector3 camPos)
-	{
+	void SendNewCamValues(Vector3 moveDelta, Vector3 camPos) {
 		this.moveDelta = moveDelta;
 		this.camPos = camPos;
 	}
 	#endregion
 
 	#region For Dot Spawning
-	void SpawnDots()
-	{
+	void SpawnDots() {
 		xRemainder += moveDelta.x;
-		while (xRemainder - xInterval > -0.25f)
-		{
+		while (xRemainder - xInterval > -0.25f) {
 			xRemainder -= xInterval;
 			lastXSpawn += xInterval;
 
@@ -252,8 +234,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 			float yHeight = (cam.orthographicSize - yMargin) * 2;
 			float maxY = yHeight / dotsToSpawn;
 
-			for (int i = 0; i < dotsToSpawn; i++)
-			{
+			for (int i = 0; i < dotsToSpawn; i++) {
 				//Edit Min Max Offset Based on next Interval
 				float xOffset = Random.Range(0, 0.666f) * xInterval; //Max Offset will be 2/3 of X Interval
 				float x = lastXSpawn + xOffset;
@@ -267,27 +248,22 @@ public class GameManager : MonoBehaviourPunCallbacks
 	}
 
 	[PunRPC]
-	void UpdateDotSpawnValues(float xRemainder, float xInterval, float lastXSpawn)
-	{
+	void UpdateDotSpawnValues(float xRemainder, float xInterval, float lastXSpawn) {
 		this.xRemainder = xRemainder;
 		this.xInterval = xInterval;
 		this.lastXSpawn = lastXSpawn;
 	}
 
 	[PunRPC]
-	void IncreaseDifficultyAll(bool cohesive)
-	{
-		if (cohesive)
-		{
+	void IncreaseDifficultyAll(bool cohesive) {
+		if (cohesive) {
 			//For Cohesive Increase
 			maxDotSpawnCoeff = Mathf.Clamp(maxDotSpawnCoeff + 0.1f, 0, 1);
 			minDotSpawnCoeff = Mathf.Clamp(minDotSpawnCoeff + 0.1f, 0, 1);
 			//For Cohesive Increase
 			maxSpawnIntervalCoeff = Mathf.Clamp(maxSpawnIntervalCoeff + 0.1f, 0, 1);
 			minSpawnIntervalCoeff = Mathf.Clamp(minSpawnIntervalCoeff + 0.1f, 0, 1);
-		}
-		else
-		{
+		} else {
 			//For Affecting Separately
 			if (maxDotSpawnCoeff != 1) maxDotSpawnCoeff = Mathf.Clamp(maxDotSpawnCoeff + 0.1f, 0, 1);
 			else minDotSpawnCoeff = Mathf.Clamp(minDotSpawnCoeff + 0.1f, 0, 1);
@@ -301,33 +277,24 @@ public class GameManager : MonoBehaviourPunCallbacks
 	}
 
 	[PunRPC]
-	void IncreaseDifficulty(int stage, bool cohesive)
-	{
+	void IncreaseDifficulty(int stage, bool cohesive) {
 		if (stage % 2 != 0) //If Stage is Odd
 		{
-			if (cohesive)
-			{
+			if (cohesive) {
 				//For Cohesive Increase
 				maxDotSpawnCoeff = Mathf.Clamp(maxDotSpawnCoeff + 0.1f, 0, 1);
 				minDotSpawnCoeff = Mathf.Clamp(minDotSpawnCoeff + 0.1f, 0, 1);
-			}
-			else
-			{
+			} else {
 				//For Affecting Separately
 				if (maxDotSpawnCoeff != 1) maxDotSpawnCoeff = Mathf.Clamp(maxDotSpawnCoeff + 0.1f, 0, 1);
 				else minDotSpawnCoeff = Mathf.Clamp(minDotSpawnCoeff + 0.1f, 0, 1);
 			}
-		}
-		else
-		{
-			if (cohesive)
-			{
+		} else {
+			if (cohesive) {
 				//For Cohesive Increase
 				maxSpawnIntervalCoeff = Mathf.Clamp(maxSpawnIntervalCoeff + 0.1f, 0, 1);
 				minSpawnIntervalCoeff = Mathf.Clamp(minSpawnIntervalCoeff + 0.1f, 0, 1);
-			}
-			else
-			{
+			} else {
 				//For Affecting Separately
 				if (maxSpawnIntervalCoeff != 1) maxSpawnIntervalCoeff = Mathf.Clamp(maxSpawnIntervalCoeff + 0.1f, 0, 1);
 				else minSpawnIntervalCoeff = Mathf.Clamp(minSpawnIntervalCoeff + 0.1f, 0, 1);
@@ -339,8 +306,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 	}
 
 	[PunRPC]
-	void RegisterTimeStamp(float time, bool setGameStart)
-	{
+	void RegisterTimeStamp(float time, bool setGameStart) {
 		timeStamp = time;
 		if (setGameStart) gameStarted = true;
 	}
@@ -361,8 +327,19 @@ public class GameManager : MonoBehaviourPunCallbacks
 	}
 	#endregion
 
-	private void OnApplicationQuit()
-	{
+	private void OnApplicationQuit() {
 		PlayerPrefs.DeleteKey("Lobby State");
+	}
+
+	// [PunRPC]
+	// void CamShakeDuration() {
+	// 	shakeDuration = setShakeDuration;
+	// }
+	void CamShake() {
+		if (shakeDuration >= 0) {
+			cam.transform.localPosition += Random.insideUnitSphere * shakeAmount;
+
+			shakeDuration -= Time.deltaTime * decreaseFactor;
+		}
 	}
 }
