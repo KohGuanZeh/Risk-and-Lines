@@ -332,9 +332,9 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	}
 
 	// [PunRPC]
-	// void CamShakeDuration() {
-	// 	shakeDuration = setShakeDuration;
-	// }
+	public void CamShakeDuration() {
+		shakeDuration = setShakeDuration;
+	}
 	void CamShake() {
 		if (shakeDuration >= 0) {
 			cam.transform.localPosition += Random.insideUnitSphere * shakeAmount;
