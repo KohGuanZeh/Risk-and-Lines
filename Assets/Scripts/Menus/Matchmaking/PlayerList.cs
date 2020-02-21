@@ -4,11 +4,12 @@ using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
 
-public class PlayerList : MonoBehaviour
+public class PlayerList : Listable
 {
     [Header("Object Components")]
     [SerializeField] TextMeshProUGUI playerNameTxt;
     public GameObject kickButton;
+    public Image readyIcon;
 
     [Header("Player List Info")]
     public string playerName;
@@ -34,6 +35,23 @@ public class PlayerList : MonoBehaviour
 
     public void KickPlayer() //To be in Button Function
     {
+        readyIcon.gameObject.SetActive(false);
         if (PhotonNetwork.IsMasterClient) PhotonNetwork.CloseConnection(PhotonNetwork.CurrentRoom.GetPlayer(playerId));
+    }
+
+    public void SetMasterClientIcon(bool isMaster)
+    {
+        readyIcon.sprite = Matchmake.inst.masterAndClientIcon[isMaster ? 0 : 1];
+    }
+
+    public void SetReadyUnreadyIcon(bool isReady)
+    {
+        readyIcon.gameObject.SetActive(isReady);
+    }
+
+    public override void OnListRemove()
+    {
+        Matchmake.inst.UpdateListingPosition(1);
+        Destroy(gameObject);
     }
 }

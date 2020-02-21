@@ -2,62 +2,73 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
-// photon namespaces
+using TMPro;
 using Photon.Pun;
 using Photon.Realtime;
 public class ChatManager : MonoBehaviourPun {
+
 	// variables for the chat
-	Player player;
-	public InputField chatInput;
-	public Transform chatContainer; // to hold all the chat messages
-	public GameObject textPrefab;
-	public RectTransform chatRect, testRect;
-	[Header("Edit Chat Size")]
-	[SerializeField] RectTransform[] childRects;
-	[SerializeField] float chatSize;
-	private void Update() {
-		if (Input.GetKeyDown(KeyCode.KeypadEnter)) {
-			deliverMsg();
-		}
-		if (Input.GetKeyDown(KeyCode.Q)) {
-			EditChatSize(); // calculates the chat size
-		}
+	public static ChatManager inst;
+	public TMP_InputField chatInput;
+	public RectTransform chatContainer; // to hold all the chat messages
+
+	[Header("For Chat Size")]
+	[SerializeField] List<TextMeshProUGUI> texts;
+	public float chatSize;
+
+	private void Awake()
+	{
+		inst = this;
+		chatSize = 0;
 	}
-	public void deliverMsg() {
-		photonView.RPC("SendMsg", RpcTarget.All, PhotonNetwork.NickName + ": " + chatInput.text); // to send the others this message
-		chatInput.text = ""; // clears the text inputtext after the message has been sent
+
+	private void Update() 
+	{
+		if (Input.GetKeyDown(KeyCode.KeypadEnter)) DeliverMsg();
+	}
+
+	public void DeliverMsg() 
+	{
+		photonView.RPC("SendMsg", RpcTarget.All, PhotonNetwork.NickName, chatInput.text); // to send the others this message
+		chatInput.text = string.Empty; // clears the text inputtext after the message has been sent
 	}
 
 	[PunRPC]
-	//sends the message to the chat box
-	void SendMsg(string msg) {
-		if (msg != PhotonNetwork.NickName + ": " + "" && msg.Length > 1) {
-			GameObject textObj = PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "MessagePrefab"), Vector2.zero, Quaternion.identity);
-			//GameObject textObj = Instantiate(textPrefab,chatContainer);
-			textObj.GetComponent<Text>().text = msg; // sets the text of the prefab and acts as a message
+	//Sends the message to the Chat Box
+	void SendMsg(string nickname, string msg) 
+	{
+		if (!string.IsNullOrEmpty(msg) && !string.IsNullOrWhiteSpace(msg)) 
+		{
+			GameObject textObj = PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Message Prefab"), Vector2.zero, Quaternion.identity);
+
+			TextMeshProUGUI text = textObj.GetComponent<TextMeshProUGUI>(); // sets the text of the prefab and acts as a message
+			text.text = string.Format("{0}: {1}", nickname, msg);
+
 			textObj.transform.parent = chatContainer;
-			textObj.transform.localScale = new Vector3(1, 1, 1);
+			textObj.transform.localScale = Vector3.one;
 
-			StartCoroutine(ChangeChatSize());
+			texts.Add(text);
+
+			StartCoroutine(ChangeChatSize(text));
 		}
 	}
-	void EditChatSize() {
-		chatSize = 0; // resets to recalculate the size again
-		childRects = chatContainer.GetComponentsInChildren<RectTransform>();
-		for (int i = 0; i < childRects.Length; i++) {
-			if (i >= 1) {
-				chatSize += childRects[i].sizeDelta.y;
 
-				// checks each time after it adds
-				if (chatSize >= chatRect.sizeDelta.y - 20) {
-					chatRect.sizeDelta = new Vector2(chatRect.sizeDelta.x, chatRect.sizeDelta.y + childRects[i].sizeDelta.y + 30f);
-				}
-			}
-		}
+	void EditChatSize(TextMeshProUGUI text) 
+	{
+		chatSize += text.rectTransform.sizeDelta.y;
+		if (chatSize >= chatContainer.sizeDelta.y) chatContainer.sizeDelta = new Vector2(chatContainer.sizeDelta.x, chatSize + 10);
+		if (chatSize > 495) chatContainer.anchoredPosition = new Vector2(chatContainer.anchoredPosition.x, chatSize - 495);
 	}
-	IEnumerator ChangeChatSize() {
+
+	IEnumerator ChangeChatSize(TextMeshProUGUI text) 
+	{
 		yield return new WaitForSeconds(.1f);
-		EditChatSize();
+		EditChatSize(text);
+	}
+
+	public void ClearChat()
+	{
+		chatSize = 0;
+		foreach (TextMeshProUGUI text in texts) Destroy(text.gameObject);
 	}
 }
