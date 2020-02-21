@@ -3495,6 +3495,16 @@ PrefabInstance:
       propertyPath: playerSpawnPos
       value: 
       objectReference: {fileID: 7000273846670663602}
+    - target: {fileID: 7000273845515985618, guid: 42cc4e963b86bb742874c0425f756bdb,
+        type: 3}
+      propertyPath: shakeAmount
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7000273845515985618, guid: 42cc4e963b86bb742874c0425f756bdb,
+        type: 3}
+      propertyPath: setShakeDuration
+      value: 0.2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 42cc4e963b86bb742874c0425f756bdb, type: 3}
 --- !u!4 &7000273846670663602 stripped

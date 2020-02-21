@@ -4,16 +4,15 @@ using UnityEngine;
 
 using Photon.Pun;
 
-public class PlayerController : MonoBehaviourPunCallbacks
-{
+public class PlayerController : MonoBehaviourPunCallbacks {
 	[Header("General Player Properties")]
 	[SerializeField] GameManager gm;
 	[SerializeField] UIManager gui;
 	[SerializeField] Rigidbody2D rb;
-    [SerializeField] TravelLine linePreset; //Stores the Line Prefab that it will Instantiate each time Player travels
+	[SerializeField] TravelLine linePreset; //Stores the Line Prefab that it will Instantiate each time Player travels
 
-    [Header("Player Movement Properties")]
-    [SerializeField] float travelSpeed = 5; //Speed at which the Player Dot travels
+	[Header("Player Movement Properties")]
+	[SerializeField] float travelSpeed = 5; //Speed at which the Player Dot travels
 	[SerializeField] TravelLine currentTravelLine; //The Line 
 	[SerializeField] TravelDot targetDot, storedDot; //Target Dot is which Dot Player will travel to. Stored Dot is The Dot that is currently tapped
 	[SerializeField] float doubleTapThreshold; //this is the time before travel and also the time to register a double tap
@@ -24,23 +23,19 @@ public class PlayerController : MonoBehaviourPunCallbacks
 	[SerializeField] float blinkCd; //Timer used to check whether it should restore a Blink.
 	[SerializeField] float maxCdTime = 5f; //Max Time for Blink to refill
 
-    void Start()
-    {
+	void Start() {
 		gm = GameManager.inst;
 		gui = UIManager.inst;
 		gui.AssignPlayerController(this); //May need photonView.IsMine
 		rb = GetComponent<Rigidbody2D>();
 
 		blinkCd = maxCdTime;
-    }
+	}
 
-    void Update()
-    {
+	void Update() {
 		//Decrease the Wait Time every frame
-		if (photonView.IsMine)
-		{
-			if (!gm.gameEnded)
-			{
+		if (photonView.IsMine) {
+			if (!gm.gameEnded) {
 				UpdateBlinkCd();
 
 				doubleTapThreshold = Mathf.Max(doubleTapThreshold - Time.deltaTime, 0);
@@ -53,49 +48,40 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		}
 	}
 
-	void TouchControls()
-	{
+	void TouchControls() {
 		Touch touch = Input.GetTouch(0); // this is for the first finger that entered the screen
 
 		// Sets the dot to move towards
-		if (touch.phase == TouchPhase.Began)
-		{
+		if (touch.phase == TouchPhase.Began) {
 			RaycastHit2D rayHit = Physics2D.GetRayIntersection(gm.cam.ScreenPointToRay(touch.position)); // this to get the direciton of the raycast
 
 			//Getting the Dot
-			if (!ReferenceEquals(rayHit.collider,null))
-			{
+			if (!ReferenceEquals(rayHit.collider, null)) {
 				TravelDot travelDot = rayHit.collider.GetComponent<TravelDot>();
-				if (!ReferenceEquals(travelDot, null))
-				{
+				if (!ReferenceEquals(travelDot, null)) {
 					bool blinked = false;
 
-					if (ReferenceEquals(targetDot, null) && !travelDot.locked)
-					{
+					if (ReferenceEquals(targetDot, null) && !travelDot.locked) {
 						travelDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, true);
 						targetDot = travelDot;
 
 						if (currentTravelLine) currentTravelLine.photonView.RPC("AddNewPoint", RpcTarget.AllBuffered, transform.position);
-						else
-						{
+						else {
 							currentTravelLine = ObjectPooling.inst.SpawnFromPool("Line", transform.position, Quaternion.identity).GetComponent<TravelLine>(); //Instantiate(linePreset, transform); //Will be changed to Object Pooling
 							currentTravelLine.photonView.RPC("CreateNewLine", RpcTarget.AllBuffered, transform.position);
 							currentTravelLine.photonView.RPC("SetPlayerRefId", RpcTarget.AllBuffered, photonView.ViewID);
 						}
-					} 
-					else if (ReferenceEquals(travelDot, storedDot) && doubleTapThreshold > 0 && blinkCount > 0) //If there is already a Stored Dot, This is Considered a Double Tap
-					{
+					} else if (ReferenceEquals(travelDot, storedDot) && doubleTapThreshold > 0 && blinkCount > 0) //If there is already a Stored Dot, This is Considered a Double Tap
+					  {
 						blinked = true;
-						if (travelDot.locked && targetDot != travelDot)
-						{
+						if (travelDot.locked && targetDot != travelDot) {
 							storedDot = null;
 							return;
 						}
 						BlinkControl();
 					}
 
-					if (!blinked)
-					{
+					if (!blinked) {
 						storedDot = travelDot;
 						doubleTapThreshold = 0.5f;
 					}
@@ -104,46 +90,37 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		}
 	}
 
-	void MouseControls()
-	{
-		if (Input.GetMouseButtonDown(0))
-		{
+	void MouseControls() {
+		if (Input.GetMouseButtonDown(0)) {
 			RaycastHit2D rayHit = Physics2D.GetRayIntersection(gm.cam.ScreenPointToRay(Input.mousePosition)); // this to get the direciton of the raycast
 
 			//Getting the Dot
-			if (!ReferenceEquals(rayHit.collider, null))
-			{
+			if (!ReferenceEquals(rayHit.collider, null)) {
 				TravelDot travelDot = rayHit.collider.GetComponent<TravelDot>();
-				if (!ReferenceEquals(travelDot, null))
-				{
+				if (!ReferenceEquals(travelDot, null)) {
 					bool blinked = false;
 
-					if (ReferenceEquals(targetDot, null) && !travelDot.locked)
-					{
+					if (ReferenceEquals(targetDot, null) && !travelDot.locked) {
 						travelDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, true);
 						targetDot = travelDot;
 
 						if (currentTravelLine) currentTravelLine.photonView.RPC("AddNewPoint", RpcTarget.AllBuffered, transform.position);
-						else
-						{
+						else {
 							currentTravelLine = ObjectPooling.inst.SpawnFromPool("Line", transform.position, Quaternion.identity).GetComponent<TravelLine>(); //Instantiate(linePreset, transform); //Will be changed to Object Pooling
 							currentTravelLine.photonView.RPC("CreateNewLine", RpcTarget.AllBuffered, transform.position);
 							currentTravelLine.photonView.RPC("SetPlayerRefId", RpcTarget.AllBuffered, photonView.ViewID);
 						}
-					}
-					else if (ReferenceEquals(travelDot, storedDot) && doubleTapThreshold > 0 && blinkCount > 0) //If there is already a Stored Dot, This is Considered a Double Tap
-					{
+					} else if (ReferenceEquals(travelDot, storedDot) && doubleTapThreshold > 0 && blinkCount > 0) //If there is already a Stored Dot, This is Considered a Double Tap
+					  {
 						blinked = true;
-						if (travelDot.locked && targetDot != travelDot)
-						{
+						if (travelDot.locked && targetDot != travelDot) {
 							storedDot = null;
 							return;
 						}
 						BlinkControl();
 					}
 
-					if (!blinked)
-					{
+					if (!blinked) {
 						storedDot = travelDot;
 						doubleTapThreshold = 0.5f;
 					}
@@ -153,8 +130,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 	}
 
 	// for normal travel
-	void TravelControl()
-	{
+	void TravelControl() {
 		if (ReferenceEquals(targetDot, null)) return;
 
 		transform.position = Vector2.MoveTowards(transform.position, targetDot.transform.position, (gm.camSpeed + travelSpeed) * Time.deltaTime);
@@ -162,18 +138,16 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 		//To remove the targetDot
 		float distanceToDot = Vector2.Distance(transform.position, targetDot.transform.position);
-		
-		if (distanceToDot <= distanceToStop)
-		{
+
+		if (distanceToDot <= distanceToStop) {
 			currentTravelLine.photonView.RPC("OnFinishedTravel", RpcTarget.AllBuffered, transform.position.x);
 			targetDot = null;
-		} 
+		}
 	}
 
-	void BlinkControl()
-	{
+	void BlinkControl() {
 		//Insert Camera Shake Effect
-
+		gm.CamShakeDuration();
 		CutLine(); //Need to be on top before Target Dot is Set to Null
 
 		transform.position = storedDot.transform.position;
@@ -188,21 +162,17 @@ public class PlayerController : MonoBehaviourPunCallbacks
 	}
 
 	//Delete the last position and cut out the Travel Line
-	void CutLine()
-	{
+	void CutLine() {
 		if (!ReferenceEquals(targetDot, null)) currentTravelLine.photonView.RPC("CutLine", RpcTarget.AllBuffered);
 		currentTravelLine = null;
 	}
 
-	void UpdateBlinkCd()
-	{
-		if (blinkCount < 3)
-		{
+	void UpdateBlinkCd() {
+		if (blinkCount < 3) {
 			blinkCd -= Time.fixedDeltaTime; //0.002f
-			gui.UpdateBlinkCd(blinkCd/maxCdTime); //BlinkCd will always go back to MaxCdTime. Hence need to Update Cd here
+			gui.UpdateBlinkCd(blinkCd / maxCdTime); //BlinkCd will always go back to MaxCdTime. Hence need to Update Cd here
 
-			if (blinkCd <= 0)
-			{
+			if (blinkCd <= 0) {
 				blinkCount++;
 				blinkCd = maxCdTime;
 				gui.UpdateBlinkCount(blinkCount);
@@ -210,8 +180,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		}
 	}
 
-	public void Death(bool ignoreGameEnd = false)
-	{
+	public void Death(bool ignoreGameEnd = false) {
 		gameObject.SetActive(false);
 
 		//Check Player Count. If Player Count <= 1. Trigger End Screen
@@ -229,8 +198,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 	}
 
 	[PunRPC]
-	public void SendDeathEvent(int playersAlive, bool ignoreGameEnd)
-	{
+	public void SendDeathEvent(int playersAlive, bool ignoreGameEnd) {
 		gameObject.SetActive(false);
 		gm.playersAlive = playersAlive;
 
@@ -240,22 +208,18 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		gui.UpdateLeaderboard(); //Update Rankings each time Player dies
 	}
 
-	void OnTriggerEnter2D(Collider2D other)
-	{
-		if (other.CompareTag("Player"))
-		{
+	void OnTriggerEnter2D(Collider2D other) {
+		if (other.CompareTag("Player")) {
 			PlayerController detectedPlayer = other.GetComponent<PlayerController>();
-			
-			if (!ReferenceEquals(detectedPlayer, null))
-			{
+
+			if (!ReferenceEquals(detectedPlayer, null)) {
 				detectedPlayer.Death(true);
 				Death();
 			}
 		}
 	}
 
-	public override void OnLeftRoom()
-	{
+	public override void OnLeftRoom() {
 		base.OnLeftRoom();
 		Death();
 	}
