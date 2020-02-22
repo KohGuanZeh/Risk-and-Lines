@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Photon.Pun;
+using Photon.Pun.UtilityScripts;
 
 public class TravelLine : MonoBehaviour, IPooledObject
 {
@@ -53,15 +54,12 @@ public class TravelLine : MonoBehaviour, IPooledObject
 
 	#region Line Renderer Related Functions
 	[PunRPC]
-	public void SetPlayerRefId(int id)
+	public void CreateNewLine(int viewId, int playerNo, Vector3 pos)
 	{
-		playerRefId = id;
-	}
+		playerRefId = viewId;
 
-	[PunRPC]
-	public void CreateNewLine(Vector3 pos)
-	{
 		line.positionCount = 2;
+		line.startColor = line.endColor = GameManager.GetCharacterColor(playerNo);
 		for (int i = 0; i < line.positionCount; i++) line.SetPosition(i, pos);
 		greatestX = pos.x;
 		UpdateDotPosArray();

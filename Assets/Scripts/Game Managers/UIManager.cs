@@ -8,12 +8,22 @@ using TMPro;
 using Photon.Pun;
 using Photon.Realtime;
 
+[System.Serializable]
+public struct RankCardItems
+{
+    public Image playerSpr;
+    public TextMeshProUGUI playerName;
+    public TextMeshProUGUI rank;
+    public TextMeshProUGUI time;
+}
+
 public class UIManager : MonoBehaviour
 {
     [Header("General Variables")]
     public static UIManager inst;
     [SerializeField] GameManager gm;
     [SerializeField] PlayerController player;
+    [SerializeField] Animator anim;
 
     [Header("GUI")]
     [SerializeField] Image blinkIconOverlay;
@@ -25,8 +35,8 @@ public class UIManager : MonoBehaviour
 
     [Header("End Screen")]
     [SerializeField] GameObject endScreen;
-    [SerializeField] GameObject spectateButton;
-    [SerializeField] TextMeshProUGUI leaderboard;
+    [SerializeField] Sprite[] charSprites;
+    [SerializeField] RankCardItems[] rankCards;
 
     private void Awake()
     {
@@ -36,6 +46,14 @@ public class UIManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        for (int i = 3; i >= PhotonNetwork.CurrentRoom.PlayerCount - 1; i--)
+        {
+            rankCards[i].playerSpr.gameObject.SetActive(false);
+            rankCards[i].playerName.text = "Player: -";
+            rankCards[i].rank.text = "Rank: -";
+            rankCards[i].time.text = "Time: -";
+        }
+
         gm = GameManager.inst;
         PhotonNetwork.AutomaticallySyncScene = false;
     }
@@ -59,9 +77,10 @@ public class UIManager : MonoBehaviour
     #endregion
 
     #region For Spectating and End
-    public void SwitchToSpectateMode(bool spectate)
+    public void SwitchToSpectateMode()
     {
-        spectatorUI.SetActive(spectate);
+        anim.SetBool("Spectate", true);
+        anim.SetBool("Show Button", true);
     }
 
     public void UpdateLeaderboard()
@@ -74,26 +93,22 @@ public class UIManager : MonoBehaviour
 
         System.Array.Sort(gm.playerInfos, (x, y) => y.deathTime.CompareTo(x.deathTime));
 
-        string text = string.Empty;
-
         for (int i = 0; i < gm.playerInfos.Length; i++)
         {
-            text += string.Format("{0}. {1} Time Survived: {2} <br>", i + 1, gm.playerInfos[i].playerName, gm.playerInfos[i].deathTime);
+            rankCards[i].playerSpr.sprite = charSprites[gm.playerInfos[i].charSpr];
+            rankCards[i].playerName.text = string.Format("Player: {0}", gm.playerInfos[i].playerName);
+            rankCards[i].rank.text = string.Format("Rank: {0}", GetRankPrefix(i));
+            rankCards[i].time.text = string.Format("Time: {0}", i == 0 ? gm.playerInfos[i + 1].deathTime.ToString("0.00") + "++" : gm.playerInfos[i].deathTime.ToString("0.00"));
         }
-
-        leaderboard.text = text;
     }
 
-    public void ShowHideEndScreen(bool show)
+    public void ShowEndScreen()
     {
-        endScreen.SetActive(show);
+        anim.SetBool("Game Ended", true);
+        anim.SetBool("Show Button", true);
     }
 
-    public void HideSpectateButton()
-    {
-        spectateButton.SetActive(false);
-    }
-
+    //Initially Planned to have Rematch but Proved to be too Difficult
     public void BackToWaitRoom()
     {
         PlayerPrefs.SetInt("Lobby State", 2);
@@ -106,4 +121,19 @@ public class UIManager : MonoBehaviour
         PhotonNetwork.LoadLevel(0);
     }
     #endregion
+
+    public string GetRankPrefix(int arrIdx)
+    {
+        switch (arrIdx)
+        {
+            case 0:
+                return "1st";
+            case 1:
+                return "2nd";
+            case 2:
+                return "3rd";
+            default:
+                return string.Format("{0}th", arrIdx + 1);
+        }
+    }
 }

@@ -96,5 +96,7 @@ MonoBehaviour:
   - SendCurrentReadyList
   - CamShake
   - CamShakeDuration
+  - SetCharacterDisplay
+  - SetPlayersCharPreset
   DisableAutoOpenWizard: 1
   ShowSettings: 1

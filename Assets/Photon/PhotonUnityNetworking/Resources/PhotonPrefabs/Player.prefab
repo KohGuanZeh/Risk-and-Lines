@@ -99,9 +99,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gm: {fileID: 0}
   gui: {fileID: 0}
+  playerNo: 0
   rb: {fileID: 0}
   linePreset: {fileID: 5506912347327240787, guid: 40b964882842aff4181d5c8a16362a9d,
     type: 3}
+  spr: {fileID: 195885749232753351}
   travelSpeed: 5
   currentTravelLine: {fileID: 0}
   targetDot: {fileID: 0}

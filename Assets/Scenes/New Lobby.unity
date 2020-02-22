@@ -556,12 +556,12 @@ PrefabInstance:
     - target: {fileID: 6242853161914615164, guid: 2c0fb5d696b46b643a35627200add189,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6242853161914615164, guid: 2c0fb5d696b46b643a35627200add189,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6242853161914615164, guid: 2c0fb5d696b46b643a35627200add189,
         type: 3}
@@ -581,7 +581,7 @@ PrefabInstance:
     - target: {fileID: 6242853161914615164, guid: 2c0fb5d696b46b643a35627200add189,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6242853161914615164, guid: 2c0fb5d696b46b643a35627200add189,
         type: 3}
@@ -591,7 +591,7 @@ PrefabInstance:
     - target: {fileID: 6242853161914615164, guid: 2c0fb5d696b46b643a35627200add189,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3940499054214785059, guid: 2c0fb5d696b46b643a35627200add189,
         type: 3}
@@ -1201,7 +1201,18 @@ MonoBehaviour:
   m_Group: {fileID: 1699152781}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 735009246}
+        m_MethodName: ChangeCharacter
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_IsOn: 0
 --- !u!1 &210910084
 GameObject:
@@ -1679,7 +1690,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4278190079
   m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -2402,6 +2413,7 @@ MonoBehaviour:
   rmButtonPrefab: {fileID: 8505668885060570994, guid: 1735b945a02ec5642abbdf36d799d85c,
     type: 3}
   roomNameDisplay: {fileID: 296542117}
+  charSelectToggles: []
   startReadyButton: {fileID: 855092195}
   startReadyButtonTxt: {fileID: 1928556612}
   playerContainer: {fileID: 78179292}
@@ -3129,7 +3141,18 @@ MonoBehaviour:
   m_Group: {fileID: 1699152781}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 735009246}
+        m_MethodName: ChangeCharacter
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 3
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_IsOn: 0
 --- !u!1 &1045768518
 GameObject:
@@ -3395,7 +3418,8 @@ MonoBehaviour:
   m_text: "\u200B"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 1b9f61cb6d84b7a4a864ce6d0bf008e8, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: -2143050903394502946, guid: 1b9f61cb6d84b7a4a864ce6d0bf008e8,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4212,7 +4236,18 @@ MonoBehaviour:
   m_Group: {fileID: 1699152781}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 735009246}
+        m_MethodName: ChangeCharacter
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_IsOn: 1
 --- !u!1 &1342290611
 GameObject:
@@ -4563,7 +4598,18 @@ MonoBehaviour:
   m_Group: {fileID: 1699152781}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 735009246}
+        m_MethodName: ChangeCharacter
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 2
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_IsOn: 0
 --- !u!1 &1410481947
 GameObject:
@@ -5700,7 +5746,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4278190079
   m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3

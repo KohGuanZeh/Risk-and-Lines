@@ -11,14 +11,22 @@ using Photon.Pun.UtilityScripts;
 [System.Serializable]
 public struct PlayerInfo {
 	public int actorId;
+	public int charSpr;
 	public string playerName;
 	public float deathTime;
 
-	public PlayerInfo(int id, string name, float time) {
+	public PlayerInfo(int id, int spr, string name, float time) {
 		actorId = id;
+		charSpr = spr;
 		playerName = name;
 		deathTime = time;
 	}
+}
+
+[System.Serializable]
+public struct CharacterPreset {
+	public Sprite coreSpr;
+	public Sprite secSpr;
 }
 
 public class GameManager : MonoBehaviourPunCallbacks {
@@ -50,6 +58,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
 	[Header("For Player Spawn")]
 	public Transform playerSpawnPos;
+	public CharacterPreset[] presets;
 
 	[Header("For Game Difficulty")]
 	[SerializeField] int difficultyStage;
@@ -71,7 +80,8 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	[SerializeField] float shakeAmount = 0f;
 	[SerializeField] float decreaseFactor = 1.0f;
 
-	private void Awake() {
+	private void Awake() 
+	{
 		inst = this;
 		cam = GetComponent<Camera>();
 		camPos = cam.transform.position;
@@ -100,14 +110,11 @@ public class GameManager : MonoBehaviourPunCallbacks {
 			if (timeStamp <= 0) photonView.RPC("RegisterTimeStamp", RpcTarget.AllBuffered, 0f, true);
 		}
 		if (Input.GetKeyDown(KeyCode.G)) PhotonNetwork.LeaveRoom();
-		if (Input.GetKeyDown(KeyCode.Q)) photonView.RPC("IncreaseDifficulty", RpcTarget.AllBuffered);
-		if (Input.GetKeyDown(KeyCode.C)) {
-			shakeDuration = setShakeDuration;
-		}
 		CamShake();
 	}
 
 	void FixedUpdate() {
+		
 		//Only Master Client will handle Camera Movement Value Changes and Dot Spawning
 		if (PhotonNetwork.IsMasterClient) {
 			#region Temp Difficulty Testing
@@ -133,13 +140,16 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	}
 
 	#region For Spawning of player
-	void CreatePlayer() {
+	void CreatePlayer() 
+	{
 		//Spawn Players Evenly
 		float minY = cam.transform.position.y - cam.orthographicSize;
 		float maxY = cam.transform.position.y + cam.orthographicSize;
 		float interval = (maxY - minY) / (PhotonNetwork.PlayerList.Length + 1);
 		Vector3 spawnPos = new Vector3(playerSpawnPos.position.x, maxY - interval * (PhotonNetwork.LocalPlayer.GetPlayerNumber()), 0);
-		PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Player"), spawnPos, Quaternion.identity);
+		GameObject playerObj = PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Player"), spawnPos, Quaternion.identity);
+		playerObj.GetComponent<PlayerController>().SetUpCharacter();
+
 	}
 	#endregion
 
@@ -168,11 +178,13 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	void GetPlayerInfoAtStart() {
 		Player[] players = PhotonNetwork.PlayerList;
 		int[] ids = new int[players.Length];
+		int[] charSprs = new int[players.Length];
 		string[] names = new string[players.Length];
 		float[] time = new float[players.Length];
 
 		for (int i = 0; i < players.Length; i++) {
 			ids[i] = players[i].ActorNumber;
+			charSprs[i] = 0; //Set only in Character Creation
 			names[i] = players[i].NickName;
 			time[i] = -1;
 		}
@@ -181,9 +193,16 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	}
 
 	[PunRPC]
-	void InitialiseLeaderboard(int[] ids, string[] names, float[] time) {
+	void InitialiseLeaderboard(int[] ids, int[] charSprs, string[] names, float[] time) {
 		playerInfos = new PlayerInfo[ids.Length];
-		for (int i = 0; i < ids.Length; i++) playerInfos[i] = new PlayerInfo(ids[i], names[i], time[i]);
+		for (int i = 0; i < ids.Length; i++) playerInfos[i] = new PlayerInfo(ids[i], charSprs[i], names[i], time[i]);
+	}
+
+	[PunRPC]
+	void SetPlayersCharPreset(int id, int presetIdx)
+	{
+		int idx = System.Array.IndexOf(playerInfos, playerInfos.Where(info => info.actorId == id).First());
+		playerInfos[idx].charSpr = presetIdx;
 	}
 
 	[PunRPC]
@@ -214,6 +233,20 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	void SendNewCamValues(Vector3 moveDelta, Vector3 camPos) {
 		this.moveDelta = moveDelta;
 		this.camPos = camPos;
+	}
+
+	public void SetCamShakeDuration()
+	{
+		shakeDuration = setShakeDuration;
+	}
+	void CamShake()
+	{
+		if (shakeDuration >= 0)
+		{
+			cam.transform.localPosition += Random.insideUnitSphere * shakeAmount;
+
+			shakeDuration -= Time.deltaTime * decreaseFactor;
+		}
 	}
 	#endregion
 
@@ -319,9 +352,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	{
 		gameEnded = true;
 		ToggleMoveCam(false);
-		gui.HideSpectateButton();
-		gui.ShowHideEndScreen(true);
-		gui.SwitchToSpectateMode(false); //In the case where we want to hide Spectate UI on End
+		gui.ShowEndScreen();
 
 		PhotonNetwork.CurrentRoom.IsOpen = true;
 	}
@@ -331,15 +362,22 @@ public class GameManager : MonoBehaviourPunCallbacks {
 		PlayerPrefs.DeleteKey("Lobby State");
 	}
 
-	// [PunRPC]
-	public void CamShakeDuration() {
-		shakeDuration = setShakeDuration;
-	}
-	void CamShake() {
-		if (shakeDuration >= 0) {
-			cam.transform.localPosition += Random.insideUnitSphere * shakeAmount;
-
-			shakeDuration -= Time.deltaTime * decreaseFactor;
+	#region ExtraUtilities
+	public static Color GetCharacterColor(int playerNo)
+	{
+		switch (playerNo)
+		{
+			case 1:
+				return Color.red;
+			case 2:
+				return Color.blue;
+			case 3:
+				return Color.green;
+			case 4:
+				return Color.yellow;
+			default:
+				return Color.white;
 		}
 	}
+	#endregion
 }

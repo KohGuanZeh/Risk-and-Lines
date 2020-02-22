@@ -27,6 +27,7 @@ public class Matchmake : MonoBehaviourPunCallbacks
 
 	[Header("For Room Panel")]
 	[SerializeField] TextMeshProUGUI roomNameDisplay; // display the name of the room
+	[SerializeField] Toggle[] charSelectToggles; //For Character Select
 	[SerializeField] Button startReadyButton;
 	[SerializeField] TextMeshProUGUI startReadyButtonTxt;
 
@@ -51,6 +52,7 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		playerLists = new List<PlayerList>();
 
 		connectedAs.text = string.Format("Connected as: [{0}]", PhotonNetwork.NickName);
+		charSelectToggles[PlayerPrefs.GetInt("Preset", 0)].isOn = true; //Set According to Previous Selected Preset (If Any)
 		UpdateSceneOnLobbyState();
 	}
 
@@ -243,7 +245,7 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		}
 	}
 
-	#region Join Quit Button Functions
+	#region Customisation Settings
 	public void ChangeNickname() //When you Click Connect Button
 	{
 		string name = newNickname.text;
@@ -254,6 +256,13 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		connectedAs.text = string.Format("Connected as: [{0}]", name);
 	}
 
+	public void ChangeCharacter(int idx) //When Click on Any Toggle on Char Select
+	{
+		PlayerPrefs.SetInt("Preset", idx);
+	}
+	#endregion
+
+	#region Join Quit Button Functions
 	public void QuitNetworkLobby()
 	{
 		PhotonNetwork.LeaveLobby();

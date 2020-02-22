@@ -7,6 +7,9 @@ using Photon.Pun;
 public class TravelDot : MonoBehaviour, IPooledObject
 {
 	[Header("Travel Dot Properties")]
+	[SerializeField] SpriteRenderer[] sprs;
+	public Color defaultColor;
+
 	public bool locked; //Check if Dot is already being locked by a Player
 	public PhotonView photonView;
 
@@ -24,6 +27,8 @@ public class TravelDot : MonoBehaviour, IPooledObject
 	public void OnObjectSpawn(int parentId)
 	{
 		//Execute Spawn Functions Here
+		foreach (SpriteRenderer spr in sprs) spr.color = defaultColor;
+
 		locked = false;
 		ObjectPooling.inst.poolDictionary[GetPoolTag()].Enqueue(gameObject);
 
@@ -48,8 +53,11 @@ public class TravelDot : MonoBehaviour, IPooledObject
 	}
 
 	[PunRPC]
-	void LockTravelDot(bool lockDot)
+	void LockTravelDot(int playerNo, bool lockDot)
 	{
 		locked = lockDot;
+
+		if (locked) foreach (SpriteRenderer spr in sprs) spr.color = GameManager.GetCharacterColor(playerNo);
+		else foreach (SpriteRenderer spr in sprs) spr.color = defaultColor; //In case we do not want White
 	}
 }

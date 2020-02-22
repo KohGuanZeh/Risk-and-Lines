@@ -148,6 +148,15 @@ MonoBehaviour:
   minMaxXInterval: {x: 6, y: 10}
   minMaxXOffset: {x: 0, y: 3}
   playerSpawnPos: {fileID: 831214271}
+  presets:
+  - coreSpr: {fileID: 0}
+    secSpr: {fileID: 0}
+  - coreSpr: {fileID: 0}
+    secSpr: {fileID: 0}
+  - coreSpr: {fileID: 0}
+    secSpr: {fileID: 0}
+  - coreSpr: {fileID: 0}
+    secSpr: {fileID: 0}
   difficultyStage: 0
   timeStamp: 0
   gameStarted: 0
@@ -156,6 +165,10 @@ MonoBehaviour:
   gameEnded: 0
   playersAlive: 0
   playerInfos: []
+  shakeDuration: 0
+  setShakeDuration: 0.2
+  shakeAmount: 1
+  decreaseFactor: 1
 --- !u!114 &2702712245036865841
 MonoBehaviour:
   m_ObjectHideFlags: 0
