@@ -13,6 +13,19 @@ public class TravelDot : MonoBehaviour, IPooledObject
 	public bool locked; //Check if Dot is already being locked by a Player
 	public PhotonView photonView;
 
+	[Header("Animation")]
+	Animator myAnim;
+
+	private void Start()
+	{
+		myAnim = GetComponent<Animator>();
+	}
+
+	private void Update()
+	{
+		myAnim.SetBool("Locked", locked); // sets the animation for the dot since the state is already handled by RPC
+	}
+
 	[PunRPC]
 	public void OnCreateObject()
 	{
