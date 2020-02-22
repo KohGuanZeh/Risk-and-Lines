@@ -12,7 +12,6 @@ public class MainMenu : MonoBehaviourPunCallbacks
 	[SerializeField] Animator anim;
 
 	[Header("For Start Game")]
-	[SerializeField] string playerName;
 	[SerializeField] TMP_InputField nameInput;
 
 	[Header("For Screen Content")]
@@ -28,27 +27,11 @@ public class MainMenu : MonoBehaviourPunCallbacks
 	public void Start()
 	{
 		PlayerPrefs.DeleteKey("Lobby State");
-		nameInput.text = playerName = PlayerPrefs.GetString("NickName", string.Empty);
+		nameInput.text = PlayerPrefs.GetString("NickName", string.Empty);
 
 		sliders[0].value = PlayerPrefs.GetFloat("Music Volume", 1);
 		sliders[1].value = PlayerPrefs.GetFloat("Sound Volume", 1);
-	}
-
-	public override void OnConnectedToMaster()
-	{
-		//If Player's Input Name is Empty, Create Random Name for it. Delete Previous Name Saved
-		if (string.IsNullOrEmpty(playerName) || string.IsNullOrWhiteSpace(playerName))
-		{
-			playerName = "Player_" + Random.Range(0, 100).ToString("000");
-			PlayerPrefs.DeleteKey("NickName");
-		}
-		//Only Save Name when Player Inputs a Valid Name
-		else PlayerPrefs.SetString("NickName", playerName); 
-
-		//Set Player's Input Name to Photon Player before going to Lobby
-		PhotonNetwork.NickName = playerName;
-
-		SceneManager.LoadScene(1);
+		PhotonNetwork.ConnectUsingSettings();
 	}
 
 	public void StartGame(bool show)
@@ -59,8 +42,21 @@ public class MainMenu : MonoBehaviourPunCallbacks
 	public void OnNameSubmit()
 	{
 		//Connect to Master when Player Submits a Name. On Connected to Master, then Load Lobby Scene.
-		playerName = nameInput.text;
-		PhotonNetwork.ConnectUsingSettings();
+		string playerName = nameInput.text;
+
+		//If Player's Input Name is Empty, Create Random Name for it. Delete Previous Name Saved
+		if (string.IsNullOrEmpty(playerName) || string.IsNullOrWhiteSpace(playerName))
+		{
+			playerName = "Player_" + Random.Range(0, 100).ToString("000");
+			PlayerPrefs.DeleteKey("NickName");
+		}
+		//Only Save Name when Player Inputs a Valid Name
+		else PlayerPrefs.SetString("NickName", playerName);
+
+		//Set Player's Input Name to Photon Player before going to Lobby
+		PhotonNetwork.NickName = playerName;
+
+		LoadingScreen.inst.LoadScene(1);
 	}
 
 	public void Instructions()

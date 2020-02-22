@@ -2,7 +2,7 @@
 using Photon.Pun;
 using TMPro;
 
-public class RoomList : MonoBehaviour
+public class RoomList : Listable
 {
     [Header("Object Components")]
     [SerializeField] TextMeshProUGUI roomNameTxt;
@@ -29,5 +29,11 @@ public class RoomList : MonoBehaviour
     {
         playerCount = count;
         roomSizeTxt.text = string.Format("{0}/{1}", playerCount, roomSize);
+    }
+
+    public override void OnListRemove()
+    {
+        Matchmake.inst.UpdateListingPosition(0);
+        Destroy(gameObject);
     }
 }

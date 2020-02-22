@@ -14,18 +14,14 @@ public class Matchmake : MonoBehaviourPunCallbacks
 	public static Matchmake inst;
 
 	[Header("Panels")]
-	[SerializeField] GameObject mainPanel;
-	[SerializeField] GameObject lobbyPanel;
-	[SerializeField] GameObject roomPanel;
-
-	[Header("For Main")]
-	[SerializeField] TMP_InputField nameInput;
-	[SerializeField] GameObject lobbyConnectButton;
+	[SerializeField] Animator anim;
 
 	[Header("For Lobby Panel")]
+	[SerializeField] TextMeshProUGUI connectedAs;
+	[SerializeField] TMP_InputField newNickname;
 	[SerializeField] TMP_InputField rmName;
 
-	public Transform rmContainer;
+	public RectTransform rmContainer;
 	public List<RoomList> rmButtons;
 	[SerializeField] RoomList rmButtonPrefab;
 
@@ -34,9 +30,11 @@ public class Matchmake : MonoBehaviourPunCallbacks
 	[SerializeField] Button startReadyButton;
 	[SerializeField] TextMeshProUGUI startReadyButtonTxt;
 
-	[SerializeField] Transform playerContainer; // used to display all the players in the current room
+	[SerializeField] RectTransform playerContainer; // used to display all the players in the current room
 	[SerializeField] List<PlayerList> playerLists;
 	[SerializeField] PlayerList playerListPrefab; // Instantiate to display each player in the room
+
+	public Sprite[] masterAndClientIcon; //Set Sprites for Respective Icons to Identify Master and Ready Players
 
 	[Header("For Game Start")]
 	[SerializeField] List<int> playersReady;
@@ -49,22 +47,17 @@ public class Matchmake : MonoBehaviourPunCallbacks
 
 	private void Start()
 	{
-		if (!PhotonNetwork.IsConnected) PhotonNetwork.ConnectUsingSettings();
-
-		//Check for Player Prefs
-		string name = PlayerPrefs.GetString("NickName", string.Empty);
-		nameInput.text = name;
-
 		rmButtons = new List<RoomList>();
 		playerLists = new List<PlayerList>();
 
+		connectedAs.text = string.Format("Connected as: [{0}]", PhotonNetwork.NickName);
 		UpdateSceneOnLobbyState();
 	}
 
 	#region Pun Callback Functions
 	public override void OnConnectedToMaster()
 	{
-		lobbyConnectButton.SetActive(true);
+		PhotonNetwork.JoinLobby();
 	}
 
 	public override void OnCreateRoomFailed(short returnCode, string message)
@@ -74,7 +67,8 @@ public class Matchmake : MonoBehaviourPunCallbacks
 
 	public override void OnRoomListUpdate(List<RoomInfo> roomList)
 	{
-		print("Room List Updated");
+		bool sortList = false;
+
 		foreach (RoomInfo room in roomList)
 		{
 			int idx = rmButtons.FindIndex(x => x.roomName == room.Name);
@@ -85,28 +79,30 @@ public class Matchmake : MonoBehaviourPunCallbacks
 				{
 					RoomList rmButton = rmButtons[idx];
 					rmButtons.RemoveAt(idx);
-					Destroy(rmButton.gameObject);
+					rmButton.anim.SetBool("Clear", true);
 				}
 				else rmButtons[idx].UpdatePlayerCount(room.PlayerCount);
 			}
 			else if (room.IsOpen && room.IsVisible && room.PlayerCount < room.MaxPlayers)
 			{
+				sortList = true;
 				RoomList rmButton = ListRoom(room);
 				rmButton.UpdatePlayerCount(room.PlayerCount);
 			}
 		}
+
+		if (sortList) UpdateListingPosition(0);
 	}
 
 	public override void OnDisconnected(DisconnectCause cause)
 	{
-		LeaveRoom();
+		if (PhotonNetwork.CurrentRoom != null) LeaveRoom();
 		PhotonNetwork.Reconnect();
 	}
 
 	public override void OnJoinedRoom()
 	{
-		roomPanel.SetActive(true);
-		lobbyPanel.SetActive(false);
+		anim.SetInteger("Lobby State", 1);
 
 		roomNameDisplay.text = PhotonNetwork.CurrentRoom.Name; //Display Room Name
 
@@ -117,10 +113,15 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		SetStartReadyButton();
 	}
 
+	public override void OnJoinRandomFailed(short returnCode, string message)
+	{
+		CreateRoom();
+	}
+
 	public override void OnLeftRoom()
 	{
-		lobbyPanel.SetActive(true);
-		roomPanel.SetActive(false);
+		anim.SetInteger("Lobby State", 0);
+		ChatManager.inst.ClearChat();
 
 		foreach (PlayerList playerList in playerLists) Destroy(playerList.gameObject);
 		playerLists.Clear();
@@ -137,7 +138,7 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		{
 			photonView.RPC("SendCurrentReadyList", newPlayer, playersReady.ToArray());
 			startReadyButton.interactable = false;
-		} 
+		}
 	}
 
 	public override void OnPlayerLeftRoom(Player otherPlayer)
@@ -160,9 +161,6 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		{
 			case 1: //Show Lobby Panel
 
-				mainPanel.SetActive(false);
-				lobbyPanel.SetActive(true);
-
 				PhotonNetwork.LeaveRoom();
 				PhotonNetwork.LeaveLobby();
 
@@ -172,14 +170,19 @@ public class Matchmake : MonoBehaviourPunCallbacks
 
 			case 2: //Show Room Panel
 
-				mainPanel.SetActive(false);
-				lobbyPanel.SetActive(false);
-				roomPanel.SetActive(true);
+				anim.SetInteger("Lobby State", 1);
 
 				roomNameDisplay.text = PhotonNetwork.CurrentRoom.Name; // update the room name display
 				SetStartReadyButton();
 
 				foreach (Player player in PhotonNetwork.PlayerList) ListPlayer(player);
+
+				break;
+
+			default:
+
+				if (!PhotonNetwork.IsConnected) PhotonNetwork.ConnectUsingSettings();
+				else PhotonNetwork.JoinLobby();
 
 				break;
 		}
@@ -206,6 +209,7 @@ public class Matchmake : MonoBehaviourPunCallbacks
 	{
 		if (ready) playersReady.Add(playerId);
 		else playersReady.Remove(playerId);
+		playerLists.Find(x => x.playerId == playerId).SetReadyUnreadyIcon(ready);
 
 		if (playersReady.Count == PhotonNetwork.CurrentRoom.PlayerCount - 1 && playersReady.Count > 0)
 		{
@@ -240,32 +244,27 @@ public class Matchmake : MonoBehaviourPunCallbacks
 	}
 
 	#region Join Quit Button Functions
-	public void JoinNetworkLobby() //When you Click Connect Button
+	public void ChangeNickname() //When you Click Connect Button
 	{
-		string name = nameInput.text;
-		if (string.IsNullOrEmpty(name) || string.IsNullOrWhiteSpace(name)) name = "Player_" + Random.Range(0, 100).ToString("000");
+		string name = newNickname.text;
+		if (string.IsNullOrEmpty(name) || string.IsNullOrWhiteSpace(name)) return;
 
 		PhotonNetwork.NickName = name;
 		PlayerPrefs.SetString("NickName", name);
-
-		mainPanel.SetActive(false);
-		lobbyPanel.SetActive(true);
-
-		PhotonNetwork.JoinLobby();
+		connectedAs.text = string.Format("Connected as: [{0}]", name);
 	}
 
 	public void QuitNetworkLobby()
 	{
-		mainPanel.SetActive(true);
-		lobbyPanel.SetActive(false);
 		PhotonNetwork.LeaveLobby();
+		LoadingScreen.inst.LoadScene(0);
 	}
 
 	public void CreateRoom()
 	{
 		string name = rmName.text;
 		if (string.IsNullOrEmpty(name) || string.IsNullOrWhiteSpace(name)) name = "Room_" + Random.Range(0, 100).ToString("000");
-		PhotonNetwork.CreateRoom(name, new RoomOptions() { IsVisible = true, IsOpen = true, MaxPlayers = (byte)4 });
+		PhotonNetwork.JoinOrCreateRoom(name, new RoomOptions() { IsVisible = true, IsOpen = true, MaxPlayers = (byte)4 }, TypedLobby.Default);
 		rmName.text = string.Empty;
 	}
 
@@ -276,6 +275,11 @@ public class Matchmake : MonoBehaviourPunCallbacks
 
 		//Have to Reconnect in order for Room List to Update...
 		StartCoroutine(ReconnectBackToLobby());
+	}
+
+	public void QuickStart()
+	{
+		PhotonNetwork.JoinRandomRoom();
 	}
 
 	IEnumerator ReconnectBackToLobby()
@@ -300,7 +304,11 @@ public class Matchmake : MonoBehaviourPunCallbacks
 	{
 		PlayerList playerList = Instantiate(playerListPrefab, playerContainer);
 		playerList.SetPlayerInfo(player.NickName, player.ActorNumber);
+		playerList.SetMasterClientIcon(player.IsMasterClient);
+		playerList.SetReadyUnreadyIcon(player.IsMasterClient); //If it is Master Client, always Show Icon
 		playerLists.Add(playerList);
+
+		UpdateListingPosition(1);
 	}
 
 	void RemovePlayerFromListing(int actorId)
@@ -310,7 +318,35 @@ public class Matchmake : MonoBehaviourPunCallbacks
 
 		PlayerList playerList = playerLists[idx];
 		playerLists.RemoveAt(idx);
-		Destroy(playerList.gameObject);
+		playerList.SetReadyUnreadyIcon(false);
+		playerList.anim.SetBool("Clear", true);
+	}
+
+	public void UpdateListingPosition(int whichList)
+	{
+		switch (whichList)
+		{
+			case 0:
+				for (int i = 0; i < rmButtons.Count; i++)
+				{
+					Vector2 anchoredPos = new Vector2(rmButtons[i].rect.anchoredPosition.x, -75 * i);
+					rmButtons[i].rect.anchoredPosition = anchoredPos;
+				}
+
+				rmContainer.sizeDelta = new Vector2(rmContainer.sizeDelta.x, 75 * rmButtons.Count);
+
+				break;
+			case 1:
+				for (int i = 0; i < playerLists.Count; i++)
+				{
+					Vector2 anchoredPos = new Vector2(playerLists[i].rect.anchoredPosition.x, -75 * i);
+					playerLists[i].rect.anchoredPosition = anchoredPos;
+				}
+
+				playerContainer.sizeDelta = new Vector2(playerContainer.sizeDelta.x, 75 * playerLists.Count);
+
+				break;
+		}
 	}
 	#endregion
 
