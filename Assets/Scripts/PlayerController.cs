@@ -1,15 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 using Photon.Pun;
+using Photon.Pun.UtilityScripts;
 
-public class PlayerController : MonoBehaviourPunCallbacks {
+public class PlayerController : MonoBehaviourPunCallbacks 
+{
 	[Header("General Player Properties")]
 	[SerializeField] GameManager gm;
 	[SerializeField] UIManager gui;
+	[SerializeField] int playerNo;
 	[SerializeField] Rigidbody2D rb;
 	[SerializeField] TravelLine linePreset; //Stores the Line Prefab that it will Instantiate each time Player travels
+
+	[Header("Player Sprites")]
+	[SerializeField] SpriteRenderer spr;
 
 	[Header("Player Movement Properties")]
 	[SerializeField] float travelSpeed = 5; //Speed at which the Player Dot travels
@@ -48,6 +55,7 @@ public class PlayerController : MonoBehaviourPunCallbacks {
 		}
 	}
 
+	#region Iput Controls
 	void TouchControls() {
 		Touch touch = Input.GetTouch(0); // this is for the first finger that entered the screen
 
@@ -62,14 +70,13 @@ public class PlayerController : MonoBehaviourPunCallbacks {
 					bool blinked = false;
 
 					if (ReferenceEquals(targetDot, null) && !travelDot.locked) {
-						travelDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, true);
+						travelDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, playerNo, true);
 						targetDot = travelDot;
 
 						if (currentTravelLine) currentTravelLine.photonView.RPC("AddNewPoint", RpcTarget.AllBuffered, transform.position);
 						else {
 							currentTravelLine = ObjectPooling.inst.SpawnFromPool("Line", transform.position, Quaternion.identity).GetComponent<TravelLine>(); //Instantiate(linePreset, transform); //Will be changed to Object Pooling
-							currentTravelLine.photonView.RPC("CreateNewLine", RpcTarget.AllBuffered, transform.position);
-							currentTravelLine.photonView.RPC("SetPlayerRefId", RpcTarget.AllBuffered, photonView.ViewID);
+							currentTravelLine.photonView.RPC("CreateNewLine", RpcTarget.AllBuffered, photonView.ViewID, playerNo, transform.position);
 						}
 					} else if (ReferenceEquals(travelDot, storedDot) && doubleTapThreshold > 0 && blinkCount > 0) //If there is already a Stored Dot, This is Considered a Double Tap
 					  {
@@ -101,17 +108,19 @@ public class PlayerController : MonoBehaviourPunCallbacks {
 					bool blinked = false;
 
 					if (ReferenceEquals(targetDot, null) && !travelDot.locked) {
-						travelDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, true);
+						travelDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, playerNo, true);
 						targetDot = travelDot;
+
+						transform.up = targetDot.transform.position - transform.position;
 
 						if (currentTravelLine) currentTravelLine.photonView.RPC("AddNewPoint", RpcTarget.AllBuffered, transform.position);
 						else {
 							currentTravelLine = ObjectPooling.inst.SpawnFromPool("Line", transform.position, Quaternion.identity).GetComponent<TravelLine>(); //Instantiate(linePreset, transform); //Will be changed to Object Pooling
-							currentTravelLine.photonView.RPC("CreateNewLine", RpcTarget.AllBuffered, transform.position);
-							currentTravelLine.photonView.RPC("SetPlayerRefId", RpcTarget.AllBuffered, photonView.ViewID);
+							currentTravelLine.photonView.RPC("CreateNewLine", RpcTarget.AllBuffered, photonView.ViewID, playerNo, transform.position);
 						}
 					} else if (ReferenceEquals(travelDot, storedDot) && doubleTapThreshold > 0 && blinkCount > 0) //If there is already a Stored Dot, This is Considered a Double Tap
 					  {
+						transform.up = storedDot.transform.position - transform.position;
 						blinked = true;
 						if (travelDot.locked && targetDot != travelDot) {
 							storedDot = null;
@@ -128,8 +137,10 @@ public class PlayerController : MonoBehaviourPunCallbacks {
 			}
 		}
 	}
+	#endregion
 
-	// for normal travel
+	#region For Travel and Blink
+	// for Normal travel
 	void TravelControl() {
 		if (ReferenceEquals(targetDot, null)) return;
 
@@ -145,14 +156,14 @@ public class PlayerController : MonoBehaviourPunCallbacks {
 		}
 	}
 
-	void BlinkControl() {
-		//Insert Camera Shake Effect
-		gm.CamShakeDuration();
+	void BlinkControl() 
+	{
+		gm.SetCamShakeDuration();
 		CutLine(); //Need to be on top before Target Dot is Set to Null
 
 		transform.position = storedDot.transform.position;
-		targetDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, false);
-		storedDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, true);
+		targetDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, -1, false);
+		storedDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, playerNo, true);
 		targetDot = null;
 		storedDot = null;
 		doubleTapThreshold = 0;
@@ -179,15 +190,41 @@ public class PlayerController : MonoBehaviourPunCallbacks {
 			}
 		}
 	}
+	#endregion
 
-	public void Death(bool ignoreGameEnd = false) {
+	#region For Character Creation
+	public void SetUpCharacter()
+	{
+		int presetIdx = PlayerPrefs.GetInt("Preset", 0);
+		playerNo = PhotonNetwork.LocalPlayer.GetPlayerNumber();
+		photonView.RPC("SetCharacterDisplay", RpcTarget.AllBuffered, playerNo, presetIdx);
+	}
+
+	[PunRPC]
+	void SetCharacterDisplay(int playerNo, int presetIdx)
+	{
+		if (ReferenceEquals(gm, null)) gm = GameManager.inst;
+
+		spr.sprite = gm.presets[presetIdx].coreSpr;
+		spr.color = GameManager.GetCharacterColor(playerNo);
+
+		//sprs[0].sprite = gm.presets[presetIdx].coreSpr;
+		//sprs[1].sprite = gm.presets[presetIdx].secSpr;
+		//sprs[0].color = sprs[1].color = GameManager.GetCharacterColor(playerNo);
+	}
+	#endregion
+
+	#region For Death
+	public void Death(bool ignoreGameEnd = false) 
+	{
+		gm.SetCamShakeDuration();
 		gameObject.SetActive(false);
 
 		//Check Player Count. If Player Count <= 1. Trigger End Screen
 		gm.playersAlive--;
 
 		//Update Dead Players
-		gui.SwitchToSpectateMode(true);
+		gui.SwitchToSpectateMode();
 		gm.photonView.RPC("UpdateLeaderboard", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.ActorNumber, (float)PhotonNetwork.Time);
 		photonView.RPC("SendDeathEvent", RpcTarget.OthersBuffered, gm.playersAlive, ignoreGameEnd);
 
@@ -207,6 +244,7 @@ public class PlayerController : MonoBehaviourPunCallbacks {
 		gm.EndGame();
 		gui.UpdateLeaderboard(); //Update Rankings each time Player dies
 	}
+	#endregion
 
 	void OnTriggerEnter2D(Collider2D other) {
 		if (other.CompareTag("Player")) {

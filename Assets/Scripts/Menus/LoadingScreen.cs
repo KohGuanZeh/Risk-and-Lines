@@ -16,6 +16,7 @@ public class LoadingScreen : MonoBehaviour
 
 	public bool fadingInProgress;
 	public bool isLoading;
+	public bool canFadeOut;
 	[SerializeField] bool canReceiveAsyncProgress;
 	public delegate void FadeEvent();
 	public FadeEvent OnFadeIn, OnFadeOut;

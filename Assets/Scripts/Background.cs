@@ -37,10 +37,10 @@ public class Background : MonoBehaviour
         }
 
         //Know that we are not changing Y axis but still good to add as Ref to Learn
-        if (Mathf.Abs(cam.transform.position.y - transform.position.y) >= textureUnitSize.y)
+        /*if (Mathf.Abs(cam.transform.position.y - transform.position.y) >= textureUnitSize.y)
         {
             float offset = (cam.transform.position.y - transform.position.y) % textureUnitSize.y;
             transform.position = new Vector3(transform.position.x, cam.transform.position.y + offset, transform.position.z);
-        }
+        }*/
     }
 }

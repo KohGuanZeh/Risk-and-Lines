@@ -7,21 +7,12 @@ using Photon.Pun;
 public class TravelDot : MonoBehaviour, IPooledObject
 {
 	[Header("Travel Dot Properties")]
+	[SerializeField] SpriteRenderer[] sprs;
+	[SerializeField] Animator anim;
+	public Color defaultColor;
+
 	public bool locked; //Check if Dot is already being locked by a Player
 	public PhotonView photonView;
-
-	[Header("Animation")]
-	Animator myAnim;
-
-	private void Start()
-	{
-		myAnim = GetComponent<Animator>();
-	}
-
-	private void Update()
-	{
-		myAnim.SetBool("Locked", locked); // sets the animation for the dot since the state is already handled by RPC
-	}
 
 	[PunRPC]
 	public void OnCreateObject()
@@ -37,7 +28,11 @@ public class TravelDot : MonoBehaviour, IPooledObject
 	public void OnObjectSpawn(int parentId)
 	{
 		//Execute Spawn Functions Here
+		foreach (SpriteRenderer spr in sprs) spr.color = defaultColor;
+
 		locked = false;
+		anim.Play("Travel Dot Unlock", 0, 1); //So that Animation wont Play when Dot first appears;
+		anim.SetBool("Locked", locked);
 		ObjectPooling.inst.poolDictionary[GetPoolTag()].Enqueue(gameObject);
 
 		if (parentId > 0) gameObject.transform.parent = PhotonNetwork.GetPhotonView(parentId).transform; //If Parent is not Null, Set New Parent
@@ -61,8 +56,12 @@ public class TravelDot : MonoBehaviour, IPooledObject
 	}
 
 	[PunRPC]
-	void LockTravelDot(bool lockDot)
+	void LockTravelDot(int playerNo, bool lockDot)
 	{
 		locked = lockDot;
+		anim.SetBool("Locked", locked);
+
+		if (locked) foreach (SpriteRenderer spr in sprs) spr.color = GameManager.GetCharacterColor(playerNo);
+		else foreach (SpriteRenderer spr in sprs) spr.color = defaultColor; //In case we do not want White
 	}
 }
