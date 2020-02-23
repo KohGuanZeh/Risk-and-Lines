@@ -27,6 +27,7 @@ public class Matchmake : MonoBehaviourPunCallbacks
 
 	[Header("For Room Panel")]
 	[SerializeField] TextMeshProUGUI roomNameDisplay; // display the name of the room
+	[SerializeField] ToggleGroup toggleGroup;
 	[SerializeField] Toggle[] charSelectToggles; //For Character Select
 	[SerializeField] Button startReadyButton;
 	[SerializeField] TextMeshProUGUI startReadyButtonTxt;

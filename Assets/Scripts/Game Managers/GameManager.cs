@@ -312,6 +312,8 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
 		defaultCamSpeed = Mathf.Clamp(defaultCamSpeed + 0.5f, defaultCamSpeed, 12.5f);
 		camSpeed = defaultCamSpeed;
+
+		gui.ShowDiffIncreased();
 	}
 
 	[PunRPC]
@@ -341,6 +343,8 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
 		defaultCamSpeed = Mathf.Clamp(defaultCamSpeed + 0.5f, defaultCamSpeed, 12.5f);
 		camSpeed = defaultCamSpeed;
+
+		gui.ShowDiffIncreased();
 	}
 
 	[PunRPC]

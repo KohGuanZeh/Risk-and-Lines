@@ -12,132 +12,145 @@ using Photon.Pun.UtilityScripts;
 [System.Serializable]
 public struct RankCardItems
 {
-    public Image playerSpr;
-    public TextMeshProUGUI playerName;
-    public TextMeshProUGUI rank;
-    public TextMeshProUGUI time;
+	public Image playerSpr;
+	public TextMeshProUGUI playerName;
+	public TextMeshProUGUI rank;
+	public TextMeshProUGUI time;
 }
 
 public class UIManager : MonoBehaviour
 {
-    [Header("General Variables")]
-    public static UIManager inst;
-    [SerializeField] GameManager gm;
-    [SerializeField] PlayerController player;
-    [SerializeField] Animator anim;
+	[Header("General Variables")]
+	public static UIManager inst;
+	[SerializeField] GameManager gm;
+	[SerializeField] PlayerController player;
+	[SerializeField] Animator anim;
 
-    [Header("GUI")]
-    [SerializeField] Image blinkIconOverlay;
-    [SerializeField] TextMeshProUGUI blinkCount;
+	[Header("GUI")]
+	[SerializeField] Image blinkIconOverlay;
+	[SerializeField] TextMeshProUGUI blinkCount;
 
-    [Header("Spectate Mode")]
-    [SerializeField] GameObject spectatorUI;
-    [SerializeField] TextMeshProUGUI spectatingTxt;
+	[Header("Spectate Mode")]
+	[SerializeField] TextMeshProUGUI placement;
+	[SerializeField] TextMeshProUGUI timeSurvived;
 
-    [Header("End Screen")]
-    [SerializeField] GameObject endScreen;
-    [SerializeField] Sprite[] charSprites;
-    [SerializeField] RankCardItems[] rankCards;
+	[Header("End Screen")]
+	[SerializeField] GameObject endScreen;
+	[SerializeField] Sprite[] charSprites;
+	[SerializeField] RankCardItems[] rankCards;
 
-    private void Awake()
-    {
-        inst = this;
-    }
+	private void Awake()
+	{
+		inst = this;
+	}
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        for (int i = 3; i >= PhotonNetwork.CurrentRoom.PlayerCount - 1; i--)
-        {
-            rankCards[i].playerSpr.gameObject.SetActive(false);
-            rankCards[i].playerName.text = "Player: -";
-            rankCards[i].rank.text = "Rank: -";
-            rankCards[i].time.text = "Time: -";
-        }
+	// Start is called before the first frame update
+	void Start()
+	{
+		for (int i = 3; i >= PhotonNetwork.CurrentRoom.PlayerCount - 1; i--)
+		{
+			rankCards[i].playerSpr.gameObject.SetActive(false);
+			rankCards[i].playerName.text = "Player: -";
+			rankCards[i].rank.text = "Rank: -";
+			rankCards[i].time.text = "Time: -";
+		}
 
-        gm = GameManager.inst;
-        PhotonNetwork.AutomaticallySyncScene = false;
-    }
+		gm = GameManager.inst;
+		PhotonNetwork.AutomaticallySyncScene = false;
+	}
 
-    public void AssignPlayerController(PlayerController player)
-    {
-       this.player = player;
-    }
+	public void AssignPlayerController(PlayerController player)
+	{
+	   this.player = player;
+	}
 
-    #region For Blink
-    public void UpdateBlinkCd(float cdRatio)
-    {
-        if (cdRatio < 0) cdRatio = 0;
-        blinkIconOverlay.fillAmount = cdRatio;
-    }
+	#region For Blink
+	public void UpdateBlinkCd(float cdRatio)
+	{
+		if (cdRatio < 0) cdRatio = 0;
+		blinkIconOverlay.fillAmount = cdRatio;
+	}
 
-    public void UpdateBlinkCount(int count)
-    {
-        blinkCount.text = count.ToString();
-    }
-    #endregion
+	public void UpdateBlinkCount(int count)
+	{
+		blinkCount.text = count.ToString();
+	}
+	#endregion
 
-    #region For Spectating and End
-    public void SwitchToSpectateMode()
-    {
-        anim.SetBool("Spectate", true);
-        anim.SetBool("Show Button", true);
-    }
+	#region For Difficulty Increase
+	public void ShowDiffIncreased()
+	{
+		anim.SetTrigger("Difficulty");
+	}
+	#endregion
 
-    public void UpdateLeaderboard()
-    {
-        for (int i = gm.playerInfos.Length - 1; i >= 0; i--)
-        {
-            if (gm.playerInfos[i].deathTime < 0) gm.playerInfos[i].deathTime = gm.playerInfos[0].deathTime + 1;
-            else break;
-        }
+	#region For Spectating and End
+	public void SwitchToSpectateMode()
+	{
+		anim.SetBool("Spectate", true);
+		anim.SetBool("Show Button", true);
+	}
 
-        System.Array.Sort(gm.playerInfos, (x, y) => y.deathTime.CompareTo(x.deathTime));
+	public void ShowPersonalResult(int placement, float time)
+	{
+		this.placement.text = string.Format("You Placed {0}", GetRankPrefix(placement));
+		timeSurvived.text = string.Format("Time Survived: {0}", time.ToString("0.00"));
+	}
 
-        for (int i = 0; i < gm.playerInfos.Length; i++)
-        {
-            rankCards[i].playerSpr.sprite = charSprites[gm.playerInfos[i].charSpr];
-            rankCards[i].playerName.text = string.Format("Player: {0}", gm.playerInfos[i].playerName);
-            rankCards[i].rank.text = string.Format("Rank: {0}", GetRankPrefix(i));
-            rankCards[i].time.text = string.Format("Time: {0}", i == 0 ? gm.playerInfos[i + 1].deathTime.ToString("0.00") + "++" : gm.playerInfos[i].deathTime.ToString("0.00"));
+	public void UpdateLeaderboard()
+	{
+		for (int i = gm.playerInfos.Length - 1; i >= 0; i--)
+		{
+			if (gm.playerInfos[i].deathTime < 0) gm.playerInfos[i].deathTime = gm.playerInfos[0].deathTime + 1;
+			else break;
+		}
 
-            int playerNo = PhotonNetwork.CurrentRoom.GetPlayer(gm.playerInfos[i].actorId).GetPlayerNumber();
-            rankCards[i].playerSpr.color = rankCards[i].playerName.color = rankCards[i].rank.color = rankCards[i].time.color = GameManager.GetCharacterColor(playerNo);
-        }
-    }
+		System.Array.Sort(gm.playerInfos, (x, y) => y.deathTime.CompareTo(x.deathTime));
 
-    public void ShowEndScreen()
-    {
-        anim.SetBool("Game Ended", true);
-        anim.SetBool("Show Button", true);
-    }
+		for (int i = 0; i < gm.playerInfos.Length; i++)
+		{
+			rankCards[i].playerSpr.sprite = charSprites[gm.playerInfos[i].charSpr];
+			rankCards[i].playerName.text = string.Format("Player: {0}", gm.playerInfos[i].playerName);
+			rankCards[i].rank.text = string.Format("Rank: {0}", GetRankPrefix(i));
+			rankCards[i].time.text = string.Format("Time: {0}", i == 0 ? gm.playerInfos[i + 1].deathTime.ToString("0.00") + "++" : gm.playerInfos[i].deathTime.ToString("0.00"));
 
-    //Initially Planned to have Rematch but Proved to be too Difficult
-    public void BackToWaitRoom()
-    {
-        PlayerPrefs.SetInt("Lobby State", 2);
-        LoadingScreen.inst.LoadScene(1);
-    }
+			int playerNo = PhotonNetwork.CurrentRoom.GetPlayer(gm.playerInfos[i].actorId).GetPlayerNumber();
+			rankCards[i].playerSpr.color = rankCards[i].playerName.color = rankCards[i].rank.color = rankCards[i].time.color = GameManager.GetCharacterColor(playerNo);
+		}
+	}
 
-    public void BackToLobby()
-    {
-        PlayerPrefs.SetInt("Lobby State", 1);
-        LoadingScreen.inst.LoadScene(1);
-    }
-    #endregion
+	public void ShowEndScreen()
+	{
+		anim.SetBool("Game Ended", true);
+		anim.SetBool("Show Button", true);
+	}
 
-    public string GetRankPrefix(int arrIdx)
-    {
-        switch (arrIdx)
-        {
-            case 0:
-                return "1st";
-            case 1:
-                return "2nd";
-            case 2:
-                return "3rd";
-            default:
-                return string.Format("{0}th", arrIdx + 1);
-        }
-    }
+	//Initially Planned to have Rematch but Proved to be too Difficult
+	public void BackToWaitRoom()
+	{
+		PlayerPrefs.SetInt("Lobby State", 2);
+		LoadingScreen.inst.LoadScene(1);
+	}
+
+	public void BackToLobby()
+	{
+		PlayerPrefs.SetInt("Lobby State", 1);
+		LoadingScreen.inst.LoadScene(1);
+	}
+	#endregion
+
+	public string GetRankPrefix(int arrIdx)
+	{
+		switch (arrIdx)
+		{
+			case 0:
+				return "1st";
+			case 1:
+				return "2nd";
+			case 2:
+				return "3rd";
+			default:
+				return string.Format("{0}th", arrIdx + 1);
+		}
+	}
 }
