@@ -64,7 +64,7 @@ public class ChatManager : MonoBehaviourPun {
 			text.text = msg;
 			text.color = GameManager.GetCharacterColor(playerNo);
 
-			textObj.transform.parent = chatContainer;
+			textObj.transform.SetParent(chatContainer);
 			textObj.transform.localScale = Vector3.one;
 
 			texts.Add(text);

@@ -224,8 +224,12 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		gm.playersAlive--;
 
 		//Update Dead Players
+		float timeSurvived = (float)PhotonNetwork.Time;
+
+		gui.ShowPersonalResult(gm.playersAlive + 1, timeSurvived);
 		gui.SwitchToSpectateMode();
-		gm.photonView.RPC("UpdateLeaderboard", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.ActorNumber, (float)PhotonNetwork.Time);
+
+		gm.photonView.RPC("UpdateLeaderboard", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.ActorNumber, timeSurvived);
 		photonView.RPC("SendDeathEvent", RpcTarget.OthersBuffered, gm.playersAlive, ignoreGameEnd);
 
 		if (ignoreGameEnd || gm.playersAlive > 1) return;
@@ -259,6 +263,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 	public override void OnLeftRoom() {
 		base.OnLeftRoom();
+		CutLine();
 		Death();
 	}
 }
