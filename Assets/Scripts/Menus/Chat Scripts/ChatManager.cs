@@ -53,6 +53,26 @@ public class ChatManager : MonoBehaviourPun {
 		}
 	}
 
+	[PunRPC]
+	void SendAutomatedMsg(string msg, int playerNo)
+	{
+		if (!string.IsNullOrEmpty(msg) && !string.IsNullOrWhiteSpace(msg))
+		{
+			GameObject textObj = PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Message Prefab"), Vector2.zero, Quaternion.identity);
+
+			TextMeshProUGUI text = textObj.GetComponent<TextMeshProUGUI>(); // sets the text of the prefab and acts as a message
+			text.text = msg;
+			text.color = GameManager.GetCharacterColor(playerNo);
+
+			textObj.transform.parent = chatContainer;
+			textObj.transform.localScale = Vector3.one;
+
+			texts.Add(text);
+
+			StartCoroutine(ChangeChatSize(text));
+		}
+	}
+
 	void EditChatSize(TextMeshProUGUI text) 
 	{
 		chatSize += text.rectTransform.sizeDelta.y;

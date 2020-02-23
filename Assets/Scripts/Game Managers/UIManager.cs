@@ -7,6 +7,7 @@ using TMPro;
 
 using Photon.Pun;
 using Photon.Realtime;
+using Photon.Pun.UtilityScripts;
 
 [System.Serializable]
 public struct RankCardItems
@@ -99,6 +100,9 @@ public class UIManager : MonoBehaviour
             rankCards[i].playerName.text = string.Format("Player: {0}", gm.playerInfos[i].playerName);
             rankCards[i].rank.text = string.Format("Rank: {0}", GetRankPrefix(i));
             rankCards[i].time.text = string.Format("Time: {0}", i == 0 ? gm.playerInfos[i + 1].deathTime.ToString("0.00") + "++" : gm.playerInfos[i].deathTime.ToString("0.00"));
+
+            int playerNo = PhotonNetwork.CurrentRoom.GetPlayer(gm.playerInfos[i].actorId).GetPlayerNumber();
+            rankCards[i].playerSpr.color = rankCards[i].playerName.color = rankCards[i].rank.color = rankCards[i].time.color = GameManager.GetCharacterColor(playerNo);
         }
     }
 
@@ -112,13 +116,13 @@ public class UIManager : MonoBehaviour
     public void BackToWaitRoom()
     {
         PlayerPrefs.SetInt("Lobby State", 2);
-        PhotonNetwork.LoadLevel(0);
+        LoadingScreen.inst.LoadScene(1);
     }
 
     public void BackToLobby()
     {
         PlayerPrefs.SetInt("Lobby State", 1);
-        PhotonNetwork.LoadLevel(0);
+        LoadingScreen.inst.LoadScene(1);
     }
     #endregion
 

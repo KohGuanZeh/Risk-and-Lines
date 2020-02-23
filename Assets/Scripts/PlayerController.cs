@@ -76,7 +76,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 						if (currentTravelLine) currentTravelLine.photonView.RPC("AddNewPoint", RpcTarget.AllBuffered, transform.position);
 						else {
 							currentTravelLine = ObjectPooling.inst.SpawnFromPool("Line", transform.position, Quaternion.identity).GetComponent<TravelLine>(); //Instantiate(linePreset, transform); //Will be changed to Object Pooling
-							currentTravelLine.photonView.RPC("CreateNewLine", RpcTarget.AllBuffered, playerNo, photonView.ViewID, transform.position);
+							currentTravelLine.photonView.RPC("CreateNewLine", RpcTarget.AllBuffered, photonView.ViewID, playerNo, transform.position);
 						}
 					} else if (ReferenceEquals(travelDot, storedDot) && doubleTapThreshold > 0 && blinkCount > 0) //If there is already a Stored Dot, This is Considered a Double Tap
 					  {
@@ -111,13 +111,16 @@ public class PlayerController : MonoBehaviourPunCallbacks
 						travelDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, playerNo, true);
 						targetDot = travelDot;
 
+						transform.up = targetDot.transform.position - transform.position;
+
 						if (currentTravelLine) currentTravelLine.photonView.RPC("AddNewPoint", RpcTarget.AllBuffered, transform.position);
 						else {
 							currentTravelLine = ObjectPooling.inst.SpawnFromPool("Line", transform.position, Quaternion.identity).GetComponent<TravelLine>(); //Instantiate(linePreset, transform); //Will be changed to Object Pooling
-							currentTravelLine.photonView.RPC("CreateNewLine", RpcTarget.AllBuffered, playerNo, photonView.ViewID, transform.position);
+							currentTravelLine.photonView.RPC("CreateNewLine", RpcTarget.AllBuffered, photonView.ViewID, playerNo, transform.position);
 						}
 					} else if (ReferenceEquals(travelDot, storedDot) && doubleTapThreshold > 0 && blinkCount > 0) //If there is already a Stored Dot, This is Considered a Double Tap
 					  {
+						transform.up = storedDot.transform.position - transform.position;
 						blinked = true;
 						if (travelDot.locked && targetDot != travelDot) {
 							storedDot = null;
@@ -194,8 +197,6 @@ public class PlayerController : MonoBehaviourPunCallbacks
 	{
 		int presetIdx = PlayerPrefs.GetInt("Preset", 0);
 		playerNo = PhotonNetwork.LocalPlayer.GetPlayerNumber();
-
-		gm.photonView.RPC("SetPlayersCharPreset", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.ActorNumber, presetIdx);
 		photonView.RPC("SetCharacterDisplay", RpcTarget.AllBuffered, playerNo, presetIdx);
 	}
 

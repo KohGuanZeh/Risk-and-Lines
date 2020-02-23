@@ -98,5 +98,6 @@ MonoBehaviour:
   - CamShakeDuration
   - SetCharacterDisplay
   - SetPlayersCharPreset
+  - SendAutomatedMsg
   DisableAutoOpenWizard: 1
   ShowSettings: 1

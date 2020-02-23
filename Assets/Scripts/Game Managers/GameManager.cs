@@ -39,7 +39,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	public Vector3 moveDelta; //Stores Move Delta of the Camera;
 	public Vector3 camPos; //Store Separately as this is the Reference Value that will be submitted to Server.
 	public float camSpeed = 0, defaultCamSpeed = 5.0f; //Default is used to Set Values
-	public float CamLeftBounds { get { return transform.position.x - cam.orthographicSize * cam.aspect; } }
+	public float CamLeftBounds { get { return camPos.x - cam.orthographicSize * cam.aspect; } }
 
 	[Header("For Spawning Dots")]
 	[Range(0, 1)] public float minSpawnIntervalCoeff; //> Coeff, > Interval Dist
@@ -110,6 +110,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 			if (timeStamp <= 0) photonView.RPC("RegisterTimeStamp", RpcTarget.AllBuffered, 0f, true);
 		}
 		if (Input.GetKeyDown(KeyCode.G)) PhotonNetwork.LeaveRoom();
+		
 		CamShake();
 	}
 
@@ -147,7 +148,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 		float maxY = cam.transform.position.y + cam.orthographicSize;
 		float interval = (maxY - minY) / (PhotonNetwork.PlayerList.Length + 1);
 		Vector3 spawnPos = new Vector3(playerSpawnPos.position.x, maxY - interval * (PhotonNetwork.LocalPlayer.GetPlayerNumber()), 0);
-		GameObject playerObj = PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Player"), spawnPos, Quaternion.identity);
+		GameObject playerObj = PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Player"), spawnPos, Quaternion.Euler(0, 0, -90));
 		playerObj.GetComponent<PlayerController>().SetUpCharacter();
 
 	}
@@ -189,13 +190,17 @@ public class GameManager : MonoBehaviourPunCallbacks {
 			time[i] = -1;
 		}
 
-		photonView.RPC("InitialiseLeaderboard", RpcTarget.AllBuffered, ids, names, time);
+		photonView.RPC("InitialiseLeaderboard", RpcTarget.AllBuffered, ids, charSprs, names, time);
 	}
 
 	[PunRPC]
-	void InitialiseLeaderboard(int[] ids, int[] charSprs, string[] names, float[] time) {
+	void InitialiseLeaderboard(int[] ids, int[] charSprs, string[] names, float[] time) 
+	{
 		playerInfos = new PlayerInfo[ids.Length];
 		for (int i = 0; i < ids.Length; i++) playerInfos[i] = new PlayerInfo(ids[i], charSprs[i], names[i], time[i]);
+
+		//Send Another RPC to get the Preset Value for Leaderboard Display
+		photonView.RPC("SetPlayersCharPreset", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.ActorNumber, PlayerPrefs.GetInt("Preset", 0));
 	}
 
 	[PunRPC]
@@ -243,10 +248,10 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	{
 		if (shakeDuration >= 0)
 		{
-			cam.transform.localPosition += Random.insideUnitSphere * shakeAmount;
-
+			cam.transform.position += Random.insideUnitSphere * shakeAmount;
 			shakeDuration -= Time.deltaTime * decreaseFactor;
 		}
+		else cam.transform.position = camPos;
 	}
 	#endregion
 
