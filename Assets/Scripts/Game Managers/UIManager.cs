@@ -82,7 +82,7 @@ public class UIManager : MonoBehaviour
 
 	void StartGameAnimationEvent()
 	{
-		gm.StartGame();
+		if (PhotonNetwork.IsMasterClient) gm.StartGame();
 	}
 	#endregion
 

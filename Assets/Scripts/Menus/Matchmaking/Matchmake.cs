@@ -269,7 +269,7 @@ public class Matchmake : MonoBehaviourPunCallbacks
 	[PunRPC]
 	void LoadSceneForAll(int scene)
 	{
-		LoadingScreen.inst.LoadScene(scene);
+		LoadingScreen.inst.LoadScene(scene, false);
 	}
 
 	#region Customisation Settings
