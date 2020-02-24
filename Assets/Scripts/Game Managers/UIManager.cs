@@ -70,6 +70,7 @@ public class UIManager : MonoBehaviour
 	#region For Game Start
 	public void TriggerGameStart()
 	{
+		if (!anim) anim = GetComponent<Animator>();
 		anim.SetTrigger("Game Start");
 		print("Game Start Triggered");
 		LoadingScreen.inst.OnFadeOut -= TriggerGameStart;
