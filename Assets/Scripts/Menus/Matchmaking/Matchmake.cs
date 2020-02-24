@@ -135,6 +135,8 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		isReady = false;
 		playersReady.Clear();
 		PhotonNetwork.AutomaticallySyncScene = false;
+
+		Debug.LogError("Left Room Correctly");
 	}
 
 	public override void OnPlayerEnteredRoom(Player newPlayer)

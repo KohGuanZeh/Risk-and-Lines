@@ -78,12 +78,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	public int playersAlive;
 	public PlayerInfo[] playerInfos;
 
-	[Header("CamShake")]
-	[SerializeField] float shakeDuration = 0f;
-	[SerializeField] float setShakeDuration;
-	[SerializeField] float shakeAmount = 0f;
-	[SerializeField] float decreaseFactor = 1.0f;
-
 	private void Awake() 
 	{
 		inst = this;
@@ -108,11 +102,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
 		//Only Master Client will handle Dot Spawning
 		if (PhotonNetwork.IsMasterClient) SpawnDots();
 		//QueueGameStart();
-	}
-
-	private void Update() 
-	{
-		//CamShake();
 	}
 
 	void FixedUpdate() {
@@ -200,7 +189,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
 	public void StartGame()
 	{
-		photonView.RPC("ToggleMoveCam", RpcTarget.AllBuffered);
+		photonView.RPC("ToggleMoveCam", RpcTarget.AllBuffered, true);
 		photonView.RPC("RegisterTimeStamp", RpcTarget.AllBuffered, 0f, true);
 	}
 
@@ -254,18 +243,12 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
 	#region For Camera Movement
 	[PunRPC]
-	void ToggleMoveCam() 
+	void ToggleMoveCam(bool move) 
 	{
-		moveCam = !moveCam;
+		moveCam = move;
 
 		if (moveCam) accelDecelMult = (defaultCamSpeed - camSpeed) / (Time.fixedDeltaTime * 0.5f);
 		else accelDecelMult = (camSpeed - 0) / 0.5f;
-		/*if (moveCam) camSpeed = defaultCamSpeed;
-		else 
-		{
-			camSpeed = 0;
-			moveDelta = Vector2.zero;
-		}*/
 	}
 
 	void AccelerateDecelerateCam()
@@ -287,20 +270,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	void SendNewCamValues(Vector3 moveDelta, Vector3 camPos) {
 		this.moveDelta = moveDelta;
 		this.camPos = camPos;
-	}
-
-	public void SetCamShakeDuration()
-	{
-		shakeDuration = setShakeDuration;
-	}
-	void CamShake()
-	{
-		if (shakeDuration >= 0)
-		{
-			cam.transform.position += Random.insideUnitSphere * shakeAmount;
-			shakeDuration -= Time.deltaTime * decreaseFactor;
-		}
-		else cam.transform.position = camPos;
 	}
 	#endregion
 
@@ -371,7 +340,8 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	}
 
 	[PunRPC]
-	void IncreaseDifficulty(int stage, bool cohesive) {
+	void IncreaseDifficulty(int stage, bool cohesive) 
+	{
 		if (stage % 2 != 0) //If Stage is Odd
 		{
 			if (cohesive) {
@@ -415,7 +385,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	public void EndGame() //Called in RPC Function
 	{
 		gameEnded = true;
-		ToggleMoveCam(); //True is Stop Moving. Bool = isMoving. Therefore, If Moving, Stop Moving.
+		ToggleMoveCam(false); //True is Stop Moving. Bool = isMoving. Therefore, If Moving, Stop Moving.
 		gui.ShowEndScreen();
 	}
 	#endregion

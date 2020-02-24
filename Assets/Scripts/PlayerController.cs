@@ -74,11 +74,13 @@ public class PlayerController : MonoBehaviourPunCallbacks
 	}
 
 	#region Iput Controls
-	void TouchControls() {
+	void TouchControls() 
+	{
 		Touch touch = Input.GetTouch(0); // this is for the first finger that entered the screen
 
 		// Sets the dot to move towards
-		if (touch.phase == TouchPhase.Began) {
+		if (touch.phase == TouchPhase.Began) 
+		{
 			RaycastHit2D rayHit = Physics2D.GetRayIntersection(gm.cam.ScreenPointToRay(touch.position)); // this to get the direciton of the raycast
 
 			//Getting the Dot
@@ -160,7 +162,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 	#region For Travel and Blink
 	// for Normal travel
-	void TravelControl() {
+	void TravelControl() 
+	{
 		if (ReferenceEquals(targetDot, null)) return;
 
 		transform.position = Vector2.MoveTowards(transform.position, targetDot.transform.position, (gm.camSpeed + travelSpeed) * Time.deltaTime);
