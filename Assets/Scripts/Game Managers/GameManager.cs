@@ -191,8 +191,8 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	void QueueGameStart()
 	{
 		LoadingScreen.inst.canFadeOut = true;
-		LoadingScreen.inst.OnFadeOut += UIManager.inst.TriggerGameStart;	
-		//UIManager.inst.TriggerGameStart();
+		//LoadingScreen.inst.OnFadeOut += UIManager.inst.TriggerGameStart;	
+		UIManager.inst.TriggerGameStart();
 	}
 
 	public void StartGame()
