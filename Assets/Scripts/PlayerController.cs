@@ -32,12 +32,15 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 	void Start() 
 	{
-		gm = GameManager.inst;
-		gui = UIManager.inst;
-		gui.AssignPlayerController(this); //May need photonView.IsMine
-		rb = GetComponent<Rigidbody2D>();
+		if (photonView.IsMine)
+		{
+			gm = GameManager.inst;
+			gui = UIManager.inst;
+			gui.AssignPlayerController(this); //May need photonView.IsMine
+			rb = GetComponent<Rigidbody2D>();
 
-		blinkCd = maxCdTime;
+			blinkCd = maxCdTime;
+		}
 	}
 
 	void Update() {
