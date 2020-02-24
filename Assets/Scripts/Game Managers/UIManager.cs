@@ -24,7 +24,7 @@ public class UIManager : MonoBehaviour
 	public static UIManager inst;
 	[SerializeField] GameManager gm;
 	[SerializeField] PlayerController player;
-	[SerializeField] Animator anim;
+	[SerializeField] Animator anim, dotAnim;
 
 	[Header("GUI")]
 	[SerializeField] Image blinkIconOverlay;
@@ -113,6 +113,11 @@ public class UIManager : MonoBehaviour
 		lobbyBtn.SetActive(true);
 		anim.SetBool("Spectate", true);
 		anim.SetBool("Show Button", true);
+	}
+
+	void TriggerDotAnimation()
+	{
+		dotAnim.SetTrigger("Dot");
 	}
 
 	public void ShowPersonalResult(int placement, float time) //Placement is in Array Index. So Placement always need to -1 since Array Starts from 0
