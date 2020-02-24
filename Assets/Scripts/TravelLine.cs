@@ -7,7 +7,7 @@ using Photon.Pun.UtilityScripts;
 
 public class TravelLine : MonoBehaviour, IPooledObject
 {
-	[SerializeField] int playerRefId;
+	public int playerRefId;
 	public PhotonView photonView;
 	[SerializeField] LineRenderer line;
 	[SerializeField] EdgeCollider2D collider;

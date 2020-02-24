@@ -137,6 +137,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 						if (currentTravelLine) currentTravelLine.photonView.RPC("AddNewPoint", RpcTarget.AllBuffered, transform.position);
 						else {
 							currentTravelLine = ObjectPooling.inst.SpawnFromPool("Line", transform.position, Quaternion.identity).GetComponent<TravelLine>(); //Instantiate(linePreset, transform); //Will be changed to Object Pooling
+							currentTravelLine.playerRefId = photonView.ViewID;
 							currentTravelLine.photonView.RPC("CreateNewLine", RpcTarget.AllBuffered, photonView.ViewID, playerNo, transform.position);
 						}
 					} else if (ReferenceEquals(travelDot, storedDot) && doubleTapThreshold > 0 && blinkCount > 0) //If there is already a Stored Dot, This is Considered a Double Tap
