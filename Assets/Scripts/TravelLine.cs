@@ -117,7 +117,7 @@ public class TravelLine : MonoBehaviour, IPooledObject
 		if (other.CompareTag("Player"))
 		{
 			PlayerController detectedPlayer = other.GetComponent<PlayerController>();
-			Debug.LogError(detectedPlayer.photonView.Owner.NickName);
+			Debug.LogError(string.Format("Photon is Retarded. Detected View ID and Name: {0}, {1}. PlayerRefId: {2}.", detectedPlayer.photonView.ViewID.ToString(), detectedPlayer.photonView.Owner.NickName, playerRefId));
 			if (!ReferenceEquals(detectedPlayer, null) && playerRefId != detectedPlayer.photonView.ViewID) detectedPlayer.Death();
 		}
 	}

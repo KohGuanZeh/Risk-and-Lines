@@ -38,22 +38,19 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 	void Start() 
 	{
-		if (photonView.IsMine)
-		{
-			gm = GameManager.inst;
-			gui = UIManager.inst;
-			Debug.LogWarning(gui.name);
-			gui.AssignPlayerController(this); //May need photonView.IsMine
-			rb = GetComponent<Rigidbody2D>();
+		gm = GameManager.inst;
+		gui = UIManager.inst;
+		Debug.LogWarning(gui.name);
+		gui.AssignPlayerController(this); //May need photonView.IsMine
+		rb = GetComponent<Rigidbody2D>();
 
-			blinkCd = maxCdTime;
-			gm.photonView.RPC("QueueGameStart", RpcTarget.AllBuffered);
+		blinkCd = maxCdTime;
+		gm.photonView.RPC("QueueGameStart", RpcTarget.AllBuffered);
 
-			shakeDuration = 0f;
-			setShakeDuration = 0.2f;
-			shakeAmount = 0.5f;
-			decreaseFactor = 1.0f;
-		}
+		shakeDuration = 0f;
+		setShakeDuration = 0.2f;
+		shakeAmount = 0.5f;
+		decreaseFactor = 1.0f;
 	}
 
 	void Update() 
