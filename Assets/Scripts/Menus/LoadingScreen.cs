@@ -42,7 +42,6 @@ public class LoadingScreen : MonoBehaviour
 
 	public void LoadScene(int sceneIdx, bool fadeOutOnLoaded = true)
 	{
-		canFadeOut = false;
 		sceneToLoad = sceneIdx;
 		isLoading = true;
 		fadingInProgress = true;

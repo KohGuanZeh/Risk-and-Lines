@@ -110,7 +110,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
 	private void Update() 
 	{
-		if (photonView.IsMine) CamShake();
+		CamShake();
 	}
 
 	void FixedUpdate() {
