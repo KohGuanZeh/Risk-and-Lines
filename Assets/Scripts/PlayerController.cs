@@ -192,6 +192,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 		blinkCount--;
 		gui.UpdateBlinkCount(blinkCount);
+
+		// for the calling of the blink sfx
+		SfxManager.inst.PlaySfx(SfxManager.inst.Sfx.blink);
 	}
 
 	//Delete the last position and cut out the Travel Line
