@@ -412,8 +412,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
 		gameEnded = true;
 		ToggleMoveCam(); //True is Stop Moving. Bool = isMoving. Therefore, If Moving, Stop Moving.
 		gui.ShowEndScreen();
-
-		PhotonNetwork.CurrentRoom.IsOpen = true;
 	}
 	#endregion
 

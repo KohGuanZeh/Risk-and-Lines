@@ -211,7 +211,7 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		{
 			if (playersReady.Count != PhotonNetwork.CurrentRoom.PlayerCount - 1) return; //Master will not be registered under Ready
 			PhotonNetwork.CurrentRoom.IsOpen = false;
-			LoadingScreen.inst.LoadScene(2, false);
+			photonView.RPC("LoadSceneForAll", RpcTarget.All, 2); //LoadingScreen.inst.LoadScene(2, false);
 			//PhotonNetwork.LoadLevel(2);
 		}
 		else
@@ -264,6 +264,12 @@ public class Matchmake : MonoBehaviourPunCallbacks
 			startReadyButton.interactable = true;
 			startReadyButtonTxt.text = "Ready";
 		}
+	}
+
+	[PunRPC]
+	void LoadSceneForAll(int scene)
+	{
+		LoadingScreen.inst.LoadScene(scene);
 	}
 
 	#region Customisation Settings
