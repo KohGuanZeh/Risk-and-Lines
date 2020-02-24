@@ -27,6 +27,8 @@ public class TravelDot : MonoBehaviour, IPooledObject
 	[PunRPC]
 	public void OnObjectSpawn(int parentId)
 	{
+		gameObject.SetActive(true);
+
 		//Execute Spawn Functions Here
 		foreach (SpriteRenderer spr in sprs) spr.color = defaultColor;
 
@@ -37,8 +39,6 @@ public class TravelDot : MonoBehaviour, IPooledObject
 
 		if (parentId > 0) gameObject.transform.parent = PhotonNetwork.GetPhotonView(parentId).transform; //If Parent is not Null, Set New Parent
 		else gameObject.transform.parent = ObjectPooling.inst.GetPool(GetPoolTag()).parent;
-
-		gameObject.SetActive(true);
 	}
 
 	[PunRPC]

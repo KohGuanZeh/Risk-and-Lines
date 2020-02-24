@@ -42,6 +42,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		{
 			gm = GameManager.inst;
 			gui = UIManager.inst;
+			Debug.LogWarning(gui.name);
 			gui.AssignPlayerController(this); //May need photonView.IsMine
 			rb = GetComponent<Rigidbody2D>();
 
@@ -247,8 +248,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		//Update Dead Players
 		float timeSurvived = gm.totalTime;
 
-		gui.ShowPersonalResult(gm.playersAlive, timeSurvived); //Getting Prefix takes Array Index hence 1st = 0;
-		gui.SwitchToSpectateMode();
+		UIManager.inst.ShowPersonalResult(gm.playersAlive, timeSurvived); //Getting Prefix takes Array Index hence 1st = 0;
+		UIManager.inst.SwitchToSpectateMode();
 
 		gm.photonView.RPC("UpdateLeaderboard", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.ActorNumber, timeSurvived);
 		photonView.RPC("SendDeathEvent", RpcTarget.OthersBuffered, gm.playersAlive, ignoreGameEnd);
@@ -256,7 +257,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		if (ignoreGameEnd || gm.playersAlive > 1) return;
 
 		gm.EndGame();
-		gui.UpdateLeaderboard();
+		UIManager.inst.UpdateLeaderboard();
 	}
 
 	[PunRPC]
