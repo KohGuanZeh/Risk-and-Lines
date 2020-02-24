@@ -33,7 +33,7 @@ public class LoadingScreen : MonoBehaviour
 
 	private void Update()
 	{
-		if (isLoading && PhotonNetwork.LevelLoadingProgress >= 1f && canFadeOut)
+		if (isLoading && canFadeOut)
 		{
 			if (ReferenceEquals(PhotonNetwork.CurrentRoom, null))
 			{
@@ -41,11 +41,6 @@ public class LoadingScreen : MonoBehaviour
 				isLoading = false;
 				canFadeOut = false;
 			}
-			else
-			{
-				photonView.RPC("TriggerFadeOutInGame", RpcTarget.AllBuffered);
-				isLoading = false;
-			} 
 		}
 	}
 
@@ -72,6 +67,7 @@ public class LoadingScreen : MonoBehaviour
 	//Problem is that Level Loading Progress Remains at 1 when Level Loading is done and cannot be Set Manually
 	IEnumerator AllowReceiveAsyncProgress()
 	{
+		yield return new WaitUntil(() => PhotonNetwork.LevelLoadingProgress >= 1f);
 		yield return new WaitForSeconds(0.5f);
 		canFadeOut = true;
 	}

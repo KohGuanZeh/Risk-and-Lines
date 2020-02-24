@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 7969349435527057675}
   - component: {fileID: 7969349435527057679}
   - component: {fileID: 7969349435527057678}
-  - component: {fileID: 8846794604819040815}
   m_Layer: 5
   m_Name: Loading Screen
   m_TagString: Untagged
@@ -136,32 +135,10 @@ MonoBehaviour:
   loadingScreen: {fileID: 7969349436494276272}
   sceneToLoad: 0
   anim: {fileID: 7969349435527057679}
-  photonView: {fileID: 8846794604819040815}
+  photonView: {fileID: 0}
   fadingInProgress: 0
   isLoading: 0
   canFadeOut: 0
---- !u!114 &8846794604819040815
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7969349435527057672}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 0
-  OwnershipTransfer: 0
-  ObservedComponents:
-  - {fileID: 0}
-  viewIdField: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
 --- !u!1 &7969349435648104497
 GameObject:
   m_ObjectHideFlags: 0
