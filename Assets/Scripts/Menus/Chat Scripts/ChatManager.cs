@@ -40,13 +40,16 @@ public class ChatManager : MonoBehaviourPun {
 	{
 		if (!string.IsNullOrEmpty(msg) && !string.IsNullOrWhiteSpace(msg)) 
 		{
-			GameObject textObj = PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Message Prefab"), Vector2.zero, Quaternion.identity);
+			//GameObject textObj = PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Message Prefab"), Vector2.zero, Quaternion.identity);
+			//TextMeshProUGUI text = textObj.GetComponent<TextMeshProUGUI>(); // sets the text of the prefab and acts as a message
 
-			TextMeshProUGUI text = textObj.GetComponent<TextMeshProUGUI>(); // sets the text of the prefab and acts as a message
+			TextMeshProUGUI text = Instantiate(textPrefab, chatContainer);
 			text.text = string.Format("{0}: {1}", nickname, msg);
 
-			textObj.transform.parent = chatContainer;
-			textObj.transform.localScale = Vector3.one;
+			text.transform.localScale = Vector3.one;
+
+			//textObj.transform.parent = chatContainer;
+			//textObj.transform.localScale = Vector3.one;
 
 			texts.Add(text);
 
