@@ -64,7 +64,7 @@ public class LoadingScreen : MonoBehaviour
 	public void OnFadeInAnimationEvent()
 	{
 		if (PhotonNetwork.CurrentRoom != null && PhotonNetwork.IsMasterClient) PhotonNetwork.LoadLevel(sceneToLoad);
-		else PhotonNetwork.LoadLevel(sceneToLoad);
+		else if (ReferenceEquals(PhotonNetwork.CurrentRoom, null))PhotonNetwork.LoadLevel(sceneToLoad);
 		//PhotonNetwork.LoadLevel(sceneToLoad);
 		if (OnFadeIn != null) OnFadeIn();
 	}

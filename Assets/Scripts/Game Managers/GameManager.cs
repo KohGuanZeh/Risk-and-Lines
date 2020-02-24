@@ -103,7 +103,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 		gui = UIManager.inst;
 
 		playersAlive = PhotonNetwork.PlayerList.Length;
-		if (photonView.IsMine) CreatePlayer();
+		CreatePlayer();
 
 		//Only Master Client will handle Dot Spawning
 		if (PhotonNetwork.IsMasterClient) SpawnDots();
