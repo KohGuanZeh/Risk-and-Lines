@@ -70,14 +70,6 @@ public class UIManager : MonoBehaviour
 	#region For Game Start
 	public void TriggerGameStart()
 	{
-		StartCoroutine(GameStartu());
-		//anim.SetTrigger("Game Start");
-		//LoadingScreen.inst.OnFadeOut -= TriggerGameStart;
-	}
-
-	IEnumerator GameStartu()
-	{
-		yield return new WaitForSeconds(1);
 		anim.SetTrigger("Game Start");
 		LoadingScreen.inst.OnFadeOut -= TriggerGameStart;
 	}
