@@ -113,6 +113,10 @@ MonoBehaviour:
   blinkCount: 3
   blinkCd: 0
   maxCdTime: 5
+  shakeDuration: 0
+  setShakeDuration: 0.2
+  shakeAmount: 0.5
+  decreaseFactor: 1
 --- !u!58 &195885749232753354
 CircleCollider2D:
   m_ObjectHideFlags: 0
