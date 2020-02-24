@@ -291,8 +291,10 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		else gm.cam.transform.position = gm.camPos;
 	}
 	#endregion
-	void OnTriggerEnter2D(Collider2D other) {
-		if (other.CompareTag("Player")) {
+	void OnTriggerEnter2D(Collider2D other) 
+	{
+		if (other.CompareTag("Player")) 
+		{
 			PlayerController detectedPlayer = other.GetComponent<PlayerController>();
 
 			if (!ReferenceEquals(detectedPlayer, null)) {

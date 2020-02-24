@@ -89,6 +89,6 @@ public class ChatManager : MonoBehaviourPun {
 	public void ClearChat()
 	{
 		chatSize = 0;
-		foreach (TextMeshProUGUI text in texts) Destroy(text.gameObject);
+		if (texts != null) foreach (TextMeshProUGUI text in texts) Destroy(text.gameObject);
 	}
 }
