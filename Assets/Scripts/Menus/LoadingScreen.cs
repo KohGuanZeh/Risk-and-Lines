@@ -13,6 +13,7 @@ public class LoadingScreen : MonoBehaviour
 	[SerializeField] GameObject loadingScreen;
 	[SerializeField] int sceneToLoad;
 	[SerializeField] Animator anim;
+	[SerializeField] PhotonView photonView;
 
 	public bool fadingInProgress;
 	public bool isLoading;
@@ -32,13 +33,19 @@ public class LoadingScreen : MonoBehaviour
 
 	private void Update()
 	{
-		if (sceneToLoad == 2) Debug.LogError(PhotonNetwork.LevelLoadingProgress);
-
 		if (isLoading && PhotonNetwork.LevelLoadingProgress >= 1f && canFadeOut)
 		{
-			anim.SetBool("Fade In", false);
-			isLoading = false;
-			canFadeOut = false;
+			if (ReferenceEquals(PhotonNetwork.CurrentRoom, null))
+			{
+				anim.SetBool("Fade In", false);
+				isLoading = false;
+				canFadeOut = false;
+			}
+			else
+			{
+				photonView.RPC("TriggerFadeOutInGame", RpcTarget.AllBuffered);
+				isLoading = false;
+			} 
 		}
 	}
 
