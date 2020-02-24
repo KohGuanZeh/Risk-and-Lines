@@ -131,7 +131,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gui: {fileID: 0}
+  totalTime: 0
   cam: {fileID: 117266251327048048}
+  moveCam: 0
+  accelDecelMult: 0
   moveDelta: {x: 0, y: 0, z: 0}
   camPos: {x: 0, y: 0, z: 0}
   camSpeed: 0
@@ -149,14 +152,14 @@ MonoBehaviour:
   minMaxXOffset: {x: 0, y: 3}
   playerSpawnPos: {fileID: 831214271}
   presets:
-  - coreSpr: {fileID: 21300000, guid: d7971bbe07820674999915e5515314f4, type: 3}
-    secSpr: {fileID: 21300000, guid: d7971bbe07820674999915e5515314f4, type: 3}
+  - coreSpr: {fileID: 21300000, guid: 705f62c5b387c44499359caf711fa515, type: 3}
+    secSpr: {fileID: 21300000, guid: 705f62c5b387c44499359caf711fa515, type: 3}
   - coreSpr: {fileID: 21300000, guid: 29bbaf14237df2c419321ce03053c42c, type: 3}
     secSpr: {fileID: 21300000, guid: 29bbaf14237df2c419321ce03053c42c, type: 3}
   - coreSpr: {fileID: 21300000, guid: ebf88d2936ba63743b3aa0073299c783, type: 3}
     secSpr: {fileID: 21300000, guid: ebf88d2936ba63743b3aa0073299c783, type: 3}
-  - coreSpr: {fileID: 21300000, guid: b01b9f6b6119b9e4c893ae28702e5d55, type: 3}
-    secSpr: {fileID: 21300000, guid: b01b9f6b6119b9e4c893ae28702e5d55, type: 3}
+  - coreSpr: {fileID: 21300000, guid: b3be8d84657bcc043a5d1cfc0e01a411, type: 3}
+    secSpr: {fileID: 21300000, guid: b3be8d84657bcc043a5d1cfc0e01a411, type: 3}
   difficultyStage: 0
   timeStamp: 0
   gameStarted: 0
