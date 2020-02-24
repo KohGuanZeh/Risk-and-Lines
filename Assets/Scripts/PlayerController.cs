@@ -252,7 +252,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		if (ignoreGameEnd || gm.playersAlive > 1) return;
 
 		gm.EndGame();
-		gui.UpdateLeaderboard(); //Update Rankings each time Player dies
+		UIManager.inst.UpdateLeaderboard(); //Update Rankings each time Player dies
 	}
 	#endregion
 

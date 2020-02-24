@@ -98,7 +98,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
 	void Start() 
 	{
-		if (photonView.IsMine) gui = UIManager.inst;
+		gui = UIManager.inst;
 
 		playersAlive = PhotonNetwork.PlayerList.Length;
 		CreatePlayer();
