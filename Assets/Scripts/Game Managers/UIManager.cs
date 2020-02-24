@@ -70,8 +70,7 @@ public class UIManager : MonoBehaviour
 	#region For Game Start
 	public void TriggerGameStart()
 	{
-		Debug.LogError("Can Print this Msg");
-		anim.SetTrigger("Game Start");
+		GetComponent<Animator>().SetTrigger("Game Start");
 		LoadingScreen.inst.OnFadeOut -= TriggerGameStart;
 	}
 
