@@ -72,7 +72,6 @@ public class UIManager : MonoBehaviour
 	{
 		if (!anim) anim = GetComponent<Animator>();
 		anim.SetTrigger("Game Start");
-		print("Game Start Triggered");
 		LoadingScreen.inst.OnFadeOut -= TriggerGameStart;
 	}
 
