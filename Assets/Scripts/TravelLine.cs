@@ -116,7 +116,7 @@ public class TravelLine : MonoBehaviour, IPooledObject
 	{
 		if (other.CompareTag("Player"))
 		{
-			print("Triggered");
+			print(other.gameObject.name);
 			PlayerController detectedPlayer = other.GetComponent<PlayerController>();
 			if (!ReferenceEquals(detectedPlayer, null) && playerRefId != detectedPlayer.photonView.ViewID) detectedPlayer.Death();
 		}
