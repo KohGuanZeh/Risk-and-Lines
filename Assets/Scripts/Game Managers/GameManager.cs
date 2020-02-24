@@ -107,7 +107,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
 		//Only Master Client will handle Dot Spawning
 		if (PhotonNetwork.IsMasterClient) SpawnDots();
-		QueueGameStart();
+		//QueueGameStart();
 		//photonView.RPC("QueueGameStart", RpcTarget.AllBuffered);
 	}
 

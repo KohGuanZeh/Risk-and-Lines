@@ -37,6 +37,7 @@ public class LoadingScreen : MonoBehaviour
 			anim.SetBool("Fade In", false);
 			isLoading = false;
 			canFadeOut = false;
+			print("canFadeOut is set to: " + canFadeOut);
 		}
 	}
 
