@@ -30,6 +30,12 @@ public class PlayerController : MonoBehaviourPunCallbacks
 	[SerializeField] float blinkCd; //Timer used to check whether it should restore a Blink.
 	[SerializeField] float maxCdTime = 5f; //Max Time for Blink to refill
 
+	[Header("CamShake")]
+	[SerializeField] float shakeDuration = 0f;
+	[SerializeField] float setShakeDuration;
+	[SerializeField] float shakeAmount = 0f;
+	[SerializeField] float decreaseFactor = 1.0f;
+
 	void Start() 
 	{
 		if (photonView.IsMine)
@@ -40,13 +46,17 @@ public class PlayerController : MonoBehaviourPunCallbacks
 			rb = GetComponent<Rigidbody2D>();
 
 			blinkCd = maxCdTime;
+			gm.photonView.RPC("QueueGameStart", RpcTarget.AllBuffered);
 		}
 	}
 
-	void Update() {
+	void Update() 
+	{
 		//Decrease the Wait Time every frame
 		if (photonView.IsMine) 
 		{
+			CamShake();
+
 			if (gm.gameStarted && !gm.gameEnded) {
 				UpdateBlinkCd();
 
@@ -256,6 +266,21 @@ public class PlayerController : MonoBehaviourPunCallbacks
 	}
 	#endregion
 
+	#region
+	public void SetCamShakeDuration()
+	{
+		shakeDuration = setShakeDuration;
+	}
+	void CamShake()
+	{
+		if (shakeDuration >= 0)
+		{
+			gm.cam.transform.position += Random.insideUnitSphere * shakeAmount;
+			shakeDuration -= Time.deltaTime * decreaseFactor;
+		}
+		else gm.cam.transform.position = gm.camPos;
+	}
+	#endregion
 	void OnTriggerEnter2D(Collider2D other) {
 		if (other.CompareTag("Player")) {
 			PlayerController detectedPlayer = other.GetComponent<PlayerController>();

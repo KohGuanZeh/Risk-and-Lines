@@ -34,6 +34,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	public static GameManager inst;
 	[SerializeField] UIManager gui;
 	public float totalTime;
+	public int playersLoaded;
 
 	[Header("Camera Items")]
 	public Camera cam;
@@ -90,7 +91,8 @@ public class GameManager : MonoBehaviourPunCallbacks {
 		camPos = cam.transform.position;
 
 		//Only Master Client will handle Camera Movement Changes and Dot Spawning so only Master will need to Initialise this Value and Pass it to the rest
-		if (PhotonNetwork.IsMasterClient) {
+		if (PhotonNetwork.IsMasterClient) 
+		{
 			InitialiseValues();
 			GetPlayerInfoAtStart();
 		}
@@ -106,11 +108,12 @@ public class GameManager : MonoBehaviourPunCallbacks {
 		//Only Master Client will handle Dot Spawning
 		if (PhotonNetwork.IsMasterClient) SpawnDots();
 		QueueGameStart();
+		//photonView.RPC("QueueGameStart", RpcTarget.AllBuffered);
 	}
 
 	private void Update() 
 	{
-		CamShake();
+		//CamShake();
 	}
 
 	void FixedUpdate() {
@@ -189,8 +192,10 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	[PunRPC]
 	void QueueGameStart()
 	{
+		playersLoaded++;
+		if (playersLoaded != PhotonNetwork.PlayerList.Length) return;
+
 		LoadingScreen.inst.canFadeOut = true;
-		//LoadingScreen.inst.OnFadeOut += UIManager.inst.TriggerGameStart;	
 		UIManager.inst.TriggerGameStart();
 	}
 
