@@ -105,8 +105,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
 		//Only Master Client will handle Dot Spawning
 		if (PhotonNetwork.IsMasterClient) SpawnDots();
-		//If this is the Last Player
-		if (PhotonNetwork.LocalPlayer.GetPlayerNumber() == PhotonNetwork.PlayerList.Length) photonView.RPC("QueueGameStart", RpcTarget.AllBuffered);
+		QueueGameStart();
 	}
 
 	private void Update() 
