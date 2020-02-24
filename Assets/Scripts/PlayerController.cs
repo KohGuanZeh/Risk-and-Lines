@@ -239,6 +239,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
 	#region For Death
 	public void Death(bool ignoreGameEnd = false) 
 	{
+		Debug.LogError("Death is Called");
+
 		SetCamShakeDuration();
 		gameObject.SetActive(false);
 
@@ -300,7 +302,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		}
 	}
 
-	public override void OnLeftRoom() {
+	public override void OnLeftRoom() 
+	{
 		base.OnLeftRoom();
 		CutLine();
 		Death();
