@@ -32,6 +32,8 @@ public class LoadingScreen : MonoBehaviour
 
 	private void Update()
 	{
+		if (sceneToLoad == 2) Debug.LogError(PhotonNetwork.LevelLoadingProgress);
+
 		if (isLoading && PhotonNetwork.LevelLoadingProgress >= 1f && canFadeOut)
 		{
 			anim.SetBool("Fade In", false);

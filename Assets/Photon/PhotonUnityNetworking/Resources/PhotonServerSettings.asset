@@ -101,5 +101,7 @@ MonoBehaviour:
   - SendAutomatedMsg
   - QueueGameStart
   - SetGameModeToStart
+  - LoadSceneForAll
+  - TriggerFadeOutInGame
   DisableAutoOpenWizard: 1
   ShowSettings: 1
