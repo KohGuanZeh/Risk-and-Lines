@@ -3157,10 +3157,10 @@ MonoBehaviour:
   lobbyBtn: {fileID: 743232553}
   spectateUI: {fileID: 1515448893}
   charSprites:
-  - {fileID: 21300000, guid: d7971bbe07820674999915e5515314f4, type: 3}
+  - {fileID: 21300000, guid: 705f62c5b387c44499359caf711fa515, type: 3}
   - {fileID: 21300000, guid: 29bbaf14237df2c419321ce03053c42c, type: 3}
   - {fileID: 21300000, guid: ebf88d2936ba63743b3aa0073299c783, type: 3}
-  - {fileID: 21300000, guid: b01b9f6b6119b9e4c893ae28702e5d55, type: 3}
+  - {fileID: 21300000, guid: b3be8d84657bcc043a5d1cfc0e01a411, type: 3}
   rankCards:
   - playerSpr: {fileID: 1844885769}
     playerName: {fileID: 113066079}

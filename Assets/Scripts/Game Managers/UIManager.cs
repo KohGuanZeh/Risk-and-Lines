@@ -153,7 +153,7 @@ public class UIManager : MonoBehaviour
 	{
 		endScreen.gameObject.SetActive(true);
 		lobbyBtn.SetActive(true);
-		//anim.SetBool("Game Ended", true);
+		anim.SetBool("Game Ended", true);
 		anim.SetBool("Show Button", true);
 	}
 
