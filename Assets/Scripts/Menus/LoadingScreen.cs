@@ -52,6 +52,14 @@ public class LoadingScreen : MonoBehaviour
 		if (fadeOutOnLoaded) StartCoroutine(AllowReceiveAsyncProgress());
 	}
 
+	[PunRPC]
+	public void TriggerFadeOutInGame()
+	{
+		anim.SetBool("Fade In", false);
+		isLoading = false;
+		canFadeOut = false;
+	}
+
 	//Problem is that Level Loading Progress Remains at 1 when Level Loading is done and cannot be Set Manually
 	IEnumerator AllowReceiveAsyncProgress()
 	{
@@ -63,7 +71,7 @@ public class LoadingScreen : MonoBehaviour
 	{
 		if (PhotonNetwork.CurrentRoom != null && PhotonNetwork.IsMasterClient) PhotonNetwork.LoadLevel(sceneToLoad);
 		else PhotonNetwork.LoadLevel(sceneToLoad);
-
+		//PhotonNetwork.LoadLevel(sceneToLoad);
 		if (OnFadeIn != null) OnFadeIn();
 	}
 
