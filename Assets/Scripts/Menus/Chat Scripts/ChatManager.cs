@@ -11,6 +11,7 @@ public class ChatManager : MonoBehaviourPun {
 	public static ChatManager inst;
 	public TMP_InputField chatInput;
 	public RectTransform chatContainer; // to hold all the chat messages
+	public TextMeshProUGUI textPrefab;
 
 	[Header("For Chat Size")]
 	[SerializeField] List<TextMeshProUGUI> texts;
@@ -58,14 +59,17 @@ public class ChatManager : MonoBehaviourPun {
 	{
 		if (!string.IsNullOrEmpty(msg) && !string.IsNullOrWhiteSpace(msg))
 		{
-			GameObject textObj = PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Message Prefab"), Vector2.zero, Quaternion.identity);
+			//GameObject textObj = PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", "Message Prefab"), Vector2.zero, Quaternion.identity);
+			//TextMeshProUGUI text = textObj.GetComponent<TextMeshProUGUI>(); // sets the text of the prefab and acts as a message
 
-			TextMeshProUGUI text = textObj.GetComponent<TextMeshProUGUI>(); // sets the text of the prefab and acts as a message
+			TextMeshProUGUI text = Instantiate(textPrefab, chatContainer);
 			text.text = msg;
 			text.color = GameManager.GetCharacterColor(playerNo);
 
-			textObj.transform.SetParent(chatContainer);
-			textObj.transform.localScale = Vector3.one;
+			text.transform.localScale = Vector3.one;
+
+			//textObj.transform.SetParent(chatContainer);
+			//textObj.transform.localScale = Vector3.one;
 
 			texts.Add(text);
 
