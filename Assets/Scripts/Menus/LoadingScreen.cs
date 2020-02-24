@@ -17,7 +17,6 @@ public class LoadingScreen : MonoBehaviour
 	public bool fadingInProgress;
 	public bool isLoading;
 	public bool canFadeOut;
-	[SerializeField] bool canReceiveAsyncProgress;
 	public delegate void FadeEvent();
 	public FadeEvent OnFadeIn, OnFadeOut;
 
@@ -33,15 +32,15 @@ public class LoadingScreen : MonoBehaviour
 
 	private void Update()
 	{
-		if (isLoading && PhotonNetwork.LevelLoadingProgress >= 1f && canReceiveAsyncProgress)
+		if (isLoading && PhotonNetwork.LevelLoadingProgress >= 1f && canFadeOut)
 		{
 			anim.SetBool("Fade In", false);
 			isLoading = false;
-			canReceiveAsyncProgress = false;
+			canFadeOut = false;
 		}
 	}
 
-	public void LoadScene(int sceneIdx)
+	public void LoadScene(int sceneIdx, bool fadeOutOnLoaded = true)
 	{
 		sceneToLoad = sceneIdx;
 		isLoading = true;
@@ -50,14 +49,14 @@ public class LoadingScreen : MonoBehaviour
 		anim.SetBool("Fade In", true);
 		anim.SetBool("Loading", true);
 
-		StartCoroutine(AllowReceiveAsyncProgress());
+		if (fadeOutOnLoaded) StartCoroutine(AllowReceiveAsyncProgress());
 	}
 
 	//Problem is that Level Loading Progress Remains at 1 when Level Loading is done and cannot be Set Manually
 	IEnumerator AllowReceiveAsyncProgress()
 	{
 		yield return new WaitForSeconds(0.5f);
-		canReceiveAsyncProgress = true;
+		canFadeOut = true;
 	}
 
 	public void OnFadeInAnimationEvent()

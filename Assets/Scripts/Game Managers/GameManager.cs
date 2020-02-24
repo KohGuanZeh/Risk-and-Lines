@@ -33,11 +33,14 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	[Header("General Variables")]
 	public static GameManager inst;
 	[SerializeField] UIManager gui;
+	public float totalTime;
 
 	[Header("Camera Items")]
 	public Camera cam;
+	public bool moveCam;
+	public float accelDecelMult; //Multiplier to Increase/Decrease the Cam Speed to Default Speed/0 in 0.5s
 	public Vector3 moveDelta; //Stores Move Delta of the Camera;
-	public Vector3 camPos; //Store Separately as this is the Reference Value that will be submitted to Server.
+	public Vector3 camPos; //Store Separately as Reference Value for Camera
 	public float camSpeed = 0, defaultCamSpeed = 5.0f; //Default is used to Set Values
 	public float CamLeftBounds { get { return camPos.x - cam.orthographicSize * cam.aspect; } }
 
@@ -63,7 +66,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	[Header("For Game Difficulty")]
 	[SerializeField] int difficultyStage;
 	[SerializeField] float timeStamp;
-	[SerializeField] bool gameStarted;
+	public bool gameStarted;
 
 	[Header("Test Different Game Difficulty")]
 	[SerializeField] bool increaseAllDiff;
@@ -93,49 +96,56 @@ public class GameManager : MonoBehaviourPunCallbacks {
 		}
 	}
 
-	void Start() {
-		playersAlive = PhotonNetwork.PlayerList.Length;
+	void Start() 
+	{
 		gui = UIManager.inst;
+		playersAlive = PhotonNetwork.PlayerList.Length;
 		CreatePlayer();
 
 		//Only Master Client will handle Dot Spawning
 		if (PhotonNetwork.IsMasterClient) SpawnDots();
+		//If this is the Last Player
+		if (PhotonNetwork.LocalPlayer.GetPlayerNumber() == PhotonNetwork.PlayerList.Length) photonView.RPC("QueueGameStart", RpcTarget.AllBuffered);
 	}
 
-	private void Update() {
-		if (Input.GetKeyDown(KeyCode.A) && PhotonNetwork.IsMasterClient) {
-			photonView.RPC("ToggleMoveCam", RpcTarget.AllBuffered, camSpeed != 0);
-
-			//Temporary Check for when Game Started. Wait till we have a Coroutine or what not that registers when to move
-			if (timeStamp <= 0) photonView.RPC("RegisterTimeStamp", RpcTarget.AllBuffered, 0f, true);
-		}
-		if (Input.GetKeyDown(KeyCode.G)) PhotonNetwork.LeaveRoom();
-		
+	private void Update() 
+	{
 		CamShake();
 	}
 
 	void FixedUpdate() {
-		
-		//Only Master Client will handle Camera Movement Value Changes and Dot Spawning
-		if (PhotonNetwork.IsMasterClient) {
-			#region Temp Difficulty Testing
-			if (gameStarted) {
-				timeStamp += Time.fixedDeltaTime;
 
-				if (timeStamp >= 30) {
-					if (increaseAllDiff) photonView.RPC("IncreaseDifficultyAll", RpcTarget.AllBuffered, cohesive);
-					else {
-						difficultyStage++;
-						photonView.RPC("IncreaseDifficulty", RpcTarget.AllBuffered, difficultyStage, cohesive);
+		if (gameStarted && !gameEnded)
+		{
+			totalTime += Time.fixedDeltaTime;
+
+			//Only Master Client will handle Camera Movement Value Changes and Dot Spawning
+			if (PhotonNetwork.IsMasterClient)
+			{
+				#region Temp Difficulty Testing
+				if (gameStarted)
+				{
+					timeStamp += Time.fixedDeltaTime;
+
+					if (timeStamp >= 30)
+					{
+						if (increaseAllDiff) photonView.RPC("IncreaseDifficultyAll", RpcTarget.AllBuffered, cohesive);
+						else
+						{
+							difficultyStage++;
+							photonView.RPC("IncreaseDifficulty", RpcTarget.AllBuffered, difficultyStage, cohesive);
+						}
+
+						photonView.RPC("RegisterTimeStamp", RpcTarget.AllBuffered, 0f, false);
 					}
-
-					photonView.RPC("RegisterTimeStamp", RpcTarget.AllBuffered, 0f, false);
-				} else photonView.RPC("RegisterTimeStamp", RpcTarget.OthersBuffered, timeStamp, false);
+					else photonView.RPC("RegisterTimeStamp", RpcTarget.OthersBuffered, timeStamp, false);
+				}
+				#endregion
+				SpawnDots();
 			}
-			#endregion
-			SpawnDots();
 		}
 
+		AccelerateDecelerateCam();
 		MoveCamera();
 		cam.transform.position = camPos; //Update Camera Position Locally for each Player
 	}
@@ -174,6 +184,25 @@ public class GameManager : MonoBehaviourPunCallbacks {
 		this.xInterval = xInterval;
 		this.lastXSpawn = lastXSpawn;
 		this.xRemainder = xRemainder;
+	}
+
+	[PunRPC]
+	void QueueGameStart()
+	{
+		LoadingScreen.inst.canFadeOut = true;
+		LoadingScreen.inst.OnFadeOut += gui.TriggerGameStart;	
+	}
+
+	public void StartGame()
+	{
+		photonView.RPC("ToggleMoveCam", RpcTarget.AllBuffered);
+		photonView.RPC("RegisterTimeStamp", RpcTarget.AllBuffered, 0f, true);
+	}
+
+	//Called in Animation Event
+	void SetGameModeToStart()
+	{
+		gameStarted = true;
 	}
 
 	void GetPlayerInfoAtStart() {
@@ -220,15 +249,30 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
 	#region For Camera Movement
 	[PunRPC]
-	void ToggleMoveCam(bool isMoving) {
-		if (isMoving) {
+	void ToggleMoveCam() 
+	{
+		moveCam = !moveCam;
+
+		if (moveCam) accelDecelMult = (defaultCamSpeed - camSpeed) / (Time.fixedDeltaTime * 0.5f);
+		else accelDecelMult = (camSpeed - 0) / 0.5f;
+		/*if (moveCam) camSpeed = defaultCamSpeed;
+		else 
+		{
 			camSpeed = 0;
 			moveDelta = Vector2.zero;
-		} else camSpeed = defaultCamSpeed;
+		}*/
 	}
 
-	void MoveCamera() {
-		if (camSpeed == 0) return;
+	void AccelerateDecelerateCam()
+	{
+		if ((moveCam && camSpeed >= defaultCamSpeed) || (!moveCam && camSpeed <= 0)) return;
+		float change = Time.fixedDeltaTime * accelDecelMult;
+		camSpeed = moveCam ? Mathf.Min(camSpeed + change, defaultCamSpeed) : Mathf.Max(camSpeed - change, 0);
+	}
+
+	void MoveCamera() 
+	{
+		if (camSpeed == 0 && !moveCam && moveDelta.x == 0) return;
 
 		moveDelta = Vector3.right * camSpeed * Time.fixedDeltaTime;
 		camPos += moveDelta;
@@ -293,15 +337,19 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	}
 
 	[PunRPC]
-	void IncreaseDifficultyAll(bool cohesive) {
-		if (cohesive) {
+	void IncreaseDifficultyAll(bool cohesive) 
+	{
+		if (cohesive) 
+		{
 			//For Cohesive Increase
 			maxDotSpawnCoeff = Mathf.Clamp(maxDotSpawnCoeff + 0.1f, 0, 1);
 			minDotSpawnCoeff = Mathf.Clamp(minDotSpawnCoeff + 0.1f, 0, 1);
 			//For Cohesive Increase
 			maxSpawnIntervalCoeff = Mathf.Clamp(maxSpawnIntervalCoeff + 0.1f, 0, 1);
 			minSpawnIntervalCoeff = Mathf.Clamp(minSpawnIntervalCoeff + 0.1f, 0, 1);
-		} else {
+		} 
+		else 
+		{
 			//For Affecting Separately
 			if (maxDotSpawnCoeff != 1) maxDotSpawnCoeff = Mathf.Clamp(maxDotSpawnCoeff + 0.1f, 0, 1);
 			else minDotSpawnCoeff = Mathf.Clamp(minDotSpawnCoeff + 0.1f, 0, 1);
@@ -311,7 +359,8 @@ public class GameManager : MonoBehaviourPunCallbacks {
 		}
 
 		defaultCamSpeed = Mathf.Clamp(defaultCamSpeed + 0.5f, defaultCamSpeed, 12.5f);
-		camSpeed = defaultCamSpeed;
+		accelDecelMult = (defaultCamSpeed - camSpeed) / 0.5f;
+		//camSpeed = defaultCamSpeed;
 
 		gui.ShowDiffIncreased();
 	}
@@ -342,7 +391,8 @@ public class GameManager : MonoBehaviourPunCallbacks {
 		}
 
 		defaultCamSpeed = Mathf.Clamp(defaultCamSpeed + 0.5f, defaultCamSpeed, 12.5f);
-		camSpeed = defaultCamSpeed;
+		accelDecelMult = (defaultCamSpeed - camSpeed) / 0.5f;
+		//camSpeed = defaultCamSpeed;
 
 		gui.ShowDiffIncreased();
 	}
@@ -360,7 +410,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	public void EndGame() //Called in RPC Function
 	{
 		gameEnded = true;
-		ToggleMoveCam(false);
+		ToggleMoveCam(); //True is Stop Moving. Bool = isMoving. Therefore, If Moving, Stop Moving.
 		gui.ShowEndScreen();
 
 		PhotonNetwork.CurrentRoom.IsOpen = true;

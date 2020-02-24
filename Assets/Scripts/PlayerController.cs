@@ -30,7 +30,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
 	[SerializeField] float blinkCd; //Timer used to check whether it should restore a Blink.
 	[SerializeField] float maxCdTime = 5f; //Max Time for Blink to refill
 
-	void Start() {
+	void Start() 
+	{
 		gm = GameManager.inst;
 		gui = UIManager.inst;
 		gui.AssignPlayerController(this); //May need photonView.IsMine
@@ -41,8 +42,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 	void Update() {
 		//Decrease the Wait Time every frame
-		if (photonView.IsMine) {
-			if (!gm.gameEnded) {
+		if (photonView.IsMine) 
+		{
+			if (gm.gameStarted && !gm.gameEnded) {
 				UpdateBlinkCd();
 
 				doubleTapThreshold = Mathf.Max(doubleTapThreshold - Time.deltaTime, 0);
@@ -222,11 +224,12 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 		//Check Player Count. If Player Count <= 1. Trigger End Screen
 		gm.playersAlive--;
+		print(gm.playersAlive);
 
 		//Update Dead Players
-		float timeSurvived = (float)PhotonNetwork.Time;
+		float timeSurvived = gm.totalTime;
 
-		gui.ShowPersonalResult(gm.playersAlive + 1, timeSurvived);
+		gui.ShowPersonalResult(gm.playersAlive, timeSurvived); //Getting Prefix takes Array Index hence 1st = 0;
 		gui.SwitchToSpectateMode();
 
 		gm.photonView.RPC("UpdateLeaderboard", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.ActorNumber, timeSurvived);

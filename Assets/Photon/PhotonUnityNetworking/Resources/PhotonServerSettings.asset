@@ -99,5 +99,7 @@ MonoBehaviour:
   - SetCharacterDisplay
   - SetPlayersCharPreset
   - SendAutomatedMsg
+  - QueueGameStart
+  - SetGameModeToStart
   DisableAutoOpenWizard: 1
   ShowSettings: 1

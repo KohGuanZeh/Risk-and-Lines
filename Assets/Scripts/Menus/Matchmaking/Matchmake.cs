@@ -211,7 +211,7 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		{
 			if (playersReady.Count != PhotonNetwork.CurrentRoom.PlayerCount - 1) return; //Master will not be registered under Ready
 			PhotonNetwork.CurrentRoom.IsOpen = false;
-			LoadingScreen.inst.LoadScene(2);
+			LoadingScreen.inst.LoadScene(2, false);
 			//PhotonNetwork.LoadLevel(2);
 		}
 		else
