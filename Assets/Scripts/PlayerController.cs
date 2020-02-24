@@ -178,7 +178,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 	void BlinkControl() 
 	{
-		GameManager.inst.SetCamShakeDuration();
+		SetCamShakeDuration();
 		CutLine(); //Need to be on top before Target Dot is Set to Null
 
 		transform.position = storedDot.transform.position;
@@ -237,7 +237,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 	#region For Death
 	public void Death(bool ignoreGameEnd = false) 
 	{
-		GameManager.inst.SetCamShakeDuration();
+		SetCamShakeDuration();
 		gameObject.SetActive(false);
 
 		//Check Player Count. If Player Count <= 1. Trigger End Screen
@@ -260,7 +260,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
 	}
 
 	[PunRPC]
-	public void SendDeathEvent(int playersAlive, bool ignoreGameEnd) {
+	public void SendDeathEvent(int playersAlive, bool ignoreGameEnd) 
+	{
 		gameObject.SetActive(false);
 		gm.playersAlive = playersAlive;
 
