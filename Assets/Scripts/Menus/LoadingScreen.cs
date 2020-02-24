@@ -13,7 +13,6 @@ public class LoadingScreen : MonoBehaviour
 	[SerializeField] GameObject loadingScreen;
 	[SerializeField] int sceneToLoad;
 	[SerializeField] Animator anim;
-	[SerializeField] PhotonView photonView;
 
 	public bool fadingInProgress;
 	public bool isLoading;
@@ -35,12 +34,9 @@ public class LoadingScreen : MonoBehaviour
 	{
 		if (isLoading && canFadeOut)
 		{
-			if (ReferenceEquals(PhotonNetwork.CurrentRoom, null))
-			{
-				anim.SetBool("Fade In", false);
-				isLoading = false;
-				canFadeOut = false;
-			}
+			anim.SetBool("Fade In", false);
+			isLoading = false;
+			canFadeOut = false;
 		}
 	}
 
