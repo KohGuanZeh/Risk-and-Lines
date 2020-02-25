@@ -93,6 +93,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
 						travelDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, playerNo, true);
 						targetDot = travelDot;
 
+						SfxManager.inst.PlaySfx(SfxManager.inst.Sfx.lockSound);// play the lock sound
+
 						if (currentTravelLine) currentTravelLine.photonView.RPC("AddNewPoint", RpcTarget.AllBuffered, transform.position);
 						else {
 							currentTravelLine = ObjectPooling.inst.SpawnFromPool("Line", transform.position, Quaternion.identity).GetComponent<TravelLine>(); //Instantiate(linePreset, transform); //Will be changed to Object Pooling
@@ -130,6 +132,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
 					if (ReferenceEquals(targetDot, null) && !travelDot.locked) {
 						travelDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, playerNo, true);
 						targetDot = travelDot;
+
+						SfxManager.inst.PlaySfx(SfxManager.inst.Sfx.lockSound);// play the lock sound
 
 						transform.up = targetDot.transform.position - transform.position;
 
