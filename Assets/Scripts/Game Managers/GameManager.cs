@@ -452,6 +452,8 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	{
 		if (!GameManager.inst.gameEnded)
 		{
+			Debug.LogError("Disconnected");
+
 			int idx = System.Array.IndexOf(playerInfos, playerInfos.Where(info => info.actorId == PhotonNetwork.LocalPlayer.ActorNumber).First());
 			
 			if (playerInfos[idx].deathTime <= 0)

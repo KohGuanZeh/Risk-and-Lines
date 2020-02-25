@@ -5040,34 +5040,35 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Why are you running? Why are you gay? Why are you running? Why are you gay?
-    Why are you running? Why are you gay? Why are you running? Why are you gay? Why
-    are you running? Why are you gay? Why are you running? Why are you gay? Why are
-    you running? Why are you gay? Why are you running? Why are you gay? Why are you
-    running? Why are you gay? Why are you running? Why are you gay? Why are you running?
-    Why are you gay? Why are you running? Why are you gay? Why are you running? Why
-    are you gay? Why are you running? Why are you gay? Why are you running? Why are
-    you gay? Why are you running? Why are you gay? Why are you running? Why are you
-    gay? Why are you running? Why are you gay? Why are you running? Why are you gay?
-    Why are you running? Why are you gay? Why are you running? Why are you gay? Why
-    are you running? Why are you gay? Why are you running? Why are you gay? Why are
-    you running? Why are you gay? Why are you running? Why are you gay? Why are you
-    running? Why are you gay? Why are you running? Why are you gay? Why are you running?
-    Why are you gay? Why are you running? Why are you gay? Why are you running? Why
-    are you gay? Why are you running? Why are you gay? Why are you running? Why are
-    you gay? Why are you running? Why are you gay? Why are you running? Why are you
-    gay? Why are you running? Why are you gay? Why are you running? Why are you gay?
-    Why are you running? Why are you gay? Why are you running? Why are you gay? Why
-    are you running? Why are you gay? Why are you running? Why are you gay? Why are
-    you running? Why are you gay? Why are you running? Why are you gay? Why are you
-    running? Why are you gay? Why are you running? Why are you gay? Why are you running?
-    Why are you gay? Why are you running? Why are you gay? Why are you running? Why
-    are you gay? Why are you running? Why are you gay? Why are you running? Why are
-    you gay? Why are you running? Why are you gay? Why are you running? Why are you
-    gay? Why are you running? Why are you gay? Why are you running? Why are you gay?
-    Why are you running? Why are you gay? Why are you running? Why are you gay? Why
-    are you running? Why are you gay? Why are you running? Why are you gay? Why are
-    you running? Why are you gay?
+  m_text: 'Tap on Dots once to Travel.
+
+
+    When you Travel, your Character will Draw a line from its current location to
+    the Dot you tapped.
+
+
+    Double Tapping a Dot will make you Teleport to that Dot
+
+
+    Players can hold up to a maximum of 3 Teleports. The teleport will recharge overtime.
+
+
+    If a Player crashes into a Line not its own, he/she will lose the Game
+
+
+    If Player crashes into another Player, both Players will die and may result in
+    a Draw.
+
+
+    If Player goes out of bounds, he.she will die.
+
+
+    Two Power Ups, 1 Instant Teleport Refill, 1 Force Increase Difficulty.
+
+
+    Difficulty Increase overtime
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 1b9f61cb6d84b7a4a864ce6d0bf008e8, type: 2}
   m_sharedMaterial: {fileID: -2143050903394502946, guid: 1b9f61cb6d84b7a4a864ce6d0bf008e8,
@@ -5096,14 +5097,14 @@ MonoBehaviour:
   m_outlineColor:
     serializedVersion: 2
     rgba: 4278190080
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 48
+  m_fontSizeBase: 48
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_textAlignment: 272
+  m_textAlignment: 257
   m_characterSpacing: 0
   m_wordSpacing: 0
   m_lineSpacing: 0
@@ -5113,7 +5114,7 @@ MonoBehaviour:
   m_enableWordWrapping: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
-  m_firstOverflowCharacterIndex: -1
+  m_firstOverflowCharacterIndex: 432
   m_linkedTextComponent: {fileID: 0}
   m_isLinkedTextComponent: 0
   m_isTextTruncated: 0
@@ -5137,12 +5138,12 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_textInfo:
     textComponent: {fileID: 1548518534}
-    characterCount: 2203
+    characterCount: 581
     spriteCount: 0
-    spaceCount: 463
-    wordCount: 464
+    spaceCount: 112
+    wordCount: 106
     linkCount: 0
-    lineCount: 16
+    lineCount: 17
     pageCount: 1
     materialCount: 1
   m_isUsingLegacyAnimationComponent: 0
