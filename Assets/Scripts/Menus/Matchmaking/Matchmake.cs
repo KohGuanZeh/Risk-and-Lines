@@ -371,11 +371,11 @@ public class Matchmake : MonoBehaviourPunCallbacks
 			case 0:
 				for (int i = 0; i < rmButtons.Count; i++)
 				{
-					Vector2 anchoredPos = new Vector2(rmButtons[i].rect.anchoredPosition.x, -75 * i);
+					Vector2 anchoredPos = new Vector2(rmButtons[i].rect.anchoredPosition.x, -110 * i);
 					rmButtons[i].rect.anchoredPosition = anchoredPos;
 				}
 
-				rmContainer.sizeDelta = new Vector2(rmContainer.sizeDelta.x, 75 * rmButtons.Count);
+				rmContainer.sizeDelta = new Vector2(rmContainer.sizeDelta.x, 110 * rmButtons.Count);
 
 				break;
 			case 1:

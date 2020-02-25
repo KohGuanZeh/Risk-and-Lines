@@ -103,5 +103,7 @@ MonoBehaviour:
   - SetGameModeToStart
   - LoadSceneForAll
   - TriggerFadeOutInGame
+  - InstaLockUnlock
+  - SetParticleColor
   DisableAutoOpenWizard: 1
   ShowSettings: 1

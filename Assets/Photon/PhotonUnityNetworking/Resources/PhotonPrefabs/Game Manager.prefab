@@ -132,6 +132,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gui: {fileID: 0}
   totalTime: 0
+  playersLoaded: 0
   cam: {fileID: 117266251327048048}
   moveCam: 0
   accelDecelMult: 0
@@ -140,9 +141,9 @@ MonoBehaviour:
   camSpeed: 0
   defaultCamSpeed: 5
   minSpawnIntervalCoeff: 0
-  maxSpawnIntervalCoeff: 1
+  maxSpawnIntervalCoeff: 0.7
   minDotSpawnCoeff: 0
-  maxDotSpawnCoeff: 1
+  maxDotSpawnCoeff: 0.7
   yMargin: 2
   minMaxY: {x: 0, y: 0}
   xInterval: 0
@@ -168,10 +169,6 @@ MonoBehaviour:
   gameEnded: 0
   playersAlive: 0
   playerInfos: []
-  shakeDuration: 0
-  setShakeDuration: 0.2
-  shakeAmount: 0.5
-  decreaseFactor: 1
 --- !u!114 &2702712245036865841
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -193,6 +190,10 @@ MonoBehaviour:
     prefabName: Line
     parent: {fileID: 0}
     poolAmt: 10
+  - tag: Death Particles
+    prefabName: Death Particle
+    parent: {fileID: 0}
+    poolAmt: 4
 --- !u!114 &6815817212846397641
 MonoBehaviour:
   m_ObjectHideFlags: 0

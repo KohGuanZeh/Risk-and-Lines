@@ -135,7 +135,6 @@ MonoBehaviour:
   loadingScreen: {fileID: 7969349436494276272}
   sceneToLoad: 0
   anim: {fileID: 7969349435527057679}
-  photonView: {fileID: 0}
   fadingInProgress: 0
   isLoading: 0
   canFadeOut: 0
@@ -513,7 +512,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.254717, g: 0.254717, b: 0.254717, a: 0}
+  m_Color: {r: 0.09433961, g: 0.09433961, b: 0.09433961, a: 0}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
