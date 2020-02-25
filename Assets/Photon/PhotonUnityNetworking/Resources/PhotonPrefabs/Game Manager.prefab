@@ -189,17 +189,17 @@ MonoBehaviour:
     sceneObj: 0
     prefabName: Line
     parent: {fileID: 0}
-    poolAmt: 10
+    poolAmt: 5
   - tag: Death Particles
     sceneObj: 0
     prefabName: Death Particle
     parent: {fileID: 0}
-    poolAmt: 4
+    poolAmt: 1
   - tag: Blink Particles
     sceneObj: 0
     prefabName: Blink Particle
     parent: {fileID: 0}
-    poolAmt: 12
+    poolAmt: 3
   - tag: Difficulty
     sceneObj: 0
     prefabName: Difficulty Increase
