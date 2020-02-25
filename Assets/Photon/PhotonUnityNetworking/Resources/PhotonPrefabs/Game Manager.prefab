@@ -194,6 +194,10 @@ MonoBehaviour:
     prefabName: Death Particle
     parent: {fileID: 0}
     poolAmt: 4
+  - tag: Blink Particles
+    prefabName: Death Particle
+    parent: {fileID: 0}
+    poolAmt: 12
 --- !u!114 &6815817212846397641
 MonoBehaviour:
   m_ObjectHideFlags: 0

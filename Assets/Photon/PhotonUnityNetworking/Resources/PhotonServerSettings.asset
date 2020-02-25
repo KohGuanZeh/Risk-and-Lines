@@ -105,5 +105,6 @@ MonoBehaviour:
   - TriggerFadeOutInGame
   - InstaLockUnlock
   - SetParticleColor
+  - SendParticleColorChanges
   DisableAutoOpenWizard: 1
   ShowSettings: 1

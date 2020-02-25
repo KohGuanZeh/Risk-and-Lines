@@ -9,6 +9,7 @@ public class Particles : MonoBehaviour, IPooledObject
 {
 	[SerializeField] string tag;
 	[SerializeField] ParticleSystem[] particles; //The Particle to Check if it is Done
+	[SerializeField] PhotonView photonView;
 
 	#region Interface Functions
 	[PunRPC]
@@ -29,7 +30,7 @@ public class Particles : MonoBehaviour, IPooledObject
 		if (parentId > 0) gameObject.transform.parent = PhotonNetwork.GetPhotonView(parentId).transform; //If Parent is not Null, Set New Parent
 		else gameObject.transform.parent = ObjectPooling.inst.GetPool(GetPoolTag()).parent;
 
-		gameObject.SetActive(true);
+		//Spawn Object Once Particle Color has been Configured
 	}
 
 	[PunRPC]
@@ -51,9 +52,20 @@ public class Particles : MonoBehaviour, IPooledObject
 		if (!particles[0].IsAlive(true)) ObjectPooling.inst.ReturnToPool(gameObject, GetPoolTag());
 	}
 
-	[PunRPC]
 	public void SetParticleColor(int playerNo)
 	{
-		foreach (ParticleSystem particle in particles) particle.startColor = GameManager.GetCharacterColor(playerNo);
+		photonView.RPC("SendParticleColorChanges", RpcTarget.AllBuffered, playerNo);
+	}
+
+	[PunRPC]
+	public void SendParticleColorChanges(int playerNo)
+	{
+		foreach (ParticleSystem particle in particles)
+		{
+			ParticleSystem.MainModule module = particle.main;
+			module.startColor = GameManager.GetCharacterColor(playerNo);
+			particle.gameObject.SetActive(true);
+			particle.Play();
+		}
 	}
 }
