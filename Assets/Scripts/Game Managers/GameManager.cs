@@ -98,7 +98,12 @@ public class GameManager : MonoBehaviourPunCallbacks {
 		CreatePlayer();
 
 		//Only Master Client will handle Dot Spawning
-		if (PhotonNetwork.IsMasterClient) SpawnDots();
+		if (PhotonNetwork.IsMasterClient)
+		{
+			nextSpawnTime = 30;
+			photonView.RPC("UpdateNextSpawnTime", RpcTarget.OthersBuffered, nextSpawnTime);
+			SpawnDots();
+		} 
 	}
 
 	void FixedUpdate() {
