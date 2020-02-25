@@ -37,10 +37,14 @@ public class MainMenu : MonoBehaviourPunCallbacks
 	public void StartGame(bool show)
 	{
 		anim.SetBool("Show Name Input", show);
+		ButtonSoundManager.inst.PlaySound(ButtonSoundManager.inst.buttonSound);
 	}
 
 	public void OnNameSubmit()
 	{
+		// play sound 
+		ButtonSoundManager.inst.PlaySound(ButtonSoundManager.inst.buttonSound);
+
 		//Connect to Master when Player Submits a Name. On Connected to Master, then Load Lobby Scene.
 		string playerName = nameInput.text;
 
@@ -66,6 +70,7 @@ public class MainMenu : MonoBehaviourPunCallbacks
 		credits.SetActive(false);
 
 		ShowHideContentScreen(true);
+		ButtonSoundManager.inst.PlaySound(ButtonSoundManager.inst.buttonSound);
 	}
 
 	public void Options()
@@ -75,6 +80,7 @@ public class MainMenu : MonoBehaviourPunCallbacks
 		credits.SetActive(false);
 
 		ShowHideContentScreen(true);
+		ButtonSoundManager.inst.PlaySound(ButtonSoundManager.inst.buttonSound);
 	}
 
 	public void Credits()
@@ -84,6 +90,7 @@ public class MainMenu : MonoBehaviourPunCallbacks
 		options.SetActive(false);
 
 		ShowHideContentScreen(true);
+		ButtonSoundManager.inst.PlaySound(ButtonSoundManager.inst.buttonSound);
 	}
 
 	public void ShowHideContentScreen(bool show)
@@ -94,6 +101,7 @@ public class MainMenu : MonoBehaviourPunCallbacks
 	public void Quit()
 	{
 		PlayerPrefs.DeleteKey("Lobby State");
+		ButtonSoundManager.inst.PlaySound(ButtonSoundManager.inst.buttonSound);
 		Application.Quit();
 	}
 
