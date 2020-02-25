@@ -189,7 +189,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 		transform.position = storedDot.transform.position;
 		targetDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, -1, false);
-		storedDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, playerNo, true);
+		storedDot.photonView.RPC("InstaLockUnlock", RpcTarget.AllBuffered, playerNo, true);
 		targetDot = null;
 		storedDot = null;
 		doubleTapThreshold = 0;
