@@ -22,6 +22,7 @@ public class Matchmake : MonoBehaviourPunCallbacks
 	[SerializeField] TMP_InputField newNickname;
 	[SerializeField] TMP_InputField rmName;
 
+	public string roomToJoin;
 	public RectTransform rmContainer;
 	public List<RoomList> rmButtons;
 	[SerializeField] RoomList rmButtonPrefab;
@@ -125,6 +126,12 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		ChatManager.inst.photonView.RPC("SendAutomatedMsg", RpcTarget.AllBuffered, msg, PhotonNetwork.LocalPlayer.GetPlayerNumber());
 
 		SetStartReadyButton();
+	}
+
+	public override void OnJoinRoomFailed(short returnCode, string message)
+	{
+		LeaveRoom();
+		anim.SetInteger("Lobby State", 0);
 	}
 
 	public override void OnJoinRandomFailed(short returnCode, string message)
