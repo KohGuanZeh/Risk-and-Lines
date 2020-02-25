@@ -38,7 +38,6 @@ public class TravelLine : MonoBehaviour, IPooledObject
 	public void OnObjectDespawn()
 	{
 		//Execute Despawn Functions Here
-		ObjectPooling.inst.poolDictionary[GetPoolTag()].Enqueue(gameObject);
 		gameObject.SetActive(false);
 	}
 

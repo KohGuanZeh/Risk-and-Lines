@@ -104,6 +104,9 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
             return;
         }
 
+        Pool pool = GetPool(tag);
+        if (!pool.sceneObj) poolDictionary[tag].Enqueue(obj);
+
         IPooledObject pooledObj = obj.GetComponent<IPooledObject>();
         if (!ReferenceEquals(pooledObj, null)) obj.GetPhotonView().RPC("OnObjectDespawn", RpcTarget.AllBuffered);
     }
