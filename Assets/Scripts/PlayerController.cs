@@ -360,19 +360,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 	private void OnApplicationQuit()
 	{
-		Debug.LogError("Quitted My Ass");
 		CutLine();
 		Death();
 		PhotonNetwork.SendAllOutgoingCommands();
-	}
-
-	public override void OnDisconnected(DisconnectCause cause)
-	{
-		if (!GameManager.inst.gameEnded)
-		{
-			CutLine();
-			Death();
-			Debug.LogError("Stuff Happened");
-		}
 	}
 }
