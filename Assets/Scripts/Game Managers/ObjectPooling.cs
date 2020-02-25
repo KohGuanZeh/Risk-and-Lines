@@ -88,11 +88,7 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
 
         IPooledObject pooledObj = obj.GetComponent<IPooledObject>();
        
-        if (!ReferenceEquals(pooledObj, null))
-        {
-            if (pool.sceneObj) obj.GetPhotonView().RPC("OnObjectSpawn", RpcTarget.AllBuffered, parentId);
-            else pooledObj.OnObjectSpawn(parentId);
-        } 
+        if (!ReferenceEquals(pooledObj, null)) obj.GetPhotonView().RPC("OnObjectSpawn", RpcTarget.AllBuffered, parentId);
 
         return obj;
     }
@@ -110,7 +106,6 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
 
         IPooledObject pooledObj = obj.GetComponent<IPooledObject>();
         if (!ReferenceEquals(pooledObj, null)) obj.GetPhotonView().RPC("OnObjectDespawn", RpcTarget.AllBuffered);
-        else pooledObj.OnObjectDespawn();
     }
 
     #endregion

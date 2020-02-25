@@ -26,12 +26,11 @@ public class TravelLine : MonoBehaviour, IPooledObject
 	[PunRPC]
 	public void OnObjectSpawn(int parentId)
 	{
-		playerRefId = -1;
-
 		//Not Setting Parent when Travel Line Spawns
 		//if (parentId > 0) gameObject.transform.parent = PhotonNetwork.GetPhotonView(parentId).transform; //If Parent is not Null, Set New Parent
 		//else gameObject.transform.parent = ObjectPooling.inst.GetPool(GetPoolTag()).parent;
 
+		playerRefId = -1;
 		gameObject.SetActive(true);
 	}
 
