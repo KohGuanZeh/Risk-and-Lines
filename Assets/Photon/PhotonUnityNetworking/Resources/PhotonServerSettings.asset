@@ -109,5 +109,6 @@ MonoBehaviour:
   - IncreaseDifficultySep
   - UpdateNextSpawnTime
   - SetIdentiferColor
+  - HideIdentifierAnim
   DisableAutoOpenWizard: 1
   ShowSettings: 1

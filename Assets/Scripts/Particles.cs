@@ -52,7 +52,8 @@ public class Particles : MonoBehaviour, IPooledObject
 
 	public void SetParticleColor(int playerNo)
 	{
-		photonView.RPC("SendParticleColorChanges", RpcTarget.AllBuffered, playerNo);
+		SendParticleColorChanges(playerNo);
+		//photonView.RPC("SendParticleColorChanges", RpcTarget.AllBuffered, playerNo);
 	}
 
 	[PunRPC]

@@ -181,26 +181,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pools:
   - tag: Dots
+    sceneObj: 1
     prefabName: Travel Dot
     parent: {fileID: 0}
     poolAmt: 30
   - tag: Line
+    sceneObj: 0
     prefabName: Line
     parent: {fileID: 0}
     poolAmt: 10
   - tag: Death Particles
+    sceneObj: 0
     prefabName: Death Particle
     parent: {fileID: 0}
     poolAmt: 4
   - tag: Blink Particles
+    sceneObj: 0
     prefabName: Blink Particle
     parent: {fileID: 0}
     poolAmt: 12
   - tag: Difficulty
+    sceneObj: 0
     prefabName: Difficulty Increase
     parent: {fileID: 0}
     poolAmt: 3
   - tag: Blink
+    sceneObj: 0
     prefabName: Blink Increase
     parent: {fileID: 0}
     poolAmt: 3
