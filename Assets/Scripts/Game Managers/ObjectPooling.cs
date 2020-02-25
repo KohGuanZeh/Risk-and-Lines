@@ -45,14 +45,12 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
             {
                 GameObject obj = pool.sceneObj ? 
                                 PhotonNetwork.InstantiateSceneObject(System.IO.Path.Combine("PhotonPrefabs", pool.prefabName), Vector3.zero, Quaternion.identity):
-                                PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", pool.prefabName), Vector3.zero, Quaternion.identity); 
-                
+                                PhotonNetwork.Instantiate(System.IO.Path.Combine("PhotonPrefabs", pool.prefabName), Vector3.zero, Quaternion.identity);
+
+                if (!pool.sceneObj) poolDictionary[pool.tag].Enqueue(obj);
+
                 IPooledObject pooledObj = obj.GetComponent<IPooledObject>();
-                if (!ReferenceEquals(pooledObj, null))
-                {
-                    if (pool.sceneObj) obj.GetPhotonView().RPC("OnCreateObject", RpcTarget.AllBuffered);
-                    else pooledObj.OnCreateObject();
-                } 
+                if (!ReferenceEquals(pooledObj, null)) obj.GetPhotonView().RPC("OnCreateObject", RpcTarget.AllBuffered);
             }
         }
     }

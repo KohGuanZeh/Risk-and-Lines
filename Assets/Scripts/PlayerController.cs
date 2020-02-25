@@ -198,8 +198,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		SetCamShakeDuration();
 		CutLine(); //Need to be on top before Target Dot is Set to Null
 
-		Particles particles = ObjectPooling.inst.SpawnFromPool("Blink Particles", transform.position, Quaternion.identity).GetComponent<Particles>();
-		particles.SetParticleColor(PhotonNetwork.LocalPlayer.GetPlayerNumber());
+		ObjectPooling.inst.SpawnFromPool("Blink Particles", transform.position, Quaternion.identity);
 
 		transform.position = storedDot.transform.position;
 		targetDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, -1, false);
@@ -288,8 +287,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		gm.photonView.RPC("UpdateLeaderboard", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.ActorNumber, timeSurvived);
 		photonView.RPC("SendDeathEvent", RpcTarget.OthersBuffered, gm.playersAlive, ignoreGameEnd);
 
-		Particles particles = ObjectPooling.inst.SpawnFromPool("Death Particles", transform.position, Quaternion.identity).GetComponent<Particles>();
-		particles.SetParticleColor(PhotonNetwork.LocalPlayer.GetPlayerNumber());
+		ObjectPooling.inst.SpawnFromPool("Death Particles", transform.position, Quaternion.identity);
 
 		if (ignoreGameEnd || gm.playersAlive > 1) return;
 

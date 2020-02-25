@@ -19,8 +19,6 @@ public class TravelDot : MonoBehaviour, IPooledObject
 	public void OnCreateObject()
 	{
 		ObjectPooling.Pool pool = ObjectPooling.inst.GetPool(GetPoolTag());
-
-		ObjectPooling.inst.poolDictionary[GetPoolTag()].Enqueue(gameObject);
 		transform.parent = pool.parent;
 		gameObject.SetActive(false);
 	}
@@ -29,12 +27,6 @@ public class TravelDot : MonoBehaviour, IPooledObject
 	public void OnObjectSpawn(int parentId)
 	{
 		gameObject.SetActive(true);
-
-		//Execute Spawn Functions Here
-		/*foreach (SpriteRenderer spr in sprs) spr.color = defaultColor;
-		locked = false;
-		anim.Play("Travel Dot Unlock", 0, 1); //So that Animation wont Play when Dot first appears;
-		anim.SetBool("Locked", locked);*/
 
 		InstaLockUnlock(-1, false);
 		ObjectPooling.inst.poolDictionary[GetPoolTag()].Enqueue(gameObject);

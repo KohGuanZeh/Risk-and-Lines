@@ -4,6 +4,7 @@ using UnityEngine;
 
 using Photon.Pun;
 using Photon.Realtime;
+using Photon.Pun.UtilityScripts;
 
 public class Particles : MonoBehaviour, IPooledObject
 {
@@ -16,19 +17,25 @@ public class Particles : MonoBehaviour, IPooledObject
 	public void OnCreateObject()
 	{
 		ObjectPooling.Pool pool = ObjectPooling.inst.GetPool(GetPoolTag());
-
-		ObjectPooling.inst.poolDictionary[GetPoolTag()].Enqueue(gameObject);
 		transform.parent = pool.parent;
-		particles = GetComponentsInChildren<ParticleSystem>();
 		gameObject.SetActive(false);
+		particles = GetComponentsInChildren<ParticleSystem>();
 	}
 
 	[PunRPC]
 	public void OnObjectSpawn(int parentId)
 	{
 		//Execute Spawn Functions Here
-		if (parentId > 0) gameObject.transform.parent = PhotonNetwork.GetPhotonView(parentId).transform; //If Parent is not Null, Set New Parent
-		else gameObject.transform.parent = ObjectPooling.inst.GetPool(GetPoolTag()).parent;
+		//if (parentId > 0) gameObject.transform.parent = PhotonNetwork.GetPhotonView(parentId).transform; //If Parent is not Null, Set New Parent
+		//else gameObject.transform.parent = ObjectPooling.inst.GetPool(GetPoolTag()).parent;
+
+		foreach (ParticleSystem particle in particles)
+		{
+			ParticleSystem.MainModule module = particle.main;
+			module.startColor = GameManager.GetCharacterColor(photonView.Owner.GetPlayerNumber());
+			particle.gameObject.SetActive(true);
+			particle.Play();
+		}
 	}
 
 	[PunRPC]
@@ -47,13 +54,12 @@ public class Particles : MonoBehaviour, IPooledObject
 
 	void Update()
 	{
-		if (particles.Length > 0 && !particles[0].IsAlive(true)) ObjectPooling.inst.ReturnToPool(gameObject, GetPoolTag());
+		if (particles.Length > 0 && !particles[0].IsAlive(true) && photonView.IsMine) ObjectPooling.inst.ReturnToPool(gameObject, GetPoolTag());
 	}
 
-	public void SetParticleColor(int playerNo)
+	/*public void SetParticleColor(int playerNo)
 	{
-		SendParticleColorChanges(playerNo);
-		//photonView.RPC("SendParticleColorChanges", RpcTarget.AllBuffered, playerNo);
+		photonView.RPC("SendParticleColorChanges", RpcTarget.AllBuffered, playerNo);
 	}
 
 	[PunRPC]
@@ -66,5 +72,5 @@ public class Particles : MonoBehaviour, IPooledObject
 			particle.gameObject.SetActive(true);
 			particle.Play();
 		}
-	}
+	}*/
 }
