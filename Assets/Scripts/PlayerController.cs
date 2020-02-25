@@ -201,9 +201,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		gui.UpdateBlinkCount(blinkCount);
 
 		// for the calling of the blink sfx
-		SfxManager TempSfx = SfxManager.inst;
-		TempSfx.PlaySfx(SfxManager.inst.Sfx.blink);
-		TempSfx.PlaySfx(SfxManager.inst.Sfx.unlockSound); // play unlock sound since the lock will always unlock when a player blinks
+		SfxManager.inst.PlaySfx(SfxManager.inst.Sfx.blink);
+		SfxManager.inst.PlaySfx(SfxManager.inst.Sfx.unlockSound); // play unlock sound since the lock will always unlock when a player blinks
 
 	}
 
@@ -253,8 +252,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
 	public void Death(bool ignoreGameEnd = false) 
 	{
 		// to play the death sound of the player
-		SfxManager TempSfx = SfxManager.inst;
-		TempSfx.PlaySfx(TempSfx.Sfx.deathSound);
+		
+		SfxManager.inst.PlaySfx(SfxManager.inst.Sfx.deathSound);
 
 		Debug.LogError("Death is Called");
 

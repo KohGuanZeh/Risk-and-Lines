@@ -24,3 +24,8 @@ Death sounds:
 Blink sounds:
 DBZ SOUND EFFECT INSTANT TRANSMISSION : https://www.youtube.com/watch?v=83t8dqpiNhw
 221613__ansel__teleport : https://freesound.org/people/ansel/sounds/221613/
+
+Collectable sounds:
+337049__shinephoenixstormcrow__320655-rhodesmas-level-up-01 : https://freesound.org/people/shinephoenixstormcrow/sounds/337049/
+332629__treasuresounds__item-pickup : https://freesound.org/people/TreasureSounds/sounds/332629/
+
