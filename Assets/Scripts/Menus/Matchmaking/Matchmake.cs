@@ -133,12 +133,6 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		SetStartReadyButton();
 	}
 
-	public override void OnJoinRoomFailed(short returnCode, string message)
-	{
-		LeaveRoom();
-		anim.SetInteger("Lobby State", 0);
-	}
-
 	public override void OnJoinRandomFailed(short returnCode, string message)
 	{
 		CreateRoom();
