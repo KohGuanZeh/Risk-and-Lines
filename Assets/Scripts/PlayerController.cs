@@ -93,7 +93,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 						travelDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, playerNo, true);
 						targetDot = travelDot;
 
-						SfxManager.inst.PlaySfx(SfxManager.inst.Sfx.lockSound);// play the lock sound
+						//SfxManager.inst.PlaySfx(SfxManager.inst.Sfx.lockSound);// play the lock sound
 
 						if (currentTravelLine) currentTravelLine.photonView.RPC("AddNewPoint", RpcTarget.AllBuffered, transform.position);
 						else {
@@ -133,7 +133,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 						travelDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, playerNo, true);
 						targetDot = travelDot;
 
-						SfxManager.inst.PlaySfx(SfxManager.inst.Sfx.lockSound);// play the lock sound
+						//SfxManager.inst.PlaySfx(SfxManager.inst.Sfx.lockSound);// play the lock sound
 
 						transform.up = targetDot.transform.position - transform.position;
 
