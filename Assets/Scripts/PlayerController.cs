@@ -335,6 +335,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		playerName.color = arrow.color = GameManager.GetCharacterColor(photonView.Owner.GetPlayerNumber());
 	}
 
+	[PunRPC]
 	public void HideIdentifierAnim()
 	{
 		identifierAnim.SetTrigger("Hide");
