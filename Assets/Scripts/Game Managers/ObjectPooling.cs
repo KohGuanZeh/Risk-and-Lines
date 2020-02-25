@@ -31,15 +31,7 @@ public class ObjectPooling : MonoBehaviourPunCallbacks
         foreach (Pool pool in pools) poolDictionary.Add(pool.tag, new Queue<GameObject>());
 
         if (PhotonNetwork.IsMasterClient) InitialisePools();
-
-        //myTestQueue = new List<GameObject>();
-        //myTestQueue = poolDictionary["Dots"].ToList();
     }
-
-    /*private void LateUpdate()
-    {
-        myTestQueue = poolDictionary["Dots"].ToList();
-    }*/
 
     #region Initialisation Functions
     void InitialisePools()

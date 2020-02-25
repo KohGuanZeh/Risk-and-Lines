@@ -16,6 +16,7 @@ public struct RankCardItems
 	public TextMeshProUGUI playerName;
 	public TextMeshProUGUI rank;
 	public TextMeshProUGUI time;
+	public Image[] corners;
 }
 
 public class UIManager : MonoBehaviour
@@ -83,6 +84,11 @@ public class UIManager : MonoBehaviour
 	{
 		if (PhotonNetwork.IsMasterClient) gm.StartGame();
 	}
+
+	void HidePlayersNickname()
+	{
+		player.HideIdentifierAnim();
+	}
 	#endregion
 
 	#region For Blink
@@ -149,7 +155,9 @@ public class UIManager : MonoBehaviour
 			rankCards[i].time.text = string.Format("Time: {0}", i == 0 && hasLastOneStanding ? gm.playerInfos[i + 1].deathTime.ToString("0.00") + "s ++" : gm.playerInfos[i].deathTime.ToString("0.00") + "s");
 
 			int playerNo = PhotonNetwork.CurrentRoom.GetPlayer(gm.playerInfos[i].actorId).GetPlayerNumber();
-			rankCards[i].playerSpr.color = rankCards[i].playerName.color = rankCards[i].rank.color = rankCards[i].time.color = GameManager.GetCharacterColor(playerNo);
+			Color color = rankCards[i].playerSpr.color = GameManager.GetCharacterColor(playerNo);
+			foreach (Image corner in rankCards[i].corners) corner.color = color;
+			//rankCards[i].playerSpr.color = rankCards[i].playerName.color = rankCards[i].rank.color = rankCards[i].time.color = GameManager.GetCharacterColor(playerNo);
 		}
 	}
 

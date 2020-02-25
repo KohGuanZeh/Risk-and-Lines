@@ -5180,7 +5180,7 @@ MonoBehaviour:
   sliders:
   - {fileID: 1876532134}
   - {fileID: 506160163}
-  mixer: {fileID: 0}
+  mixer: {fileID: 24100000, guid: 2a2a5bf74f810354ea083e005131a302, type: 2}
 --- !u!1 &1596271509
 GameObject:
   m_ObjectHideFlags: 0

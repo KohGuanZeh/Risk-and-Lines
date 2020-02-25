@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.UI;
 using TMPro;
 
@@ -24,6 +25,10 @@ public class Matchmake : MonoBehaviourPunCallbacks
 	public RectTransform rmContainer;
 	public List<RoomList> rmButtons;
 	[SerializeField] RoomList rmButtonPrefab;
+
+	[Header("Options")]
+	[SerializeField] AudioMixer mixer;
+	[SerializeField] Slider[] sliders;
 
 	[Header("For Room Panel")]
 	[SerializeField] TextMeshProUGUI roomNameDisplay; // display the name of the room
@@ -49,6 +54,9 @@ public class Matchmake : MonoBehaviourPunCallbacks
 
 	private void Start()
 	{
+		sliders[0].value = PlayerPrefs.GetFloat("Music Volume", 1);
+		sliders[1].value = PlayerPrefs.GetFloat("Sound Volume", 1);
+
 		rmButtons = new List<RoomList>();
 		playerLists = new List<PlayerList>();
 
@@ -289,6 +297,11 @@ public class Matchmake : MonoBehaviourPunCallbacks
 	{
 		PlayerPrefs.SetInt("Preset", idx);
 	}
+
+	public void Options(bool show)
+	{
+		anim.SetBool("Options", show);
+	}
 	#endregion
 
 	#region Join Quit Button Functions
@@ -389,6 +402,20 @@ public class Matchmake : MonoBehaviourPunCallbacks
 
 				break;
 		}
+	}
+	#endregion
+
+	#region Options
+	public void SetMusicVolume(float val)
+	{
+		mixer.SetFloat("Music Volume", Mathf.Log10(val) * 20);
+		PlayerPrefs.SetFloat("Music Volume", val);
+	}
+
+	public void SetSoundVolume(float val)
+	{
+		mixer.SetFloat("Sound Volume", Mathf.Log10(val) * 20);
+		PlayerPrefs.SetFloat("Sound Volume", val);
 	}
 	#endregion
 
