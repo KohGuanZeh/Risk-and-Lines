@@ -19,6 +19,8 @@ public class TravelDot : MonoBehaviour, IPooledObject
 	public void OnCreateObject()
 	{
 		ObjectPooling.Pool pool = ObjectPooling.inst.GetPool(GetPoolTag());
+
+		ObjectPooling.inst.poolDictionary[GetPoolTag()].Enqueue(gameObject);
 		transform.parent = pool.parent;
 		gameObject.SetActive(false);
 	}
