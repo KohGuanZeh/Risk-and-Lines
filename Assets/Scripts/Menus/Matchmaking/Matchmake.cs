@@ -228,7 +228,9 @@ public class Matchmake : MonoBehaviourPunCallbacks
 			if (playersReady.Count != PhotonNetwork.CurrentRoom.PlayerCount - 1) return; //Master will not be registered under Ready
 			PhotonNetwork.CurrentRoom.IsOpen = false;
 			photonView.RPC("LoadSceneForAll", RpcTarget.All, 2); //LoadingScreen.inst.LoadScene(2, false);
-			//PhotonNetwork.LoadLevel(2);
+																 //PhotonNetwork.LoadLevel(2);
+																 // play button sound
+			ButtonSoundManager.inst.PlaySound(ButtonSoundManager.inst.startGameSound);
 		}
 		else
 		{
@@ -238,6 +240,8 @@ public class Matchmake : MonoBehaviourPunCallbacks
 
 			string msg = string.Format(isReady ? "{0} is ready." : "{0} needs more time to prepare.", PhotonNetwork.LocalPlayer.NickName);
 			ChatManager.inst.photonView.RPC("SendAutomatedMsg", RpcTarget.AllBuffered, msg, PhotonNetwork.LocalPlayer.GetPlayerNumber());
+			// play button sound
+			ButtonSoundManager.inst.PlaySound(ButtonSoundManager.inst.buttonSound);
 		}
 	}
 
@@ -297,6 +301,9 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		PhotonNetwork.NickName = name;
 		PlayerPrefs.SetString("NickName", name);
 		connectedAs.text = string.Format("Connected as: [{0}]", name);
+
+		// play sound 
+		ButtonSoundManager.inst.PlaySound(ButtonSoundManager.inst.buttonSound);
 	}
 
 	public void ChangeCharacter(int idx) //When Click on Any Toggle on Char Select
@@ -307,12 +314,16 @@ public class Matchmake : MonoBehaviourPunCallbacks
 	public void Options(bool show)
 	{
 		anim.SetBool("Options", show);
+		// play button sound
+		ButtonSoundManager.inst.PlaySound(ButtonSoundManager.inst.buttonSound);
 	}
 	#endregion
 
 	#region Join Quit Button Functions
 	public void QuitNetworkLobby()
 	{
+		// play button sound
+		ButtonSoundManager.inst.PlaySound(ButtonSoundManager.inst.buttonSound);
 		PhotonNetwork.LeaveLobby();
 		LoadingScreen.inst.LoadScene(0);
 	}
@@ -323,10 +334,16 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		if (string.IsNullOrEmpty(name) || string.IsNullOrWhiteSpace(name)) name = "Room_" + Random.Range(0, 100).ToString("000");
 		PhotonNetwork.JoinOrCreateRoom(name, new RoomOptions() { IsVisible = true, IsOpen = false, MaxPlayers = (byte)4 }, TypedLobby.Default);
 		rmName.text = string.Empty;
+
+		// play button sound
+		ButtonSoundManager.inst.PlaySound(ButtonSoundManager.inst.buttonSound);
 	}
 
 	public void LeaveRoom()
 	{
+		// play button sound
+		ButtonSoundManager.inst.PlaySound(ButtonSoundManager.inst.buttonSound);
+
 		PhotonNetwork.LeaveRoom();
 		PhotonNetwork.LeaveLobby();
 
@@ -337,6 +354,8 @@ public class Matchmake : MonoBehaviourPunCallbacks
 	public void QuickStart()
 	{
 		PhotonNetwork.JoinRandomRoom();
+		// play button sound
+		ButtonSoundManager.inst.PlaySound(ButtonSoundManager.inst.buttonSound);
 	}
 
 	IEnumerator ReconnectBackToLobby()
