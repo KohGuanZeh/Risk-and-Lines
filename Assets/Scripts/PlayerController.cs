@@ -55,9 +55,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		blinkCd = maxCdTime;
 		gm.photonView.RPC("QueueGameStart", RpcTarget.AllBuffered);
 
-		//Assigning of Identifier at Start
-		playerName.text = photonView.Owner.NickName;
-		playerName.color = arrow.color = GameManager.GetCharacterColor(playerNo);
+		photonView.RPC("SetIdentifierColor", RpcTarget.AllBuffered);
 
 		shakeDuration = 0f;
 		setShakeDuration = 0.2f;
@@ -330,6 +328,14 @@ public class PlayerController : MonoBehaviourPunCallbacks
 	#endregion
 
 	#region For Player Identification
+	[PunRPC]
+	public void SetIdentiferColor()
+	{
+		//Assigning of Identifier at Start
+		playerName.text = photonView.Owner.NickName;
+		playerName.color = arrow.color = GameManager.GetCharacterColor(playerNo);
+	}
+
 	public void HideIdentifierAnim()
 	{
 		identifierAnim.SetTrigger("Hide");

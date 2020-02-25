@@ -108,5 +108,6 @@ MonoBehaviour:
   - SendParticleColorChanges
   - IncreaseDifficultySep
   - UpdateNextSpawnTime
+  - SetIdentiferColor
   DisableAutoOpenWizard: 1
   ShowSettings: 1

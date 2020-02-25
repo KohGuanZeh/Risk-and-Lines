@@ -4828,7 +4828,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tag: Blink Particles
   particles: []
-  photonView: {fileID: 0}
+  photonView: {fileID: 3684741364762125452}
 --- !u!114 &3684741364762125452
 MonoBehaviour:
   m_ObjectHideFlags: 0

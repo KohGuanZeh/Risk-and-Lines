@@ -3161,7 +3161,7 @@ MonoBehaviour:
     type: 3}
   masterAndClientIcon:
   - {fileID: 21300000, guid: 80b5614488e668b45aeea699eba40a3c, type: 3}
-  - {fileID: 21300000, guid: 7377013011b4c3348809ff574abe799e, type: 3}
+  - {fileID: 21300000, guid: a22ef87c0d63f1f40b4b67cd27f0d76f, type: 3}
   playersReady: 
   isReady: 0
 --- !u!4 &735009247
