@@ -276,7 +276,6 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 		//Check Player Count. If Player Count <= 1. Trigger End Screen
 		gm.playersAlive--;
-		print(gm.playersAlive);
 
 		//Update Dead Players
 		float timeSurvived = gm.totalTime;
@@ -298,6 +297,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 	[PunRPC]
 	public void SendDeathEvent(int playersAlive, bool ignoreGameEnd) 
 	{
+		SfxManager.inst.PlaySfx(SfxManager.inst.Sfx.deathSound);
 		gameObject.SetActive(false);
 		gm.playersAlive = playersAlive;
 
@@ -364,6 +364,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		{
 			CutLine();
 			Death();
+			Debug.LogError("Stuff Happened");
 		}
 	}
 }
