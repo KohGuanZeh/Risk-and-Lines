@@ -110,5 +110,6 @@ MonoBehaviour:
   - UpdateNextSpawnTime
   - SetIdentiferColor
   - HideIdentifierAnim
+  - UpdateDeadPlayersOnDisconnect
   DisableAutoOpenWizard: 1
   ShowSettings: 1
