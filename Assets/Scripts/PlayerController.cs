@@ -104,7 +104,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 						travelDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, playerNo, true);
 						targetDot = travelDot;
 
-						//SfxManager.inst.PlaySfx(SfxManager.inst.Sfx.lockSound);// play the lock sound
+						SfxManager.inst.PlaySfx(SfxManager.inst.Sfx.lockSound);// play the lock sound
 
 						if (currentTravelLine) currentTravelLine.photonView.RPC("AddNewPoint", RpcTarget.AllBuffered, transform.position);
 						else {
@@ -144,7 +144,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 						travelDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, playerNo, true);
 						targetDot = travelDot;
 
-						//SfxManager.inst.PlaySfx(SfxManager.inst.Sfx.lockSound);// play the lock sound
+						SfxManager.inst.PlaySfx(SfxManager.inst.Sfx.lockSound);// play the lock sound
 
 						transform.up = targetDot.transform.position - transform.position;
 
@@ -212,10 +212,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		gui.UpdateBlinkCount(blinkCount);
 
 		// for the calling of the blink sfx
-		//SfxManager TempSfx = SfxManager.inst;
-		//TempSfx.PlaySfx(SfxManager.inst.Sfx.blink);
-		//TempSfx.PlaySfx(SfxManager.inst.Sfx.unlockSound); // play unlock sound since the lock will always unlock when a player blinks
 
+		SfxManager.inst.PlaySfx(SfxManager.inst.Sfx.blink);
 	}
 
 	//Delete the last position and cut out the Travel Line
@@ -269,8 +267,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
 	public void Death(bool ignoreGameEnd = false) 
 	{
 		// to play the death sound of the player
-		//SfxManager TempSfx = SfxManager.inst;
-		//TempSfx.PlaySfx(TempSfx.Sfx.deathSound);
+
+		SfxManager.inst.PlaySfx(SfxManager.inst.Sfx.deathSound);
 
 		Debug.LogError("Death is Called");
 
