@@ -48,6 +48,9 @@ TagManager:
   - name: Travel Dot
     uniqueID: 506138591
     locked: 0
+  - name: Power Up
+    uniqueID: 300489129
+    locked: 0
   - name: Player
     uniqueID: 477768291
     locked: 0

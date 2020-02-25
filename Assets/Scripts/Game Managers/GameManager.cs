@@ -23,12 +23,6 @@ public struct PlayerInfo {
 	}
 }
 
-[System.Serializable]
-public struct CharacterPreset {
-	public Sprite coreSpr;
-	public Sprite secSpr;
-}
-
 public class GameManager : MonoBehaviourPunCallbacks {
 	[Header("General Variables")]
 	public static GameManager inst;
@@ -60,11 +54,15 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	public float lastXSpawn; //Last X Position that Spawned the Dots
 	public Vector2 minMaxXInterval, minMaxXOffset; //Min and Max X Interval and Offset
 
+	[Header("For Spawning Interactables")]
+	public float nextSpawnTime;
+
 	[Header("For Player Spawn")]
 	public Transform playerSpawnPos;
-	public CharacterPreset[] presets;
+	public Sprite[] presets;
 
 	[Header("For Game Difficulty")]
+	public bool reachedMaxDifficulty;
 	[SerializeField] int difficultyStage;
 	[SerializeField] float timeStamp;
 	public bool gameStarted;
@@ -101,7 +99,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
 		//Only Master Client will handle Dot Spawning
 		if (PhotonNetwork.IsMasterClient) SpawnDots();
-		//QueueGameStart();
 	}
 
 	void FixedUpdate() {
@@ -114,19 +111,13 @@ public class GameManager : MonoBehaviourPunCallbacks {
 			if (PhotonNetwork.IsMasterClient)
 			{
 				#region Temp Difficulty Testing
-				if (gameStarted)
+				if (gameStarted && !reachedMaxDifficulty)
 				{
 					timeStamp += Time.fixedDeltaTime;
 
 					if (timeStamp >= 15)
 					{
-						if (increaseAllDiff) photonView.RPC("IncreaseDifficultyAll", RpcTarget.AllBuffered, cohesive);
-						else
-						{
-							difficultyStage++;
-							photonView.RPC("IncreaseDifficulty", RpcTarget.AllBuffered, difficultyStage, cohesive);
-						}
-
+						IncreaseDifficulty();
 						photonView.RPC("RegisterTimeStamp", RpcTarget.AllBuffered, 0f, false);
 					}
 					else photonView.RPC("RegisterTimeStamp", RpcTarget.OthersBuffered, timeStamp, false);
@@ -276,7 +267,8 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	#region For Dot Spawning
 	void SpawnDots() {
 		xRemainder += moveDelta.x;
-		while (xRemainder - xInterval > -0.25f) {
+		while (xRemainder - xInterval > -0.25f) 
+		{
 			xRemainder -= xInterval;
 			lastXSpawn += xInterval;
 
@@ -298,6 +290,22 @@ public class GameManager : MonoBehaviourPunCallbacks {
 				dotPositions[i] = new Vector3(x, y, 0);
 				ObjectPooling.inst.SpawnFromPool("Dots", dotPositions[i], Quaternion.identity);
 			}
+
+			//Spawn Interactables
+			if (totalTime >= nextSpawnTime)
+			{
+				int noToSpawn = GetNumberToSpawn();
+				for (int i = 1; i < noToSpawn; i++)
+				{
+					float xOffset = Random.Range(0, 1.0f) * xInterval;
+					float x = lastXSpawn + xOffset;
+					float y = Random.Range(0, 1.0f) * yHeight + minMaxY.x;
+					Vector3 spawnPos = new Vector3(x, y, 0);
+					ObjectPooling.inst.SpawnFromPool(GetSpawnObjTag(), spawnPos, Quaternion.identity);
+				}
+				nextSpawnTime = totalTime + 30;
+				photonView.RPC("UpdateNextSpawnTime", RpcTarget.OthersBuffered, nextSpawnTime);
+			}
 		}
 
 		photonView.RPC("UpdateDotSpawnValues", RpcTarget.OthersBuffered, xRemainder, xInterval, lastXSpawn);
@@ -311,6 +319,17 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	}
 
 	//Testing Different Difficulty Algorithms
+	public void IncreaseDifficulty()
+	{
+		if (increaseAllDiff) photonView.RPC("IncreaseDifficultyAll", RpcTarget.AllBuffered, cohesive);
+		else
+		{
+			difficultyStage++;
+			photonView.RPC("IncreaseDifficultySep", RpcTarget.AllBuffered, difficultyStage, cohesive);
+		}
+	}
+
+
 	[PunRPC]
 	void IncreaseDifficultyAll(bool cohesive) 
 	{
@@ -338,10 +357,12 @@ public class GameManager : MonoBehaviourPunCallbacks {
 		//camSpeed = defaultCamSpeed;
 
 		gui.ShowDiffIncreased();
+
+		if (defaultCamSpeed >= 12.5f && minDotSpawnCoeff >= 1 && minSpawnIntervalCoeff >= 1) reachedMaxDifficulty = true;
 	}
 
 	[PunRPC]
-	void IncreaseDifficulty(int stage, bool cohesive) 
+	void IncreaseDifficultySep(int stage, bool cohesive) 
 	{
 		if (stage % 2 != 0) //If Stage is Odd
 		{
@@ -371,6 +392,8 @@ public class GameManager : MonoBehaviourPunCallbacks {
 		//camSpeed = defaultCamSpeed;
 
 		gui.ShowDiffIncreased();
+
+		if (defaultCamSpeed >= 12.5f && minDotSpawnCoeff >= 1 && minSpawnIntervalCoeff >= 1) reachedMaxDifficulty = true;
 	}
 
 	[PunRPC]
@@ -382,6 +405,30 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
 	#endregion
 
+	#region For Interactable Spawn
+	[PunRPC]
+	void UpdateNextSpawnTime(float val)
+	{
+		nextSpawnTime = val;
+	}
+
+	int GetNumberToSpawn()
+	{
+		float pct = UnityEngine.Random.Range(0, 100);
+		if (pct <= 20) return 0; //20% to spawn 0
+		else if (pct <= 60) return 1; //40% to spawn 1
+		else if (pct <= 90) return 2; //30% to spawn 2
+		else return 3; //10% to spawn 3
+	}
+
+	string GetSpawnObjTag()
+	{
+		float pct = UnityEngine.Random.Range(0, 100);
+		if (pct <= 70) return "Blink";
+		else return "Difficulty";
+	}
+	#endregion
+
 	#region For Game End
 	public void EndGame() //Called in RPC Function
 	{
@@ -391,25 +438,26 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	}
 	#endregion
 
-	private void OnApplicationQuit() {
+	private void OnApplicationQuit() 
+	{
 		PlayerPrefs.DeleteKey("Lobby State");
 	}
 
 	#region ExtraUtilities
-	public static Color GetCharacterColor(int playerNo)
+	public static Color GetCharacterColor(int playerNo, float alpha = 1)
 	{
 		switch (playerNo)
 		{
 			case 1:
-				return new Color(1, 0.37f, 0.68f, 1);
+				return new Color(1, 0.37f, 0.68f, alpha);
 			case 2:
-				return new Color(0.37f, 0.68f, 1, 1);
+				return new Color(0.37f, 0.68f, 1, alpha);
 			case 3:
-				return new Color(0.21f, 1, 0.60f, 1);
+				return new Color(0.21f, 1, 0.60f, alpha);
 			case 4:
-				return new Color(1, 1, 0.24f, 1);
+				return new Color(1, 1, 0.24f, alpha);
 			default:
-				return Color.white;
+				return new Color(1, 1, 1, alpha);
 		}
 	}
 	#endregion

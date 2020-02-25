@@ -106,5 +106,7 @@ MonoBehaviour:
   - InstaLockUnlock
   - SetParticleColor
   - SendParticleColorChanges
+  - IncreaseDifficultySep
+  - UpdateNextSpawnTime
   DisableAutoOpenWizard: 1
   ShowSettings: 1

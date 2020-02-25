@@ -117,6 +117,7 @@ MonoBehaviour:
   sprs:
   - {fileID: 2021310505252144820}
   - {fileID: 3399604773426811518}
+  lockedAlpha: 0.5
   anim: {fileID: 5009747921053545317}
   defaultColor: {r: 1, g: 1, b: 1, a: 1}
   locked: 0

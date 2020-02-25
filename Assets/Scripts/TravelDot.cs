@@ -8,6 +8,7 @@ public class TravelDot : MonoBehaviour, IPooledObject
 {
 	[Header("Travel Dot Properties")]
 	[SerializeField] SpriteRenderer[] sprs;
+	[SerializeField] float lockedAlpha;
 	[SerializeField] Animator anim;
 	public Color defaultColor;
 
@@ -62,7 +63,7 @@ public class TravelDot : MonoBehaviour, IPooledObject
 		locked = lockDot;
 		anim.SetBool("Locked", locked);
 
-		if (locked) foreach (SpriteRenderer spr in sprs) spr.color = GameManager.GetCharacterColor(playerNo);
+		if (locked) foreach (SpriteRenderer spr in sprs) spr.color = GameManager.GetCharacterColor(playerNo, lockedAlpha);
 		else foreach (SpriteRenderer spr in sprs) spr.color = defaultColor; //In case we do not want White
 	}
 
@@ -73,7 +74,7 @@ public class TravelDot : MonoBehaviour, IPooledObject
 		anim.SetBool("Locked", locked);
 		anim.Play(locked ? "Travel Dot Lock" : "Travel Dot Unlock", 0 ,1);
 
-		if (locked) foreach (SpriteRenderer spr in sprs) spr.color = GameManager.GetCharacterColor(playerNo);
+		if (locked) foreach (SpriteRenderer spr in sprs) spr.color = GameManager.GetCharacterColor(playerNo, lockedAlpha);
 		else foreach (SpriteRenderer spr in sprs) spr.color = defaultColor; //In case we do not want White
 	}
 }

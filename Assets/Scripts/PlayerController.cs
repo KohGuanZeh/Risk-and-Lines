@@ -1,7 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 using Photon.Pun;
 using Photon.Pun.UtilityScripts;
@@ -17,6 +20,11 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 	[Header("Player Sprites")]
 	[SerializeField] SpriteRenderer spr;
+
+	[Header("Player Identifier")]
+	[SerializeField] TextMeshProUGUI playerName;
+	[SerializeField] Image arrow;
+	[SerializeField] Animator identifierAnim;
 
 	[Header("Player Movement Properties")]
 	[SerializeField] float travelSpeed = 5; //Speed at which the Player Dot travels
@@ -46,6 +54,10 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 		blinkCd = maxCdTime;
 		gm.photonView.RPC("QueueGameStart", RpcTarget.AllBuffered);
+
+		//Assigning of Identifier at Start
+		playerName.text = photonView.Owner.NickName;
+		playerName.color = arrow.color = GameManager.GetCharacterColor(playerNo);
 
 		shakeDuration = 0f;
 		setShakeDuration = 0.2f;
@@ -187,8 +199,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		SetCamShakeDuration();
 		CutLine(); //Need to be on top before Target Dot is Set to Null
 
-		//Particles particles = ObjectPooling.inst.SpawnFromPool("Blink Particles", transform.position, Quaternion.identity).GetComponent<Particles>();
-		//particles.SetParticleColor(PhotonNetwork.LocalPlayer.GetPlayerNumber());
+		Particles particles = ObjectPooling.inst.SpawnFromPool("Blink Particles", transform.position, Quaternion.identity).GetComponent<Particles>();
+		particles.SetParticleColor(PhotonNetwork.LocalPlayer.GetPlayerNumber());
 
 		transform.position = storedDot.transform.position;
 		targetDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, -1, false);
@@ -201,9 +213,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		gui.UpdateBlinkCount(blinkCount);
 
 		// for the calling of the blink sfx
-		SfxManager TempSfx = SfxManager.inst;
-		TempSfx.PlaySfx(SfxManager.inst.Sfx.blink);
-		TempSfx.PlaySfx(SfxManager.inst.Sfx.unlockSound); // play unlock sound since the lock will always unlock when a player blinks
+		//SfxManager TempSfx = SfxManager.inst;
+		//TempSfx.PlaySfx(SfxManager.inst.Sfx.blink);
+		//TempSfx.PlaySfx(SfxManager.inst.Sfx.unlockSound); // play unlock sound since the lock will always unlock when a player blinks
 
 	}
 
@@ -225,6 +237,15 @@ public class PlayerController : MonoBehaviourPunCallbacks
 			}
 		}
 	}
+
+	public void InstantFillBlink()
+	{
+		if (blinkCount >= 3) return;
+
+		blinkCount++;
+		if (blinkCount >= 3) blinkCd = maxCdTime;
+		gui.UpdateBlinkCount(blinkCount);
+	}
 	#endregion
 
 	#region For Character Creation
@@ -240,12 +261,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
 	{
 		if (ReferenceEquals(gm, null)) gm = GameManager.inst;
 
-		spr.sprite = gm.presets[presetIdx].coreSpr;
+		spr.sprite = gm.presets[presetIdx];
 		spr.color = GameManager.GetCharacterColor(playerNo);
-
-		//sprs[0].sprite = gm.presets[presetIdx].coreSpr;
-		//sprs[1].sprite = gm.presets[presetIdx].secSpr;
-		//sprs[0].color = sprs[1].color = GameManager.GetCharacterColor(playerNo);
 	}
 	#endregion
 
@@ -253,8 +270,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
 	public void Death(bool ignoreGameEnd = false) 
 	{
 		// to play the death sound of the player
-		SfxManager TempSfx = SfxManager.inst;
-		TempSfx.PlaySfx(TempSfx.Sfx.deathSound);
+		//SfxManager TempSfx = SfxManager.inst;
+		//TempSfx.PlaySfx(TempSfx.Sfx.deathSound);
 
 		Debug.LogError("Death is Called");
 
@@ -274,8 +291,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		gm.photonView.RPC("UpdateLeaderboard", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.ActorNumber, timeSurvived);
 		photonView.RPC("SendDeathEvent", RpcTarget.OthersBuffered, gm.playersAlive, ignoreGameEnd);
 
-		//Particles particles = ObjectPooling.inst.SpawnFromPool("Death Particles", transform.position, Quaternion.identity).GetComponent<Particles>();
-		//particles.SetParticleColor(PhotonNetwork.LocalPlayer.GetPlayerNumber());
+		Particles particles = ObjectPooling.inst.SpawnFromPool("Death Particles", transform.position, Quaternion.identity).GetComponent<Particles>();
+		particles.SetParticleColor(PhotonNetwork.LocalPlayer.GetPlayerNumber());
 
 		if (ignoreGameEnd || gm.playersAlive > 1) return;
 
@@ -296,7 +313,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 	}
 	#endregion
 
-	#region
+	#region Cam Shake
 	public void SetCamShakeDuration()
 	{
 		shakeDuration = setShakeDuration;
@@ -311,6 +328,19 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		else gm.cam.transform.position = gm.camPos;
 	}
 	#endregion
+
+	#region For Player Identification
+	public void HideIdentifierAnim()
+	{
+		identifierAnim.SetTrigger("Hide");
+	}
+
+	void StopIdentifierAnim()
+	{
+		identifierAnim.SetBool("Hidden", true);
+	}
+	#endregion
+
 	void OnTriggerEnter2D(Collider2D other) 
 	{
 		if (other.CompareTag("Player")) 
