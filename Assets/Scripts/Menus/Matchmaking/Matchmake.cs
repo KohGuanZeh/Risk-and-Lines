@@ -77,6 +77,11 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		base.OnCreateRoomFailed(returnCode, message);
 	}
 
+	public override void OnCreatedRoom()
+	{
+		PhotonNetwork.CurrentRoom.IsOpen = true;
+	}
+
 	public override void OnRoomListUpdate(List<RoomInfo> roomList)
 	{
 		bool sortList = false;
@@ -322,7 +327,7 @@ public class Matchmake : MonoBehaviourPunCallbacks
 	{
 		string name = rmName.text;
 		if (string.IsNullOrEmpty(name) || string.IsNullOrWhiteSpace(name)) name = "Room_" + Random.Range(0, 100).ToString("000");
-		PhotonNetwork.JoinOrCreateRoom(name, new RoomOptions() { IsVisible = true, IsOpen = true, MaxPlayers = (byte)4 }, TypedLobby.Default);
+		PhotonNetwork.JoinOrCreateRoom(name, new RoomOptions() { IsVisible = true, IsOpen = false, MaxPlayers = (byte)4 }, TypedLobby.Default);
 		rmName.text = string.Empty;
 	}
 

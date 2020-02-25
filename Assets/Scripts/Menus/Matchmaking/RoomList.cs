@@ -15,7 +15,7 @@ public class RoomList : Listable
 
     public void JoinRoomOnClick()
     {
-        if (PhotonNetwork.IsConnectedAndReady) PhotonNetwork.JoinRoom(roomName);
+        PhotonNetwork.JoinRoom(roomName);
     }
 
     public void SetRoom(string name, int rmSize) // public function called in waitingroomcontroller
