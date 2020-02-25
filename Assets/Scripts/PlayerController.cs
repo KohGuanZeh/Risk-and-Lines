@@ -333,7 +333,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 	{
 		//Assigning of Identifier at Start
 		playerName.text = photonView.Owner.NickName;
-		playerName.color = arrow.color = GameManager.GetCharacterColor(playerNo);
+		playerName.color = arrow.color = GameManager.GetCharacterColor(photonView.Owner.GetPlayerNumber());
 	}
 
 	public void HideIdentifierAnim()

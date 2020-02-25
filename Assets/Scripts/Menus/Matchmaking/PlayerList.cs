@@ -52,10 +52,10 @@ public class PlayerList : Listable
         if (PhotonNetwork.IsMasterClient)
         {
             Player player = PhotonNetwork.CurrentRoom.GetPlayer(playerId);
+            PhotonNetwork.CloseConnection(player);
 
             string msg = string.Format("{0} has been Kicked form the Room.", player.NickName);
             ChatManager.inst.photonView.RPC("SendAutomatedMsg", RpcTarget.AllBuffered, msg, player.GetPlayerNumber());
-            PhotonNetwork.CloseConnection(player);
         } 
     }
 
