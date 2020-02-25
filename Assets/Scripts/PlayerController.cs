@@ -192,6 +192,12 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 		blinkCount--;
 		gui.UpdateBlinkCount(blinkCount);
+
+		// for the calling of the blink sfx
+		SfxManager TempSfx = SfxManager.inst;
+		TempSfx.PlaySfx(SfxManager.inst.Sfx.blink);
+		TempSfx.PlaySfx(SfxManager.inst.Sfx.unlockSound); // play unlock sound since the lock will always unlock when a player blinks
+
 	}
 
 	//Delete the last position and cut out the Travel Line
@@ -239,6 +245,10 @@ public class PlayerController : MonoBehaviourPunCallbacks
 	#region For Death
 	public void Death(bool ignoreGameEnd = false) 
 	{
+		// to play the death sound of the player
+		SfxManager TempSfx = SfxManager.inst;
+		TempSfx.PlaySfx(TempSfx.Sfx.deathSound);
+
 		Debug.LogError("Death is Called");
 
 		SetCamShakeDuration();
