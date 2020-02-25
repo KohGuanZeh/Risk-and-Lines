@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	[Range(0, 1)] public float maxSpawnIntervalCoeff; //> Coeff, > Interval Dist
 	[Range(0, 1)] public float minDotSpawnCoeff; //Coefficient that affects Dot Spawning. > Coeff, < Dots Spawn
 	[Range(0, 1)] public float maxDotSpawnCoeff; //Coefficient that affects Dot Spawning. > Coeff, < Dots Spawn
-												 //public Vector2Int minMaxDotSpawn;
+	//public Vector2Int minMaxDotSpawn;
 
 	public float yMargin; //Offset so that the Dot do not spawn at exactly the top of bottom of the Screen
 	public Vector2 minMaxY; //Minimum and Maximum Y that Dot will Spawn
@@ -58,7 +58,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	public float xInterval; //How much X Dist Camera needs to cover before Spawning the next few dots
 	public float xRemainder; //How much X Dist it exceeded from its X Interval
 	public float lastXSpawn; //Last X Position that Spawned the Dots
-	public Vector2 minMaxXInterval, minMaxXOffset; //Min and Max X Interval and Offset //No Longer Used
+	public Vector2 minMaxXInterval, minMaxXOffset; //Min and Max X Interval and Offset
 
 	[Header("For Player Spawn")]
 	public Transform playerSpawnPos;
@@ -118,7 +118,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 				{
 					timeStamp += Time.fixedDeltaTime;
 
-					if (timeStamp >= 30)
+					if (timeStamp >= 15)
 					{
 						if (increaseAllDiff) photonView.RPC("IncreaseDifficultyAll", RpcTarget.AllBuffered, cohesive);
 						else
@@ -310,6 +310,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 		this.lastXSpawn = lastXSpawn;
 	}
 
+	//Testing Different Difficulty Algorithms
 	[PunRPC]
 	void IncreaseDifficultyAll(bool cohesive) 
 	{
@@ -400,13 +401,13 @@ public class GameManager : MonoBehaviourPunCallbacks {
 		switch (playerNo)
 		{
 			case 1:
-				return Color.red;
+				return new Color(1, 0.37f, 0.68f, 1);
 			case 2:
-				return Color.blue;
+				return new Color(0.37f, 0.68f, 1, 1);
 			case 3:
-				return Color.green;
+				return new Color(0.21f, 1, 0.60f, 1);
 			case 4:
-				return Color.yellow;
+				return new Color(1, 1, 0.24f, 1);
 			default:
 				return Color.white;
 		}
