@@ -8,6 +8,7 @@ using TMPro;
 
 using Photon.Pun;
 using Photon.Pun.UtilityScripts;
+using Photon.Realtime;
 
 public class PlayerController : MonoBehaviourPunCallbacks 
 {
@@ -360,10 +361,12 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		}
 	}
 
-	public override void OnLeftRoom() 
+	public override void OnDisconnected(DisconnectCause cause)
 	{
-		base.OnLeftRoom();
-		CutLine();
-		Death();
+		if (!GameManager.inst.gameEnded)
+		{
+			CutLine();
+			Death();
+		}
 	}
 }

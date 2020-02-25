@@ -87,7 +87,7 @@ public class UIManager : MonoBehaviour
 
 	void HidePlayersNickname()
 	{
-		player.HideIdentifierAnim();
+		player.photonView.RPC("HideIdentifierAnim", RpcTarget.AllBuffered);
 	}
 	#endregion
 

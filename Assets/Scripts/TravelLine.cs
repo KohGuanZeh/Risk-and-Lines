@@ -59,7 +59,7 @@ public class TravelLine : MonoBehaviour, IPooledObject
 		playerRefId = viewId;
 
 		line.positionCount = 2;
-		line.startColor = line.endColor = GameManager.GetCharacterColor(playerNo);
+		line.startColor = line.endColor = GameManager.GetCharacterColor(playerNo , 0.8f);
 		for (int i = 0; i < line.positionCount; i++) line.SetPosition(i, pos);
 		greatestX = pos.x;
 		UpdateDotPosArray();
