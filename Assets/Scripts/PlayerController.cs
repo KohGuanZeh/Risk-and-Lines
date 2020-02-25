@@ -55,7 +55,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		blinkCd = maxCdTime;
 		gm.photonView.RPC("QueueGameStart", RpcTarget.AllBuffered);
 
-		photonView.RPC("SetIdentifierColor", RpcTarget.AllBuffered);
+		photonView.RPC("SetIdentiferColor", RpcTarget.AllBuffered);
 
 		shakeDuration = 0f;
 		setShakeDuration = 0.2f;

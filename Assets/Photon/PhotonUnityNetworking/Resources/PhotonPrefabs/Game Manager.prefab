@@ -151,6 +151,7 @@ MonoBehaviour:
   lastXSpawn: 0
   minMaxXInterval: {x: 6, y: 10}
   minMaxXOffset: {x: 0, y: 3}
+  nextSpawnTime: 0
   playerSpawnPos: {fileID: 831214271}
   presets:
   - {fileID: 21300000, guid: 705f62c5b387c44499359caf711fa515, type: 3}
