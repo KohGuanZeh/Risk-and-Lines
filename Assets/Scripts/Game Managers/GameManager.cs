@@ -448,6 +448,32 @@ public class GameManager : MonoBehaviourPunCallbacks {
 		PlayerPrefs.DeleteKey("Lobby State");
 	}
 
+	public override void OnDisconnected(DisconnectCause cause)
+	{
+		if (!GameManager.inst.gameEnded)
+		{
+			int idx = System.Array.IndexOf(playerInfos, playerInfos.Where(info => info.actorId == PhotonNetwork.LocalPlayer.ActorNumber).First());
+			
+			if (playerInfos[idx].deathTime <= 0)
+			{
+				int playersLeft = playersAlive - 1;
+				photonView.RPC("UpdateDeadPlayersOnDisconnect", RpcTarget.AllBuffered, playersLeft, playerInfos[idx].actorId, totalTime);
+			}
+		}
+	}
+
+	[PunRPC]
+	void UpdateDeadPlayersOnDisconnect(int playersLeft, int actorNumber, float timeSurvived)
+	{
+		playersAlive = playersLeft;
+		UpdateLeaderboard(actorNumber, timeSurvived);
+
+		if (playersAlive > 1) return;
+
+		EndGame();
+		UIManager.inst.UpdateLeaderboard();
+	}
+
 	#region ExtraUtilities
 	public static Color GetCharacterColor(int playerNo, float alpha = 1)
 	{
