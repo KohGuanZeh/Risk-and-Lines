@@ -113,6 +113,7 @@ public class Matchmake : MonoBehaviourPunCallbacks
 
 	public override void OnDisconnected(DisconnectCause cause)
 	{
+		PhotonNetwork.AutomaticallySyncScene = false;
 		ChatManager.inst.ClearChat();
 		if (PhotonNetwork.CurrentRoom != null) LeaveRoom();
 		PhotonNetwork.Reconnect();
@@ -228,20 +229,21 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		{
 			if (playersReady.Count != PhotonNetwork.CurrentRoom.PlayerCount - 1) return; //Master will not be registered under Ready
 			PhotonNetwork.CurrentRoom.IsOpen = false;
+			PhotonNetwork.AutomaticallySyncScene = true;
 			photonView.RPC("LoadSceneForAll", RpcTarget.All, 2); //LoadingScreen.inst.LoadScene(2, false);
-																 //PhotonNetwork.LoadLevel(2);
-																 // play button sound
+
 			ButtonSoundManager.inst.PlaySound(ButtonSoundManager.inst.startGameSound);
 		}
 		else
 		{
 			isReady = !isReady;
+			PhotonNetwork.AutomaticallySyncScene = isReady;
 			startReadyButtonTxt.text = isReady ? "Cancel" : "Ready";
 			photonView.RPC("SendReadyUnready", RpcTarget.AllBuffered, isReady, PhotonNetwork.LocalPlayer.ActorNumber);
 
 			string msg = string.Format(isReady ? "{0} is ready." : "{0} needs more time to prepare.", PhotonNetwork.LocalPlayer.NickName);
 			ChatManager.inst.photonView.RPC("SendAutomatedMsg", RpcTarget.AllBuffered, msg, PhotonNetwork.LocalPlayer.GetPlayerNumber());
-			// play button sound
+
 			ButtonSoundManager.inst.PlaySound(ButtonSoundManager.inst.buttonSound);
 		}
 	}
@@ -255,7 +257,13 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		PlayerList playerList = playerLists.Find(x => x.playerId == playerId); 
 		if (playerList) playerList.SetReadyUnreadyIcon(ready);
 
-		if (playersReady.Count == PhotonNetwork.CurrentRoom.PlayerCount - 1 && playersReady.Count > 0)
+		if (PhotonNetwork.IsMasterClient)
+		{
+			if (playersReady.Count == PhotonNetwork.CurrentRoom.PlayerCount - 1 && playersReady.Count > 0) startReadyButton.interactable = true;
+			else startReadyButton.interactable = false;
+		}
+
+		/*if (playersReady.Count == PhotonNetwork.CurrentRoom.PlayerCount - 1 && playersReady.Count > 0)
 		{
 			if (PhotonNetwork.IsMasterClient) startReadyButton.interactable = true;
 			PhotonNetwork.AutomaticallySyncScene = true;
@@ -264,7 +272,7 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		{
 			if (PhotonNetwork.IsMasterClient) startReadyButton.interactable = false;
 			PhotonNetwork.AutomaticallySyncScene = false;
-		}
+		}*/
 	}
 
 	[PunRPC]
@@ -345,6 +353,7 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		// play button sound
 		ButtonSoundManager.inst.PlaySound(ButtonSoundManager.inst.buttonSound);
 
+		PhotonNetwork.AutomaticallySyncScene = false;
 		PhotonNetwork.LeaveRoom();
 		PhotonNetwork.LeaveLobby();
 

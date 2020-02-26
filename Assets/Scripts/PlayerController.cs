@@ -49,11 +49,10 @@ public class PlayerController : MonoBehaviourPunCallbacks
 	{
 		gm = GameManager.inst;
 		gui = UIManager.inst;
-		Debug.LogWarning(gui.name);
 		gui.AssignPlayerController(this); //May need photonView.IsMine
 		rb = GetComponent<Rigidbody2D>();
-
 		blinkCd = maxCdTime;
+
 		gm.QueueGameStart();
 
 		photonView.RPC("SetIdentiferColor", RpcTarget.AllBuffered);
