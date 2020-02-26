@@ -113,6 +113,7 @@ public class Matchmake : MonoBehaviourPunCallbacks
 
 	public override void OnDisconnected(DisconnectCause cause)
 	{
+		ChatManager.inst.ClearChat();
 		if (PhotonNetwork.CurrentRoom != null) LeaveRoom();
 		PhotonNetwork.Reconnect();
 	}

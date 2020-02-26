@@ -170,14 +170,15 @@ public class UIManager : MonoBehaviour
 	}
 
 	//Initially Planned to have Rematch but Proved to be too Difficult
-	public void BackToWaitRoom()
+	/*public void BackToWaitRoom()
 	{
 		PlayerPrefs.SetInt("Lobby State", 2);
 		LoadingScreen.inst.LoadScene(1);
-	}
+	}*/
 
 	public void BackToLobby()
 	{
+		LoadingScreen.inst.canFadeOut = false; //RPC if called late can Set it back to true
 		PlayerPrefs.SetInt("Lobby State", 1);
 		LoadingScreen.inst.LoadScene(1);
 	}
