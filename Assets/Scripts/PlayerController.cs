@@ -84,7 +84,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		}
 	}
 
-	#region Iput Controls
+	#region Input Controls
 	void TouchControls() 
 	{
 		Touch touch = Input.GetTouch(0); // this is for the first finger that entered the screen
@@ -105,6 +105,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
 						targetDot = travelDot;
 
 						SfxManager.inst.PlaySfx(SfxManager.inst.Sfx.lockSound);// play the lock sound
+
+						transform.up = targetDot.transform.position - transform.position;
 
 						if (currentTravelLine) currentTravelLine.photonView.RPC("AddNewPoint", RpcTarget.AllBuffered, transform.position);
 						else {
