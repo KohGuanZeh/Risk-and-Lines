@@ -115,7 +115,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
 			//Only Master Client will handle Camera Movement Value Changes and Dot Spawning
 			if (PhotonNetwork.IsMasterClient)
 			{
-				#region Temp Difficulty Testing
 				if (gameStarted && !reachedMaxDifficulty)
 				{
 					timeStamp += Time.fixedDeltaTime;
@@ -127,7 +126,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
 					}
 					else photonView.RPC("RegisterTimeStamp", RpcTarget.OthersBuffered, timeStamp, false);
 				}
-				#endregion
 				SpawnDots();
 			}
 		}

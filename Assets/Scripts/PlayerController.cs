@@ -270,9 +270,10 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 		SfxManager.inst.PlaySfx(SfxManager.inst.Sfx.deathSound);
 
-		Debug.LogError("Death is Called");
+		//Debug.LogError("Death is Called");
 
 		SetCamShakeDuration();
+		ObjectPooling.inst.SpawnFromPool("Death Particles", transform.position, Quaternion.identity);
 		gameObject.SetActive(false);
 
 		//Check Player Count. If Player Count <= 1. Trigger End Screen
@@ -287,8 +288,6 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		gm.photonView.RPC("UpdateLeaderboard", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.ActorNumber, timeSurvived);
 		photonView.RPC("SendDeathEvent", RpcTarget.OthersBuffered, gm.playersAlive, ignoreGameEnd);
 
-		ObjectPooling.inst.SpawnFromPool("Death Particles", transform.position, Quaternion.identity);
-
 		if (ignoreGameEnd || gm.playersAlive > 1) return;
 
 		gm.EndGame();
@@ -300,7 +299,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
 	{
 		SfxManager.inst.PlaySfx(SfxManager.inst.Sfx.deathSound);
 		gameObject.SetActive(false);
-		gm.playersAlive = playersAlive;
+		//gm.playersAlive = playersAlive;
+		gm.playersAlive--;
 
 		if (ignoreGameEnd || gm.playersAlive > 1) return;
 
