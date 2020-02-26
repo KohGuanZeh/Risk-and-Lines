@@ -76,7 +76,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 				doubleTapThreshold = Mathf.Max(doubleTapThreshold - Time.deltaTime, 0);
 				if (Input.touchCount > 0) TouchControls();
-				//MouseControls();
+				MouseControls();
 				TravelControl();
 
 				if (transform.position.x < gm.CamLeftBounds) Death();
