@@ -60,7 +60,6 @@ public class UIManager : MonoBehaviour
 		}
 
 		gm = GameManager.inst;
-		PhotonNetwork.AutomaticallySyncScene = false;
 	}
 
 	public void AssignPlayerController(PlayerController player)

@@ -54,7 +54,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		rb = GetComponent<Rigidbody2D>();
 
 		blinkCd = maxCdTime;
-		gm.photonView.RPC("QueueGameStart", RpcTarget.AllBuffered);
+		gm.QueueGameStart();
 
 		photonView.RPC("SetIdentiferColor", RpcTarget.AllBuffered);
 
@@ -362,8 +362,11 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 	private void OnApplicationQuit()
 	{
-		CutLine();
-		Death();
-		PhotonNetwork.SendAllOutgoingCommands();
+		if (gameObject.activeInHierarchy && !gm.gameEnded)
+		{
+			CutLine();
+			Death();
+			PhotonNetwork.SendAllOutgoingCommands();
+		}
 	}
 }

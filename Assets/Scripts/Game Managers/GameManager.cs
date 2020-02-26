@@ -174,12 +174,13 @@ public class GameManager : MonoBehaviourPunCallbacks {
 	}
 
 	[PunRPC]
-	void QueueGameStart()
+	public void QueueGameStart()
 	{
 		playersLoaded++;
 		if (playersLoaded != PhotonNetwork.PlayerList.Length) return;
 
 		LoadingScreen.inst.canFadeOut = true;
+		PhotonNetwork.AutomaticallySyncScene = false;
 		UIManager.inst.TriggerGameStart();
 	}
 
