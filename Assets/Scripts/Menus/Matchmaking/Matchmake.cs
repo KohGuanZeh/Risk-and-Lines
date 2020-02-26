@@ -130,7 +130,7 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		foreach (Player player in players) ListPlayer(player);
 
 		string msg = string.Format("{0} has joined the Room.", PhotonNetwork.LocalPlayer.NickName);
-		ChatManager.inst.photonView.RPC("SendAutomatedMsg", RpcTarget.AllBuffered, msg, PhotonNetwork.LocalPlayer.GetPlayerNumber());
+		ChatManager.inst.photonView.RPC("SendAutomatedMsg", RpcTarget.All, msg, PhotonNetwork.LocalPlayer.GetPlayerNumber());
 
 		SetStartReadyButton();
 	}
@@ -160,7 +160,7 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		ListPlayer(newPlayer, true);
 		if (PhotonNetwork.IsMasterClient)
 		{
-			photonView.RPC("SendCurrentReadyList", newPlayer, playersReady.ToArray());
+			//photonView.RPC("SendCurrentReadyList", newPlayer, playersReady.ToArray());
 			startReadyButton.interactable = false;
 		}
 	}
@@ -171,19 +171,22 @@ public class Matchmake : MonoBehaviourPunCallbacks
 		for (int i = 0; i < players.Length; i++) players[i].SetPlayerNumber(i + 1);
 
 		RemovePlayerFromListing(otherPlayer.ActorNumber);
+
 		foreach (PlayerList playerList in playerLists)
 		{
+			if (playerList.playerId == PhotonNetwork.MasterClient.ActorNumber) playerList.SetMasterClientIcon(true);
 			playerList.UpdateKickButtonDisplay();
 			playerList.UpdatePlayerColor();
 			//playerList.UpdatePlayerColor(PhotonNetwork.CurrentRoom.GetPlayer(playerList.playerId).GetPlayerNumber());
 		}
 
-		SetStartReadyButton();
+		playersReady.Remove(PhotonNetwork.MasterClient.ActorNumber); //Always Removes Master
 
 		if (PhotonNetwork.IsMasterClient)
 		{
+			SetStartReadyButton();
 			string msg = string.Format("{0} has left the Room.", otherPlayer.NickName);
-			ChatManager.inst.photonView.RPC("SendAutomatedMsg", RpcTarget.AllBuffered, msg, otherPlayer.GetPlayerNumber());
+			ChatManager.inst.photonView.RPC("SendAutomatedMsg", RpcTarget.All, msg, otherPlayer.GetPlayerNumber());
 
 			photonView.RPC("SendReadyUnready", RpcTarget.AllBuffered, false, otherPlayer.ActorNumber);
 		} 
@@ -239,10 +242,11 @@ public class Matchmake : MonoBehaviourPunCallbacks
 			isReady = !isReady;
 			PhotonNetwork.AutomaticallySyncScene = isReady;
 			startReadyButtonTxt.text = isReady ? "Cancel" : "Ready";
+			if (isReady) PhotonNetwork.OpCleanActorRpcBuffer(PhotonNetwork.LocalPlayer.ActorNumber);
 			photonView.RPC("SendReadyUnready", RpcTarget.AllBuffered, isReady, PhotonNetwork.LocalPlayer.ActorNumber);
 
 			string msg = string.Format(isReady ? "{0} is ready." : "{0} needs more time to prepare.", PhotonNetwork.LocalPlayer.NickName);
-			ChatManager.inst.photonView.RPC("SendAutomatedMsg", RpcTarget.AllBuffered, msg, PhotonNetwork.LocalPlayer.GetPlayerNumber());
+			ChatManager.inst.photonView.RPC("SendAutomatedMsg", RpcTarget.All, msg, PhotonNetwork.LocalPlayer.GetPlayerNumber());
 
 			ButtonSoundManager.inst.PlaySound(ButtonSoundManager.inst.buttonSound);
 		}
@@ -262,17 +266,6 @@ public class Matchmake : MonoBehaviourPunCallbacks
 			if (playersReady.Count == PhotonNetwork.CurrentRoom.PlayerCount - 1 && playersReady.Count > 0) startReadyButton.interactable = true;
 			else startReadyButton.interactable = false;
 		}
-
-		/*if (playersReady.Count == PhotonNetwork.CurrentRoom.PlayerCount - 1 && playersReady.Count > 0)
-		{
-			if (PhotonNetwork.IsMasterClient) startReadyButton.interactable = true;
-			PhotonNetwork.AutomaticallySyncScene = true;
-		}
-		else
-		{
-			if (PhotonNetwork.IsMasterClient) startReadyButton.interactable = false;
-			PhotonNetwork.AutomaticallySyncScene = false;
-		}*/
 	}
 
 	[PunRPC]

@@ -55,13 +55,14 @@ public class PlayerList : Listable
             PhotonNetwork.CloseConnection(player);
 
             string msg = string.Format("{0} has been Kicked form the Room.", player.NickName);
-            ChatManager.inst.photonView.RPC("SendAutomatedMsg", RpcTarget.AllBuffered, msg, player.GetPlayerNumber());
+            ChatManager.inst.photonView.RPC("SendAutomatedMsg", RpcTarget.All, msg, player.GetPlayerNumber());
         } 
     }
 
     public void SetMasterClientIcon(bool isMaster)
     {
         readyIcon.sprite = Matchmake.inst.masterAndClientIcon[isMaster ? 0 : 1];
+        if (isMaster) readyIcon.gameObject.SetActive(true);
     }
 
     public void SetReadyUnreadyIcon(bool isReady)
