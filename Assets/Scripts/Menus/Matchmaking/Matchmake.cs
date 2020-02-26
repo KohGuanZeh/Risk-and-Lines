@@ -188,7 +188,7 @@ public class Matchmake : MonoBehaviourPunCallbacks
 			string msg = string.Format("{0} has left the Room.", otherPlayer.NickName);
 			ChatManager.inst.photonView.RPC("SendAutomatedMsg", RpcTarget.All, msg, otherPlayer.GetPlayerNumber());
 
-			photonView.RPC("SendReadyUnready", RpcTarget.AllBuffered, false, otherPlayer.ActorNumber);
+			photonView.RPC("SendReadyUnready", RpcTarget.All, false, otherPlayer.ActorNumber);
 		} 
 	}
 	#endregion
