@@ -75,7 +75,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 				doubleTapThreshold = Mathf.Max(doubleTapThreshold - Time.deltaTime, 0);
 				if (Input.touchCount > 0) TouchControls();
-				MouseControls();
+				//MouseControls();
 				TravelControl();
 
 				if (transform.position.x < gm.CamLeftBounds) Death();
@@ -200,7 +200,6 @@ public class PlayerController : MonoBehaviourPunCallbacks
 		CutLine(); //Need to be on top before Target Dot is Set to Null
 
 		ObjectPooling.inst.SpawnFromPool("Blink Particles", transform.position, Quaternion.identity);
-		PhotonNetwork.SendAllOutgoingCommands();
 
 		transform.position = storedDot.transform.position;
 		targetDot.photonView.RPC("LockTravelDot", RpcTarget.AllBuffered, -1, false);
@@ -288,8 +287,6 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 		gm.photonView.RPC("UpdateLeaderboard", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.ActorNumber, timeSurvived);
 		photonView.RPC("SendDeathEvent", RpcTarget.OthersBuffered, gm.playersAlive, ignoreGameEnd);
-
-		PhotonNetwork.SendAllOutgoingCommands();
 
 		if (ignoreGameEnd || gm.playersAlive > 1) return;
 
