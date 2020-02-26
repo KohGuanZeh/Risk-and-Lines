@@ -368,4 +368,17 @@ public class PlayerController : MonoBehaviourPunCallbacks
 			PhotonNetwork.SendAllOutgoingCommands();
 		}
 	}
+
+	private void OnApplicationPause(bool pause)
+	{
+		if (pause)
+		{
+			if (gameObject.activeInHierarchy && !gm.gameEnded)
+			{
+				CutLine();
+				Death();
+				PhotonNetwork.SendAllOutgoingCommands();
+			}
+		}
+	}
 }
